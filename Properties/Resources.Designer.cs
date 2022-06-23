@@ -61,8 +61,7 @@ namespace AlgebraProjekt.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to === mXparser ===
-        ///
+        ///   Looks up a localized string similar to ====== mXparser ======
         ///Simplified BSD License
         ///Copyright 2010 - 2020 Mariusz Gromada. All rights reserved.
         ///You may use this software under the condition of Simplified BSD License.
@@ -70,11 +69,11 @@ namespace AlgebraProjekt.Properties {
         ///modification, are permitted provided that the following conditions are met:
         ///1. Redistributions of source code must retain the above copyright notice,
         ///   this list of conditions and the following disclaimer.
-        ///2. Redistributions in binary form must reproduce the ab [rest of string was truncated]&quot;;.
+        ///2. Redistributions in binary form must reproduce th [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string ParserLic {
+        internal static string LICENSE {
             get {
-                return ResourceManager.GetString("ParserLic", resourceCulture);
+                return ResourceManager.GetString("LICENSE", resourceCulture);
             }
         }
     }

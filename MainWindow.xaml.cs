@@ -572,7 +572,7 @@ namespace AlgebraProjekt
         private void Licencje(object obiekt, RoutedEventArgs argumenty)
         {
 
-            MessageBox.Show(Properties.Resources.ParserLic, "Licencje autorów trzecich i programu");
+            MessageBox.Show(Properties.Resources.LICENSE, "Licencje autorów trzecich i programu");
 
         }
 

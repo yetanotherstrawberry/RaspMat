@@ -1,4 +1,4 @@
-﻿====== mXparser ======
+====== mXparser ======
 Simplified BSD License
 Copyright 2010 - 2020 Mariusz Gromada. All rights reserved.
 You may use this software under the condition of Simplified BSD License.
@@ -36,7 +36,7 @@ Science Blog:
 - https://mathspace.pl
 ====== Kalkulator macierzy ======
 BSD 2-Clause License
-Copyright (c) 2021-2022, Michał Malinowski
+Copyright (c) 2021-2022, yetanotherstrawberry
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 1. Redistributions of source code must retain the above copyright notice, this
@@ -55,7 +55,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ====== Algorytm ======
-Algorytm eliminacji Gaussa jest oparty na następujących źródłach:
+Algorytm eliminacji Gaussa jest oparty na nast?puj?cych ?r�d?ach:
 https://en.wikipedia.org/wiki/Gaussian_elimination#Pseudocode
 na licencji: https://creativecommons.org/licenses/by-sa/3.0/
 https://apollo.astro.amu.edu.pl/PAD/pmwiki.php?n=Dybol.DydaktykaEliminacjaGaussa
