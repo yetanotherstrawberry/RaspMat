@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Kalkulator macierzy" MinHeight="500" MinWidth="850">
+        Title="Kalkulator macierzy" MinHeight="520" MinWidth="850">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250" />
@@ -82,8 +82,12 @@
                 </GroupBox>
             </StackPanel>
             <StackPanel VerticalAlignment="Bottom">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Licencje" Click="Licencje" Width="110" Height="20" Margin="2" />
+                <StackPanel>
+                    <Button HorizontalAlignment="Center" Content="O programie" Click="Readme" Width="90" Height="20" Margin="2" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Licencja" Click="Licencja" Width="70" Height="20" Margin="2" />
+                    <Button Content="Licencje pakietów trzecich" Click="Licencje" Width="150" Height="20" Margin="2" />
+                </StackPanel>
                 </StackPanel>
                 <GroupBox Header="Podpowiedzi" HorizontalAlignment="Stretch">
                     <CheckBox Content="Pokaż wykonywanie algorytmów" VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="TrybPokazu" IsChecked="False" Margin="2" />

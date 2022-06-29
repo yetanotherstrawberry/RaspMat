@@ -61,19 +61,46 @@ namespace AlgebraProjekt.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ====== mXparser ======
-        ///Simplified BSD License
-        ///Copyright 2010 - 2020 Mariusz Gromada. All rights reserved.
-        ///You may use this software under the condition of Simplified BSD License.
+        ///   Looks up a localized string similar to The MIT License (MIT)
+        ///
+        ///Copyright (c) 2007 James Newton-King
+        ///
+        ///Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+        ///
+        ///The above c [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string LICENCJE {
+            get {
+                return ResourceManager.GetString("LICENCJE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BSD 2-Clause License
+        ///Copyright (c) 2020-2022, yetanotherstrawberry
+        ///All rights reserved.
+        ///
         ///Redistribution and use in source and binary forms, with or without
         ///modification, are permitted provided that the following conditions are met:
-        ///1. Redistributions of source code must retain the above copyright notice,
-        ///   this list of conditions and the following disclaimer.
-        ///2. Redistributions in binary form must reproduce th [rest of string was truncated]&quot;;.
+        ///
+        ///1. Redistributions of source code must retain the above copyright notice, this
+        ///   list of conditions and the following disclaimer.
+        ///
+        ///2. Redistributions in binary form must reproduce the above copyright notice,
+        ///   this list of conditions and the following disclaimer in  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string LICENSE {
             get {
                 return ResourceManager.GetString("LICENSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string README {
+            get {
+                return ResourceManager.GetString("README", resourceCulture);
             }
         }
     }

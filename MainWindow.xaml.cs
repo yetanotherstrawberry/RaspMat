@@ -2,6 +2,7 @@
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using org.mariuszgromada.math.mxparser;
 using System;
 using System.ComponentModel;
 using System.Data;
@@ -260,6 +261,8 @@ namespace AlgebraProjekt
 
             InitializeComponent();
             ZablokujInterface();
+
+            org.mariuszgromada.math.mxparser.License.iConfirmNonCommercialUse("yetanotherstrawberry");
 
         }
 
@@ -569,10 +572,24 @@ namespace AlgebraProjekt
 
         }
 
+        private void Readme(object obiekt, RoutedEventArgs argumenty)
+        {
+
+            MessageBox.Show(Properties.Resources.README, "Opis/pomoc programu");
+
+        }
+        
+        private void Licencja(object obiekt, RoutedEventArgs argumenty)
+        {
+
+            MessageBox.Show(Properties.Resources.LICENSE, "Licencja programu");
+
+        }
+
         private void Licencje(object obiekt, RoutedEventArgs argumenty)
         {
 
-            MessageBox.Show(Properties.Resources.LICENSE, "Licencje autorów trzecich i programu");
+            MessageBox.Show("=== mXparser ===" + Environment.NewLine + mXparser.LICENSE.Replace('\n', ' ') + Environment.NewLine + "=== Newtonsoft.Json ===" + Environment.NewLine + Properties.Resources.LICENCJE, "Licencje autorów trzecich");
 
         }
 
