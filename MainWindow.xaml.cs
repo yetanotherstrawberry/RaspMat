@@ -17,7 +17,7 @@ namespace AlgebraProjekt
     public partial class MainWindow : Window
     {
 
-        private const string guzikWprowadzanieTekt = "Wprowadź macierz", zerowaGuzikTekst = "Edytuj zerową", bladWyznacznik = "Wyznacznik macierzy jest równy 0, zatem nie można jej odwrócić.";
+        private const string guzikWprowadzanieTekst = "Wprowadź macierz", zerowaGuzikTekst = "Edytuj zerową", bladWyznacznik = "Wyznacznik macierzy jest równy 0, zatem nie można jej odwrócić.";
 
         private Macierz macierz;
         private DataTable wprowadzanie = null;
@@ -78,7 +78,7 @@ namespace AlgebraProjekt
         {
 
             ZablokujInterface();
-            WprowadzGuzik.Content = guzikWprowadzanieTekt;
+            WprowadzGuzik.Content = guzikWprowadzanieTekst;
             ZerowaGuzik.Content = zerowaGuzikTekst;
             wprowadzanie = null;
             WprowadzGuzik.IsEnabled = true;
@@ -190,7 +190,7 @@ namespace AlgebraProjekt
                     wprowadzanie = null;
                     OdswiezMacierz();
                     ZerowaGuzik.IsEnabled = true;
-                    WprowadzGuzik.Content = guzikWprowadzanieTekt;
+                    WprowadzGuzik.Content = guzikWprowadzanieTekst;
 
                 }
 
@@ -475,7 +475,7 @@ namespace AlgebraProjekt
                     OdswiezMacierz();
 
                     ZerowaGuzik.IsEnabled = true;
-                    WprowadzGuzik.Content = guzikWprowadzanieTekt;
+                    WprowadzGuzik.Content = guzikWprowadzanieTekst;
                     WprowadzGuzik.IsEnabled = true;
                     ZerowaGuzik.Content = zerowaGuzikTekst;
 
@@ -503,13 +503,13 @@ namespace AlgebraProjekt
                 bool czyPokaz = (bool)TrybPokazu.IsChecked;
 
                 if (czyPokaz)
-                    if (Interaction.MsgBox("Dopisz I z prawej strony macierzy.\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Odwracanie macierzy") == MsgBoxResult.No)
+                    if (Interaction.MsgBox("Dopisz I z prawej strony macierzy." + Environment.NewLine + "Czy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Odwracanie macierzy") == MsgBoxResult.No)
                         return;
                 macierz = Macierz.Dopisana(macierz, true);
                 OdswiezMacierz();
 
                 if (czyPokaz)
-                    if (Interaction.MsgBox("Wykonaj całkowitą redukcję.\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Odwracanie macierzy") == MsgBoxResult.No)
+                    if (Interaction.MsgBox("Wykonaj całkowitą redukcję." + Environment.NewLine + "Czy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Odwracanie macierzy") == MsgBoxResult.No)
                         return;
                 EliminacjaGaussa(null, argumenty);
                 OdswiezMacierz();
@@ -549,7 +549,7 @@ namespace AlgebraProjekt
                 }
 
                 if (czyPokaz)
-                    if (Interaction.MsgBox("Usuń I z lewej strony.\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Odwracanie macierzy") == MsgBoxResult.No)
+                    if (Interaction.MsgBox("Usuń I z lewej strony." + Environment.NewLine + "Czy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Odwracanie macierzy") == MsgBoxResult.No)
                         return;
                 macierz = Macierz.Obcieta(macierz, true);
                 OdswiezMacierz();
