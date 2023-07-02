@@ -7,12 +7,12 @@ using System.Windows;
 // Ogólne informacje o zestawie są kontrolowane poprzez następujący 
 // zestaw atrybutów. Zmień wartości tych atrybutów, aby zmodyfikować informacje
 // powiązane z zestawem.
-[assembly: AssemblyTitle("AlgebraProjekt")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("RaspMat")]
+[assembly: AssemblyDescription("User interface for performing Matrix operations.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AlgebraProjekt")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyProduct("RaspMat")]
+[assembly: AssemblyCopyright("Copyright © yetanotherstrawberry 2020-2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,6 @@ using System.Windows;
 // Możesz określić wszystkie wartości lub użyć domyślnych numerów kompilacji i poprawki
 // przy użyciu symbolu „*”, tak jak pokazano poniżej:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0.0")]
+[assembly: NeutralResourcesLanguage("en-US")]

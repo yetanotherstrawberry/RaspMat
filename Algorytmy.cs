@@ -1,219 +1,20 @@
-﻿using Arytmetyka;
-using Microsoft.VisualBasic;
-using org.mariuszgromada.math.mxparser;
+﻿using Microsoft.VisualBasic;
+using RaspMat.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows;
 
-namespace AlgebraProjekt
+namespace RaspMat.Views
 {
-
-    public partial class MainWindow : Window
+        /*
+    public partial class GaussianWindow : Window
     {
 
         private const string bladPodalgorytmu = "Algorytm podrzędny został zakończony zanim algorytm wyższego poziomu skończył pracę.";
 
-        // https://en.wikipedia.org/wiki/Gaussian_elimination#Pseudocode
-        // https://apollo.astro.amu.edu.pl/PAD/pmwiki.php?n=Dybol.DydaktykaEliminacjaGaussa
-        private void EliminacjaGaussa(object obiekt, RoutedEventArgs argumenty)
-        {
 
-            bool czyPokaz = (bool)TrybPokazu.IsChecked;
-
-            for (long i = 0, kol = 0; i < macierz.Wiersze() && kol < macierz.Kolumny(); i++, kol++)
-            {
-
-                while (kol < macierz.Kolumny() && macierz.Tablica()[i, kol].Licznik() == 0)
-                {
-
-                    bool czySameZera = true;
-
-                    long j;
-                    for (j = i; j < macierz.Wiersze(); j++)
-                        if (macierz.Tablica()[j, kol].Licznik() != 0)
-                        {
-                            czySameZera = false;
-                            break;
-                        }
-
-                    if (czySameZera) kol++;
-
-                    if (j != i && i < macierz.Wiersze() && j < macierz.Wiersze())
-                    {
-
-                        if (czyPokaz)
-                            if (Interaction.MsgBox("Zamień wiersze " + i.ToString() + " i " + j.ToString() + ".\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Eliminacja Gaussa") == MsgBoxResult.No)
-                                if (obiekt != null)
-                                    return;
-                                else
-                                    throw new ConstraintException(bladPodalgorytmu);
-
-                        macierz = Macierz.MacierzZamianyWierszy(macierz, i, j) * macierz;
-                        OdswiezMacierz();
-
-                    }
-
-                }
-
-                if (kol < macierz.Kolumny())
-                {
-
-                    if (czyPokaz && !new Ulamek(macierz.Tablica()[i, kol].Mianownik(), macierz.Tablica()[i, kol].Licznik()).Equals(new Ulamek(1, 1)))
-                        if (Interaction.MsgBox("Pomnóż wiersz " + i.ToString() + " przez (" + new Ulamek(macierz.Tablica()[i, kol].Mianownik(), macierz.Tablica()[i, kol].Licznik()).ToString() + ").\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Eliminacja Gaussa") == MsgBoxResult.No)
-                            if (obiekt != null)
-                                return;
-                            else
-                                throw new ConstraintException(bladPodalgorytmu);
-
-                    macierz = Macierz.MacierzMnozeniaWiersza(macierz, i, new Ulamek(macierz.Tablica()[i, kol].Mianownik(), macierz.Tablica()[i, kol].Licznik())) * macierz;
-                    OdswiezMacierz();
-
-                    Ulamek przez_co_mnozyc = new Ulamek(macierz.Tablica()[i, kol].Mianownik(), macierz.Tablica()[i, kol].Licznik());
-
-                    for (long j = i + 1; j < macierz.Wiersze(); j++)
-                    {
-
-                        Ulamek co_mnozyc = new Ulamek(macierz.Tablica()[j, kol].Licznik(), macierz.Tablica()[j, kol].Mianownik());
-                        Ulamek mnoznik = co_mnozyc * przez_co_mnozyc * new Ulamek(-1, 1);
-
-                        if (czyPokaz && !mnoznik.Equals(new Ulamek(0, 1)))
-                            if (Interaction.MsgBox("Dodaj do wiersza " + j.ToString() + " wiersz " + i.ToString() + " pomnożony przez (" + mnoznik.ToString() + ").\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Eliminacja Gaussa") == MsgBoxResult.No)
-                                if (obiekt != null)
-                                    return;
-                                else
-                                    throw new ConstraintException(bladPodalgorytmu);
-
-                        macierz = Macierz.MacierzDodawaniaWierszy(macierz, j, i, mnoznik) * macierz;
-                        OdswiezMacierz();
-
-                    }
-
-                }
-
-            }
-
-            for (long i = macierz.Wiersze() - 1; i > 0; i--)
-            {
-
-                long kolumna_bez_zera = 0;
-
-                while (kolumna_bez_zera < macierz.Kolumny() && macierz.Tablica()[i, kolumna_bez_zera].Licznik() == 0) kolumna_bez_zera++;
-
-                if (kolumna_bez_zera == macierz.Kolumny()) continue;
-
-                for (long x = i - 1; x >= 0; x--)
-                {
-
-                    Ulamek skalar = (new Ulamek(macierz.Tablica()[x, kolumna_bez_zera].Licznik(), macierz.Tablica()[x, kolumna_bez_zera].Mianownik()) / new Ulamek(macierz.Tablica()[i, kolumna_bez_zera].Licznik(), macierz.Tablica()[i, kolumna_bez_zera].Mianownik())) * new Ulamek(-1, 1);
-
-                    if (czyPokaz && !skalar.Equals(new Ulamek(0, 1)))
-                        if (Interaction.MsgBox("Dodaj do wiersza " + x.ToString() + " wiersz " + i.ToString() + " pomnożony przez (" + skalar.ToString() + ").\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Eliminacja Gaussa") == MsgBoxResult.No)
-                            if (obiekt != null)
-                                return;
-                            else
-                                throw new ConstraintException(bladPodalgorytmu);
-
-                    macierz = Macierz.MacierzDodawaniaWierszy(macierz, x, i, skalar) * macierz;
-                    OdswiezMacierz();
-
-                }
-
-            }
-
-            OdswiezMacierz();
-            if (czyPokaz) Interaction.MsgBox("Macierz jest w postaci całkowicie zredukowanej.", MsgBoxStyle.OkOnly, "Eliminacja Gaussa zakończona");
-
-        }
-
-        private void ZmianaBazy(object obiekt, RoutedEventArgs argumenty)
-        {
-
-            bool czyPokaz = (bool)TrybPokazu.IsChecked;
-
-            string tekst_z = Interaction.InputBox("Wprowadź bazę, z której chcesz przejść w formacie (1,2,3);(3,2,1).", "Baza B1", "(1,0,0);(1,1,0);(1,1,1)");
-            if (tekst_z.Length == 0) return;
-
-            string tekst_do = Interaction.InputBox("Wprowadź bazę, do której chcesz przejść w formacie (1,2,3);(3,2,1).", "Baza B2", "(1,1,7);(3,2,1);(0,0,1)");
-            if (tekst_do.Length == 0) return;
-
-            List<string[][]> temp_macierze_do_rozwiazania = new List<string[][]>();
-
-            foreach (string wektor_z in tekst_z.Split(';'))
-            {
-
-                List<string[]> temp = new List<string[]>();
-
-                foreach (string wektory_do in tekst_do.Split(';'))
-                    temp.Add((from wektor in wektory_do.Replace("(", "").Replace(")", "").Split(',') select wektor).ToArray());
-
-                temp.Add((from wektor in wektor_z.Replace("(", "").Replace(")", "").Split(',') select wektor).ToArray());
-
-                temp_macierze_do_rozwiazania.Add(temp.ToArray());
-
-                if (czyPokaz)
-                    if (Interaction.MsgBox("Należy przedstawić wektor (" + wektor_z + ") jako kombinację wektorów bazy {" + tekst_do + "} za pomocą macierzy, której kolumnami są poszczególne wektory.\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Eliminacja Gaussa") == MsgBoxResult.No)
-                        if (obiekt != null)
-                            return;
-                        else
-                            throw new ConstraintException(bladPodalgorytmu);
-
-            }
-
-            if (tekst_z.Split(';').Count() != tekst_do.Split(';').Count())
-                throw new ArgumentException("Bazy są z różnych przestrzeni.");
-
-            List<Macierz> macierze_do_rozwiazania = (from macierz in temp_macierze_do_rozwiazania select Macierz.Transpozycja(new Macierz(macierz))).ToList();
-
-            if (czyPokaz)
-                if (Interaction.MsgBox("Należy rozwiązać " + macierze_do_rozwiazania.Count() + " macierz/e(-y) za pomocą całkowitej eliminacji.\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Eliminacja Gaussa") == MsgBoxResult.No)
-                    if (obiekt != null)
-                        return;
-                    else
-                        throw new ConstraintException(bladPodalgorytmu);
-
-            List<Macierz> rozwiazane_macierze = new List<Macierz>();
-
-            foreach (Macierz macierz_do_rozwiazania in macierze_do_rozwiazania)
-            {
-
-                macierz = macierz_do_rozwiazania;
-
-                if (czyPokaz)
-                    if (Interaction.MsgBox("Należy rozwiązać następującą macierz:\n" + macierz_do_rozwiazania.ToString() + "\nskładającą się z wektorów bazy docelowej i jednego z wektorów z bazy pierwotnej w ostatniej kolumnie.\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Eliminacja Gaussa") == MsgBoxResult.No)
-                        if (obiekt != null)
-                            return;
-                        else
-                            throw new ConstraintException(bladPodalgorytmu);
-
-                EliminacjaGaussa(null, argumenty);
-
-                rozwiazane_macierze.Add(macierz);
-
-            }
-
-            List<string[]> ret = new List<string[]>();
-
-            foreach (Macierz rozwiazana_macierz in rozwiazane_macierze)
-            {
-
-                string[] wiersze = new string[rozwiazana_macierz.Wiersze()];
-
-                for (int i = 0; i < rozwiazana_macierz.Wiersze(); i++)
-                    wiersze[i] = rozwiazana_macierz.Tablica()[i, rozwiazana_macierz.Kolumny() - 1].ToString();
-
-                ret.Add(wiersze);
-
-            }
-
-            macierz = Macierz.Transpozycja(new Macierz(ret.ToArray()));
-            OdswiezMacierz();
-
-            if (czyPokaz)
-                Interaction.MsgBox("Wszystkie macierze zostały rozwiązane.\nUzyskane wyniki należy wstawić do kolumn nowej macierzy, która będzie macierzą przejścia z bazy B1 do B2.", MsgBoxStyle.OkOnly, "Macierz utworzona - koniec pracy");
-
-        }
 
         private void PrzeksztalcenieLiniowe(object obiekt, RoutedEventArgs argumenty)
         {
@@ -261,7 +62,7 @@ namespace AlgebraProjekt
 
                 }
 
-                List<Macierz> macierze_przejscia = new List<Macierz>();
+                List<Matrix> macierze_przejscia = new List<Matrix>();
 
                 for (int i = 0; i < wyniki.Length; i++)
                 {
@@ -273,45 +74,45 @@ namespace AlgebraProjekt
 
                     do_redukcji[baza_do.Length] = wyniki[i];
 
-                    macierze_przejscia.Add(Macierz.Transpozycja(new Macierz(do_redukcji)));
+                    macierze_przejscia.Add(Matrix.Transpose(new Matrix(do_redukcji)));
 
                 }
 
-                List<Macierz> rozwiazane_macierze = new List<Macierz>();
+                List<Matrix> rozwiazane_macierze = new List<Matrix>();
 
-                foreach (Macierz do_rozwiazania in macierze_przejscia)
+                foreach (Matrix do_rozwiazania in macierze_przejscia)
                 {
 
-                    macierz = do_rozwiazania;
+                    matrix = do_rozwiazania;
                     OdswiezMacierz();
                     if (czyPokaz)
-                        if (Interaction.MsgBox("Należy rozwiązać poniższą macierz przejścia do bazy B2 za pomocą eliminacji:\n" + macierz.ToString() + "\nW kolumnach zostały wstawione poszczególne wektory bazy, a w ostatniej jeden z wektorów po przekształceniu liniowym. Czy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Przekształcenie liniowe") == MsgBoxResult.No)
+                        if (Interaction.MsgBox("Należy rozwiązać poniższą macierz przejścia do bazy B2 za pomocą eliminacji:\n" + matrix.ToString() + "\nW kolumnach zostały wstawione poszczególne wektory bazy, a w ostatniej jeden z wektorów po przekształceniu liniowym. Czy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Przekształcenie liniowe") == MsgBoxResult.No)
                             if (obiekt != null)
                                 return;
                             else
                                 throw new ConstraintException(bladPodalgorytmu);
 
-                    EliminacjaGaussa(null, argumenty);
+                    TotalGaussianElimination(null, argumenty);
 
-                    rozwiazane_macierze.Add(macierz);
+                    rozwiazane_macierze.Add(matrix);
 
                 }
 
                 List<string[]> ret = new List<string[]>();
 
-                foreach (Macierz rozwiazana_macierz in rozwiazane_macierze)
+                foreach (Matrix rozwiazana_macierz in rozwiazane_macierze)
                 {
 
-                    string[] wiersze = new string[rozwiazana_macierz.Wiersze()];
+                    string[] wiersze = new string[rozwiazana_macierz.Rows];
 
-                    for (int i = 0; i < rozwiazana_macierz.Wiersze(); i++)
-                        wiersze[i] = rozwiazana_macierz.Tablica()[i, rozwiazana_macierz.Kolumny() - 1].ToString();
+                    for (int i = 0; i < rozwiazana_macierz.Rows; i++)
+                        wiersze[i] = rozwiazana_macierz[i, rozwiazana_macierz.Columns - 1].ToString();
 
                     ret.Add(wiersze);
 
                 }
 
-                macierz = Macierz.Transpozycja(new Macierz(ret.ToArray()));
+                matrix = Matrix.Transpose(new Matrix(ret.ToArray()));
                 OdswiezMacierz();
 
                 if (czyPokaz)
@@ -333,5 +134,67 @@ namespace AlgebraProjekt
         }
 
     }
-
+*/
 }
+/*
+private void Odwrotnosc(object obiekt, RoutedEventArgs argumenty)
+{
+
+    bool czyPokaz = (bool)TrybPokazu.IsChecked;
+
+    if (czyPokaz)
+        if (Interaction.MsgBox("Dopisz I z prawej strony macierzy." + Environment.NewLine + "Czy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Odwracanie macierzy") == MsgBoxResult.No)
+            return;
+    matrix = Matrix.AddI(matrix, true);
+    OdswiezMacierz();
+
+    if (czyPokaz)
+        if (Interaction.MsgBox("Wykonaj całkowitą redukcję." + Environment.NewLine + "Czy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Odwracanie macierzy") == MsgBoxResult.No)
+            return;
+    TotalGaussianElimination(null, argumenty);
+    OdswiezMacierz();
+
+    for (long h = 0; h < matrix.Columns; h++)
+    {
+
+        bool czySameZera = true;
+
+        for (long j = 0; j < matrix.Rows; j++)
+            if (matrix[j, h].Numerator != 0)
+            {
+                czySameZera = false;
+                break;
+            }
+
+        if (czySameZera)
+            throw new ArgumentException(bladWyznacznik);
+
+    }
+
+    for (long h = 0; h < matrix.Rows; h++)
+    {
+
+        bool czySameZera = true;
+
+        for (long j = 0; j < matrix.Columns / 2; j++)
+            if (matrix[h, j].Numerator != 0)
+            {
+                czySameZera = false;
+                break;
+            }
+
+        if (czySameZera)
+            throw new ArgumentException(bladWyznacznik);
+
+    }
+
+    if (czyPokaz)
+        if (Interaction.MsgBox("Usuń I z lewej strony." + Environment.NewLine + "Czy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Odwracanie macierzy") == MsgBoxResult.No)
+            return;
+    matrix = Matrix.Slice(matrix, true);
+    OdswiezMacierz();
+
+    if (czyPokaz)
+        Interaction.MsgBox("Macierz została odwrócona.", MsgBoxStyle.OkOnly, "Koniec pracy algorytmu");
+}
+*/

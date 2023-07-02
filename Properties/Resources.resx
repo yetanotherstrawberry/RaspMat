@@ -117,14 +117,156 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="LICENCJE" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\licencje.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="ADD_ZEROES" xml:space="preserve">
+    <value>Add zeros.</value>
   </data>
+  <data name="ALGORITHMS" xml:space="preserve">
+    <value>Algorithms</value>
+  </data>
+  <data name="DET_ZERO" xml:space="preserve">
+    <value>Cannot inverse this matrix, because its determinant is zero.</value>
+  </data>
+  <data name="ECHELON" xml:space="preserve">
+    <value>Row echelon</value>
+  </data>
+  <data name="ENTER_MATRIX" xml:space="preserve">
+    <value>New matrix</value>
+  </data>
+  <data name="ERROR" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ERR_MAT_BAD_SHAPE" xml:space="preserve">
+    <value>The numer of rows or columns of this matrix indicates it does not support the requested operation.</value>
+  </data>
+  <data name="ERR_MAT_NO_SQUARE" xml:space="preserve">
+    <value>This operation can be performed on a square matrix only.</value>
+  </data>
+  <data name="ERR_MULTIPLY_MAT_MISMATCH" xml:space="preserve">
+    <value>Left matrix has different amount of columns than right of rows .</value>
+  </data>
+  <data name="ERR_NO_INTS" xml:space="preserve">
+    <value>No integer supplied.</value>
+  </data>
+  <data name="ERR_ROWS" xml:space="preserve">
+    <value>You must select exactly {0} row(s).</value>
+  </data>
+  <data name="ERR_STRING_FORMAT" xml:space="preserve">
+    <value>Supplied string is not in any of the supported formats: {0}</value>
+  </data>
+  <data name="ERR_SUM_SUB_MAT_MISMATCH" xml:space="preserve">
+    <value>Cannot add or subtract matrices with different shapes.</value>
+  </data>
+  <data name="ERR_TOO_MANY_INTS" xml:space="preserve">
+    <value>Too many integers supplied.</value>
+  </data>
+  <data name="ERR_TOO_SMALL_MAT" xml:space="preserve">
+    <value>The matrix must have at least {0} column(s) and {1} row(s).</value>
+  </data>
+  <data name="IDENTITY_MAT" xml:space="preserve">
+    <value>Identity matrix</value>
+  </data>
+  <data name="INSERT_I" xml:space="preserve">
+    <value>Insert identity</value>
+  </data>
+  <data name="IN_ADD_ZEROS" xml:space="preserve">
+    <value>Fill with zeros.</value>
+  </data>
+  <data name="IN_COLUMNS" xml:space="preserve">
+    <value>Columns:</value>
+  </data>
+  <data name="IN_ROWS" xml:space="preserve">
+    <value>Rows:</value>
+  </data>
+  <data name="LEFT" xml:space="preserve">
+    <value>Left</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="LICENSE" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\LICENSE.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+    <value>..\license.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1250</value>
+  </data>
+  <data name="LOAD_MAT" xml:space="preserve">
+    <value>Load matrix</value>
+  </data>
+  <data name="MATRIX" xml:space="preserve">
+    <value>Matrix</value>
+  </data>
+  <data name="MAT_HALF" xml:space="preserve">
+    <value>Matrix slicing</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
   </data>
   <data name="README" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\readme.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+    <value>..\readme.md;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="REDUCED" xml:space="preserve">
+    <value>Reduced row echelon</value>
+  </data>
+  <data name="REMOVE_HALF" xml:space="preserve">
+    <value>Remove half</value>
+  </data>
+  <data name="RIGHT" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="ROW" xml:space="preserve">
+    <value>Row(s)</value>
+  </data>
+  <data name="SAVE_MAT" xml:space="preserve">
+    <value>Save matrix</value>
+  </data>
+  <data name="SCALAR" xml:space="preserve">
+    <value>Scalar:</value>
+  </data>
+  <data name="SCALE" xml:space="preserve">
+    <value>Scale</value>
+  </data>
+  <data name="STEP_MULTIPLY_ROW" xml:space="preserve">
+    <value>Multiply row {0} by {1}.</value>
+  </data>
+  <data name="STEP_SUM_ROWS" xml:space="preserve">
+    <value>Add row {0} multiplied by {1} to row {2}.</value>
+  </data>
+  <data name="STEP_SWAP_ROWS" xml:space="preserve">
+    <value>Swap rows {0} and {1}.</value>
+  </data>
+  <data name="SWAP_ROWS" xml:space="preserve">
+    <value>Swap rows</value>
+  </data>
+  <data name="TITLE" xml:space="preserve">
+    <value>RaspMat</value>
+  </data>
+  <data name="TRANSPOITION" xml:space="preserve">
+    <value>Transposition</value>
+  </data>
+  <data name="TRANSPOSE" xml:space="preserve">
+    <value>Transpose</value>
+  </data>
+  <data name="_ADD_ZEROS" xml:space="preserve">
+    <value>AddZeros</value>
+    <comment>Do not translate. Used internally as a name for a parameter.</comment>
+  </data>
+  <data name="_CELL_DEFAULT" xml:space="preserve">
+    <value />
+    <comment>Do not translate. Default value for a DataGrid cell of a Matrix. Can be empty.</comment>
+  </data>
+  <data name="_COLS" xml:space="preserve">
+    <value>Cols</value>
+    <comment>Do not translate. Used internally as a name for a parameter.</comment>
+  </data>
+  <data name="_FILE_FILTER" xml:space="preserve">
+    <value>JSON|*.json|*|*.*</value>
+    <comment>Used internally as a filter for file dialogs.</comment>
+  </data>
+  <data name="_NEW_MAT_DIALOG" xml:space="preserve">
+    <value>NewMatDialog</value>
+    <comment>Do not translate. Used internally as a name for a view.</comment>
+  </data>
+  <data name="_ROWS" xml:space="preserve">
+    <value>Rows</value>
+    <comment>Do not translate. Used internally as a name for a parameter.</comment>
+  </data>
+  <data name="_ZERO" xml:space="preserve">
+    <value>0</value>
+    <comment>Do not translate. String representation of 0.</comment>
   </data>
 </root>

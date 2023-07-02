@@ -1,0 +1,116 @@
+﻿<Window x:Class="RaspMat.Views.GaussianWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:vm="clr-namespace:RaspMat.ViewModels"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:prop="clr-namespace:RaspMat.Properties"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:GaussianWindowViewModel, IsDesignTimeCreatable=False}" 
+        Title="{x:Static prop:Resources.TITLE}"
+        MinHeight="520"
+        MinWidth="850">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="120" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Margin" Value="2" />
+        </Style>
+        <Style TargetType="GroupBox">
+            
+        </Style>
+        <Style TargetType="StackPanel">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Orientation" Value="Horizontal" />
+        </Style>
+        <Style x:Key="verticalStackpanel" TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Vertical" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+
+            <StackPanel Style="{StaticResource verticalStackpanel}">
+                <GroupBox Header="{x:Static prop:Resources.SCALE}" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel>
+                            <TextBlock Height="20" Text="{x:Static prop:Resources.SCALAR}" HorizontalAlignment="Center" Margin="2" />
+                            <TextBox Height="20" Text="{Binding Scalar}" TextWrapping="Wrap" Width="40" HorizontalAlignment="Center" Margin="2" />
+                        </StackPanel>
+                        <StackPanel>
+                            <Button Command="{Binding MatScaleComm}" Content="{x:Static prop:Resources.MATRIX}" Width="80" Height="20" Margin="20,2,2,2" />
+                            <Button Command="{Binding RowScaleComm}" Content="{x:Static prop:Resources.ROW}" Width="80" Height="20" Margin="20,2,2,2" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="{x:Static prop:Resources.TRANSPOITION}">
+                    <Button Content="{x:Static prop:Resources.TRANSPOSE}" Command="{Binding MatTransposeComm}" />
+                </GroupBox>
+                <GroupBox Header="{x:Static prop:Resources.MAT_HALF}" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel>
+                            <RadioButton GroupName="Side" Content="{x:Static prop:Resources.LEFT}" Margin="10,5,10,5" x:Name="LeftSide" />
+                            <RadioButton GroupName="Side" Content="{x:Static prop:Resources.RIGHT}" Margin="10,5,10,5" IsChecked="True" />
+                        </StackPanel>
+                        <StackPanel>
+                            <Button
+                                Content="{x:Static prop:Resources.INSERT_I}"
+                                Command="{Binding MatAddIComm}"
+                                CommandParameter="{Binding Source={x:Reference LeftSide}, Path=IsChecked}" />
+                            <Button
+                                Content="{x:Static prop:Resources.REMOVE_HALF}"
+                                Command="{Binding MatRemoveIComm}"
+                                CommandParameter="{Binding Source={x:Reference LeftSide}, Path=IsChecked}" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Column="1" Grid.RowSpan="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="50" />
+            </Grid.RowDefinitions>
+            <GroupBox Header="{x:Static prop:Resources.ALGORITHMS}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Row="0">
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Command="{Binding MatGaussComm}" Content="{x:Static prop:Resources.REDUCED}" />
+                    <Button Command="{Binding MatEchelonComm}" Content="{x:Static prop:Resources.ECHELON}" />
+                </StackPanel>
+            </GroupBox>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
+                <DataGrid
+                    ItemsSource="{Binding MatrixDataTable}"
+                    SelectionMode="Extended"
+                    SelectionUnit="FullRow"
+                    HeadersVisibility="None"
+                    CanUserAddRows="False"
+                    ColumnWidth="SizeToCells"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                    <DataGrid.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{x:Static SystemColors.ActiveCaptionColor}"/>
+                    </DataGrid.Resources>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding GridSelectedRowComm}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </DataGrid>
+            </ScrollViewer>
+            <GroupBox Header="{x:Static prop:Resources.MATRIX}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Grid.Row="2">
+                <StackPanel>
+                    <Button Content="{x:Static prop:Resources.ENTER_MATRIX}" Command="{Binding UserInputComm}" />
+                    <Button Content="{x:Static prop:Resources.SAVE_MAT}" Command="{Binding SerializeComm}" />
+                    <Button Content="{x:Static prop:Resources.LOAD_MAT}" Command="{Binding DeserializeComm}" />
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</Window>
