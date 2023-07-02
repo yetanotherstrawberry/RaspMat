@@ -184,6 +184,23 @@ namespace RaspMat.Models
             return ret;
         }
 
+        public static bool operator !=(Matrix left, Matrix right)
+        {
+            if (left.Columns != right.Columns || left.Rows != right.Rows) return true;
+
+            for (long row = 0; row < left.Rows; row++)
+            {
+                for (long col = 0; col < right.Columns; col++)
+                {
+                    if (left[row, col] != right[row, col]) return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool operator ==(Matrix left, Matrix right) => !(left != right);
+
         public static Matrix Transpose(Matrix matrix)
         {
             return new Matrix(matrix.Columns, matrix.Rows, (row, col) => matrix[col][row]);
@@ -219,6 +236,22 @@ namespace RaspMat.Models
             }
 
             return retSB.ToString();
+        }
+
+        public override bool Equals(object obj) => obj is Matrix mat && this == mat;
+
+        public override int GetHashCode()
+        {
+            var ret = 0;
+            for (long row = 0; row < Rows; row++)
+            {
+                ret = (int)((ret + (this[row, 0].Numerator % int.MaxValue)) % int.MaxValue);
+            }
+            for (long column = 0; column < Columns; column++)
+            {
+                ret = (int)((ret + (this[0, column].Denominator % int.MaxValue)) % int.MaxValue);
+            }
+            return ret;
         }
         #endregion Methods
 
