@@ -313,26 +313,6 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BSD 2-Clause License
-        ///Copyright (c) 2020-2023, yetanotherstrawberry
-        ///All rights reserved.
-        ///
-        ///Redistribution and use in source and binary forms, with or without
-        ///modification, are permitted provided that the following conditions are met:
-        ///
-        ///1. Redistributions of source code must retain the above copyright notice, this
-        ///   list of conditions and the following disclaimer.
-        ///
-        ///2. Redistributions in binary form must reproduce the above copyright notice,
-        ///   this list of conditions and the following disclaimer in  [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string LICENSE {
-            get {
-                return ResourceManager.GetString("LICENSE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Load matrix.
         /// </summary>
         public static string LOAD_MAT {
@@ -365,16 +345,6 @@ namespace RaspMat.Properties {
         public static string OK {
             get {
                 return ResourceManager.GetString("OK", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        public static byte[] README {
-            get {
-                object obj = ResourceManager.GetObject("README", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         
