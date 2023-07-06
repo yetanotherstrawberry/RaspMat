@@ -17,14 +17,14 @@ namespace RaspMat.Helpers
         /// <param name="startCol">Column (2nd dimension) index to start from.</param>
         /// <param name="colLength">Designated length of the 2nd dimension. Will copy everything past starting index if null.</param>
         /// <returns>New array with elements copied from input.</returns>
-        public static T[][] Copy<T>(this T[][] input, long startCol = 0, long? colLength = null)
+        public static T[][] Copy<T>(this T[][] input, int startCol = 0, int? colLength = null)
         {
-            var ret = new T[input.LongLength][];
+            var ret = new T[input.Length][];
 
-            Parallel.For(0, ret.LongLength, row =>
+            Parallel.For(0, ret.Length, row =>
             {
-                ret[row] = new T[colLength ?? input[row].LongLength - startCol];
-                Array.Copy(input[row], startCol, ret[row], 0, ret[row].LongLength);
+                ret[row] = new T[colLength ?? input[row].Length - startCol];
+                Array.Copy(input[row], startCol, ret[row], 0, ret[row].Length);
             });
 
             return ret;
@@ -40,9 +40,9 @@ namespace RaspMat.Helpers
         /// <returns>New array resulted from converting the input.</returns>
         public static Y[][] Convert<T, Y>(this T[][] input, Converter<T, Y> converter)
         {
-            var ret = new Y[input.LongLength][];
+            var ret = new Y[input.Length][];
 
-            Parallel.For(0, ret.LongLength, row =>
+            Parallel.For(0, ret.Length, row =>
             {
                 ret[row] = Array.ConvertAll(input[row], converter);
             });
@@ -58,15 +58,15 @@ namespace RaspMat.Helpers
         /// <param name="cols">Length od the 2nd dimension.</param>
         /// <param name="creator">Function that accepts 2 indexes and returns value to be assigned.</param>
         /// <returns>2D array of <c>T</c> with values from <c>creator</c>.</returns>
-        public static T[][] Create<T>(long rows, long cols, Func<long, long, T> creator)
+        public static T[][] Create<T>(int rows, int cols, Func<int, int, T> creator)
         {
             var ret = new T[rows][];
 
-            Parallel.For(0, ret.LongLength, row =>
+            Parallel.For(0, ret.Length, row =>
             {
                 ret[row] = new T[cols];
 
-                Parallel.For(0, ret[row].LongLength, col =>
+                Parallel.For(0, ret[row].Length, col =>
                 {
                     ret[row][col] = creator(row, col);
                 });

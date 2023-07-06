@@ -6,11 +6,11 @@ namespace RaspMat.Helpers
     internal static class DataTableHelpers
     {
 
-        public static DataTable CreateDataTable<T>(long rows, long columns, Func<long, long, T> cellValue)
+        public static DataTable CreateDataTable<T>(int rows, int columns, Func<int, int, T> cellValue)
         {
             var ret = new DataTable();
 
-            for (long col = 0; col < columns; col++)
+            for (int col = 0; col < columns; col++)
             {
                 ret.Columns.Add(new DataColumn
                 {
@@ -19,7 +19,7 @@ namespace RaspMat.Helpers
                 });
             }
 
-            for (long row = 0; row < rows; row++)
+            for (int row = 0; row < rows; row++)
             {
                 var dataRow = ret.NewRow();
                 for (int col = 0; col < columns; col++)

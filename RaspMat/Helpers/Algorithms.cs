@@ -37,8 +37,10 @@ namespace RaspMat.Helpers
         public static IList<IAlgorithmResult<Matrix>> TotalGaussianElimination(this Matrix matrix, bool reducedEchelon = true)
         {
             var ret = new List<IAlgorithmResult<Matrix>>();
+            var row = 0;
+            var col = 0;
 
-            for (long row = 0, col = 0; row < matrix.Rows && col < matrix.Columns; row++, col++)
+            while (row < matrix.Rows && col < matrix.Columns)
             {
                 while (col < matrix.Columns && matrix[row, col] == 0)
                 {
@@ -105,6 +107,8 @@ namespace RaspMat.Helpers
                         }
                     }
                 }
+                row++;
+                col++;
             }
 
             // Subtract from all rows above the current one it's value multiplied by the ratio,
@@ -113,7 +117,7 @@ namespace RaspMat.Helpers
             {
                 for (var currentRow = matrix.Rows - 1; currentRow > 0; currentRow--)
                 {
-                    long nonZeroCol = 0;
+                    var nonZeroCol = 0;
 
                     while (nonZeroCol < matrix.Columns && matrix[currentRow, nonZeroCol] == 0) nonZeroCol++;
 
@@ -156,7 +160,7 @@ namespace RaspMat.Helpers
             {
                 var temp = new Fraction[to.Length + 1][];
 
-                for (int i = 0; i < to.Length; i++)
+                for (long i = 0; i < to.Length; i++)
                 {
                     temp[i] = Array.ConvertAll(to[i].Split(vectorSplitter), str => Fraction.Parse(str));
                 }
@@ -204,7 +208,7 @@ namespace RaspMat.Helpers
 
                 string[] wiersze = new string[rozwiazana_macierz.Rows];
 
-                for (int i = 0; i < rozwiazana_macierz.Rows; i++)
+                for (long i = 0; i < rozwiazana_macierz.Rows; i++)
                     wiersze[i] = rozwiazana_macierz[i, rozwiazana_macierz.Columns - 1].ToString();
 
                 ret.Add(wiersze);

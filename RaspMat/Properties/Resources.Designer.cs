@@ -160,6 +160,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Elementary operations.
+        /// </summary>
+        public static string ELEMENTARY_MAT_OP {
+            get {
+                return ResourceManager.GetString("ELEMENTARY_MAT_OP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New matrix.
         /// </summary>
         public static string ENTER_MATRIX {

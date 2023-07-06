@@ -22,6 +22,7 @@ namespace RaspMat
             containerRegistry.RegisterDialog<NewMatDialog>(name: RaspMat.Properties.Resources._NEW_MAT_DIALOG);
             containerRegistry.RegisterInstance<IFileService>(new FileService(RaspMat.Properties.Resources._FILE_FILTER));
             containerRegistry.RegisterSingleton<ISerializationService, SerializationService>();
+            containerRegistry.RegisterInstance(errorService);
         }
 
         public App()

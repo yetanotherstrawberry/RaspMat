@@ -1,7 +1,7 @@
-﻿using RaspMat.Helpers;
+﻿using Newtonsoft.Json;
+using RaspMat.Helpers;
 using RaspMat.Properties;
 using System;
-using System.Text.Json.Serialization;
 
 namespace RaspMat.Models
 {
@@ -59,7 +59,7 @@ namespace RaspMat.Models
         /// <exception cref="ArgumentException"><paramref name="fraction"/> has more than 2 or no parts when split by '/'.</exception>
         public static Fraction Parse(string fraction)
         {
-            var integers = Array.ConvertAll(fraction.Replace(" ", string.Empty).Split('/'), str => long.Parse(str.TrimStart('(').TrimEnd(')')));
+            var integers = Array.ConvertAll(fraction.Replace(" ", string.Empty).Split('/'), str => int.Parse(str.TrimStart('(').TrimEnd(')')));
 
             if (integers.Length < 1)
                 throw new ArgumentException(message: Resources.ERR_NO_INTS, paramName: nameof(fraction));
@@ -99,7 +99,7 @@ namespace RaspMat.Models
         public static bool operator !=(Fraction a, Fraction b)
             => !(a == b);
 
-        public static implicit operator Fraction(long numerator)
+        public static implicit operator Fraction(int numerator)
             => new Fraction(numerator);
 
         /// <summary>

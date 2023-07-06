@@ -1,35 +1,37 @@
-﻿using RaspMat.Helpers;
+﻿using Newtonsoft.Json;
+using RaspMat.Helpers;
+using RaspMat.Interfaces;
 using RaspMat.Properties;
 using System;
 using System.Data;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace RaspMat.Models
 {
-    internal class Matrix
+    internal class Matrix : IMatrix<Fraction>
     {
 
-        private const long MinCols = 1, MinRows = 1;
+        private const int MinCols = 1, MinRows = 1;
 
         #region Properties
-        [JsonInclude]
-        public Fraction[][] FractionMatrix { get; }
+        [JsonProperty]
+        private Fraction[][] FractionMatrix { get; }
 
         [JsonIgnore]
-        public long Rows => FractionMatrix.LongLength;
-        [JsonIgnore]
-        public long Columns => FractionMatrix[0].LongLength;
+        public int Rows => FractionMatrix.Length;
 
-        private Fraction[] this[long row]
+        [JsonIgnore]
+        public int Columns => FractionMatrix.First().Length;
+
+        private Fraction[] this[int row]
         {
             get => FractionMatrix[row];
             set => FractionMatrix[row] = value;
         }
 
-        public Fraction this[long row, long col]
+        public Fraction this[int row, int col]
         {
             get => this[row][col];
             private set => this[row][col] = value;
@@ -37,7 +39,7 @@ namespace RaspMat.Models
         #endregion Properties
 
         #region Constructors
-        public Matrix(long rows, long cols, Func<long, long, Fraction> values)
+        public Matrix(int rows, int cols, Func<int, int, Fraction> values)
         {
             if (rows < MinRows || cols < MinCols)
                 throw new ArgumentException(
@@ -47,12 +49,12 @@ namespace RaspMat.Models
             FractionMatrix = JaggedArrayHelper.Create(rows, cols, values);
         }
 
-        private Matrix(Fraction[][] inputFracMat, bool copy)
+        private Matrix(Fraction[][] fractionMatrix, bool copy)
         {
             if (copy)
-                FractionMatrix = inputFracMat.Copy();
+                FractionMatrix = fractionMatrix.Copy();
             else
-                FractionMatrix = inputFracMat;
+                FractionMatrix = fractionMatrix;
         }
 
         public Matrix(string[][] input)
@@ -60,19 +62,24 @@ namespace RaspMat.Models
             FractionMatrix = input.Convert(str => Fraction.Parse(str));
         }
 
-        public Matrix(long rows, long cols) : this(rows, cols, (row, col) => Fraction.Zero) { }
         [JsonConstructor]
         public Matrix(Fraction[][] fractionMatrix) : this(fractionMatrix, copy: true) { }
-        public Matrix(long size) : this(size, size) { }
+        public Matrix(int rows, int cols) : this(rows, cols, (row, col) => Fraction.Zero) { }
+        public Matrix(int size) : this(size, size) { }
         #endregion Constructors
 
         #region StaticMethods
-        public static Matrix Identity(long size)
+        public static Matrix Identity(int size)
         {
-            return new Matrix(size, size, (row, col) => row == col ? 1 : 0);
+            return RowEchelon(size, size);
         }
 
-        public static Matrix SwapMatrix(Matrix matrix, long a, long b)
+        public static Matrix RowEchelon(int rows, int columns)
+        {
+            return new Matrix(rows, columns, (row, col) => row == col ? 1 : 0);
+        }
+
+        public static Matrix SwapMatrix(Matrix matrix, int a, int b)
         {
             var ret = Identity(matrix.Rows);
 
@@ -85,7 +92,7 @@ namespace RaspMat.Models
             return ret;
         }
 
-        public static Matrix AddToRowMatrix(Matrix matrix, long destination, long source, Fraction srcMultiplication)
+        public static Matrix AddToRowMatrix(Matrix matrix, int destination, int source, Fraction srcMultiplication)
         {
             var ret = Identity(matrix.Rows);
 
@@ -94,7 +101,7 @@ namespace RaspMat.Models
             return ret;
         }
 
-        public static Matrix AdditionMatrix(Matrix matrix, long destination, long source, Fraction scale)
+        public static Matrix AdditionMatrix(Matrix matrix, int destination, int source, Fraction scale)
         {
             var ret = Identity(matrix.Columns);
 
@@ -103,7 +110,7 @@ namespace RaspMat.Models
             return ret;
         }
 
-        public static Matrix MultiplicationMatrix(long diagonal, long index, Fraction multiplier)
+        public static Matrix MultiplicationMatrix(int diagonal, int index, Fraction multiplier)
         {
             var ret = Identity(diagonal);
 
@@ -120,15 +127,15 @@ namespace RaspMat.Models
             var ret = new Matrix(matrix.Rows, matrix.Columns * 2);
 
             // Copies the original matrix to the left side of the returned matrix if onRight is true.
-            for (long row = 0; row < matrix.Rows; row++)
-                for (long col = 0, shift = ret.Rows; col < matrix.Columns; col++, shift++)
+            for (int row = 0; row < matrix.Rows; row++)
+                for (int col = 0, shift = ret.Rows; col < matrix.Columns; col++, shift++)
                     ret[row, onLeft ? shift : col] = matrix[row, col];
 
             /*
              * Assigns I to the matrix.
              * shift is used in case we add I on the right side of the square matrix.
              */
-            for (long row = 0, shift = matrix.Rows; row < ret.Rows; row++, shift++)
+            for (int row = 0, shift = matrix.Rows; row < ret.Rows; row++, shift++)
                 ret[row, onLeft ? row : shift] = 1;
 
             return ret;
@@ -174,7 +181,7 @@ namespace RaspMat.Models
                 {
                     var cellValue = Fraction.Zero;
 
-                    for (long cell = 0; cell < left.Columns; cell++)
+                    for (int cell = 0; cell < left.Columns; cell++)
                         cellValue += left[row, cell] * right[cell, col];
 
                     ret[row, col] = cellValue;
@@ -183,23 +190,6 @@ namespace RaspMat.Models
 
             return ret;
         }
-
-        public static bool operator !=(Matrix left, Matrix right)
-        {
-            if (left.Columns != right.Columns || left.Rows != right.Rows) return true;
-
-            for (long row = 0; row < left.Rows; row++)
-            {
-                for (long col = 0; col < right.Columns; col++)
-                {
-                    if (left[row, col] != right[row, col]) return true;
-                }
-            }
-
-            return false;
-        }
-
-        public static bool operator ==(Matrix left, Matrix right) => !(left != right);
 
         public static Matrix Transpose(Matrix matrix)
         {
@@ -224,9 +214,9 @@ namespace RaspMat.Models
         {
             var retSB = new StringBuilder();
 
-            for (long i = 0; i < Rows; i++)
+            for (int i = 0; i < Rows; i++)
             {
-                for (long j = 0; j < Columns; j++)
+                for (int j = 0; j < Columns; j++)
                 {
                     retSB.Append(this[i, j]);
                     if (j < Columns - 1)
@@ -238,16 +228,29 @@ namespace RaspMat.Models
             return retSB.ToString();
         }
 
-        public override bool Equals(object obj) => obj is Matrix mat && this == mat;
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Matrix mat) || Columns != mat.Columns || Rows != mat.Rows) return false;
+
+            for (int row = 0; row < Rows; row++)
+            {
+                for (int col = 0; col < Columns; col++)
+                {
+                    if (this[row, col] != mat[row, col]) return false;
+                }
+            }
+
+            return true;
+        }
 
         public override int GetHashCode()
         {
             var ret = 0;
-            for (long row = 0; row < Rows; row++)
+            for (int row = 0; row < Rows; row++)
             {
                 ret = (int)((ret + (this[row, 0].Numerator % int.MaxValue)) % int.MaxValue);
             }
-            for (long column = 0; column < Columns; column++)
+            for (int column = 0; column < Columns; column++)
             {
                 ret = (int)((ret + (this[0, column].Denominator % int.MaxValue)) % int.MaxValue);
             }

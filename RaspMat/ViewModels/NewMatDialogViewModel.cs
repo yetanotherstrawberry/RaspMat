@@ -10,7 +10,7 @@ namespace RaspMat.ViewModels
     internal class NewMatDialogViewModel : BindableBase, IDialogAware
     {
 
-        public ICommand CloseDialogCommand { get; private set; }
+        public ICommand CloseDialogCommand { get; }
 
         public event Action<IDialogResult> RequestClose;
 
@@ -26,8 +26,8 @@ namespace RaspMat.ViewModels
         {
             var ret = new DialogResult(ButtonResult.OK);
 
-            ret.Parameters.Add(Resources._ROWS, long.Parse(Rows));
-            ret.Parameters.Add(Resources._COLS, long.Parse(Columns));
+            ret.Parameters.Add(Resources._ROWS, int.Parse(Rows));
+            ret.Parameters.Add(Resources._COLS, int.Parse(Columns));
             ret.Parameters.Add(Resources._ADD_ZEROS, AddZeros);
 
             RequestClose?.Invoke(ret);

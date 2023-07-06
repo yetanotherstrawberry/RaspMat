@@ -13,7 +13,5 @@ namespace RaspMat.ViewModels
 
         public IList<IAlgorithmResult<Matrix>> Steps { get; private set; }
 
-
-
     }
 }

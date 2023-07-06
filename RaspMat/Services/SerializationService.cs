@@ -1,5 +1,6 @@
-﻿using RaspMat.Interfaces;
-using System.Text.Json;
+﻿using Newtonsoft.Json;
+using RaspMat.Interfaces;
+using System.IO;
 
 namespace RaspMat.Services
 {
@@ -7,24 +8,30 @@ namespace RaspMat.Services
     {
 
         private readonly IFileService fileService;
+        private readonly JsonSerializer serializer = new JsonSerializer();
 
-        public T Deserialize<T>()
+        public T Deserialize<T>() where T : class
         {
-            using (var stream = fileService.OpenFile())
-            {
-                if (stream == null) return default;
+            var stream = fileService.OpenFile();
+            if (stream is null) return default;
 
-                return JsonSerializer.Deserialize<T>(stream);
+            using (stream)
+            using (var reader = new StreamReader(stream))
+            using (var jsonReader = new JsonTextReader(reader))
+            {
+                return serializer.Deserialize<T>(jsonReader);
             }
         }
 
-        public void Serialize<T>(T obj)
+        public void Serialize<T>(T obj) where T : class
         {
-            using (var stream = fileService.NewFile())
-            {
-                if (stream == null) return;
+            var stream = fileService.NewFile();
+            if (stream is null) return; // No file selected - cancel silently.
 
-                JsonSerializer.Serialize(stream, obj);
+            using (stream)
+            using (var writer = new StreamWriter(stream))
+            {
+                serializer.Serialize(writer, obj);
             }
         }
 
