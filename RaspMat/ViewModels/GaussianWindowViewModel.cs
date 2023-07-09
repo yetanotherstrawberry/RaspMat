@@ -5,11 +5,11 @@ using RaspMat.Helpers;
 using RaspMat.Interfaces;
 using RaspMat.Models;
 using RaspMat.Properties;
+using RaspMat.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -33,9 +33,10 @@ namespace RaspMat.ViewModels
         public ICommand GridSelectedRowComm { get; }
         public ICommand SerializeComm { get; }
         public ICommand DeserializeComm { get; }
+        public ICommand StepListWindowComm { get; }
 
         /// <summary>
-        /// Field for <see cref="MatrixDataTable"/>
+        /// Field for <see cref="MatrixDataTable"/>.
         /// </summary>
         private DataTable matrixDataTable = new Matrix(new Fraction[][]
         {
@@ -59,7 +60,11 @@ namespace RaspMat.ViewModels
         public DataTable MatrixDataTable
         {
             get => matrixDataTable;
-            set => SetProperty(ref matrixDataTable, value);
+            set
+            {
+                SetProperty(ref matrixDataTable, value);
+                SelectedRows.Clear();
+            }
         }
 
         /// <summary>
@@ -73,13 +78,12 @@ namespace RaspMat.ViewModels
         private Matrix CurrentMatrix
         {
             get => Matrix.Parse(MatrixDataTable);
-            set
-            {
-                MatrixDataTable = value.ToDataTable();
-                SelectedRows.Clear();
-            }
+            set => MatrixDataTable = value.ToDataTable();
         }
 
+        /// <summary>
+        /// Field for <see cref="IsFree"/>.
+        /// </summary>
         private bool isFree = true;
 
         /// <summary>
@@ -94,12 +98,12 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Field for <see cref="Steps"/>.
         /// </summary>
-        private IEnumerable<IAlgorithmResult<Matrix>> steps = new IAlgorithmResult<Matrix>[0];
+        private IList<IAlgorithmResult<Matrix>> steps = new List<IAlgorithmResult<Matrix>>();
 
         /// <summary>
         /// Steps performed by algorithms. Notifies about the value change.
         /// </summary>
-        public IEnumerable<IAlgorithmResult<Matrix>> Steps
+        public IList<IAlgorithmResult<Matrix>> Steps
         {
             get => steps;
             set => SetProperty(ref steps, value);
@@ -150,7 +154,7 @@ namespace RaspMat.ViewModels
 
                 var filler = res.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
 
-                MatrixDataTable = DataTableHelpers.CreateDataTable(
+                MatrixDataTable = DataTableHelpers.CreateStrDataTable(
                     res.Parameters.GetValue<int>(Resources._ROWS),
                     res.Parameters.GetValue<int>(Resources._COLS),
                     (row, column) => filler);
@@ -158,35 +162,13 @@ namespace RaspMat.ViewModels
         }
 
         /// <summary>
-        /// Gets 
+        /// Gets the number of a row in the <see cref="Matrix"/>.
         /// </summary>
-        /// <param name="rowView"></param>
-        /// <returns></returns>
+        /// <param name="rowView"><see cref="DataRow"/> of the <see cref="MatrixDataTable"/>.</param>
+        /// <returns>Number of the row.</returns>
         private int DataGridRowToMatRow(DataRowView rowView)
         {
             return MatrixDataTable.Rows.IndexOf(rowView.Row);
-        }
-
-        private readonly IErrorService err;
-
-        private ICommand GenerateAsyncActionCommand(Action action)
-        {
-            return new DelegateCommand(async () =>
-            {
-                try
-                {
-                    IsFree = false;
-                    await Task.Run(action);
-                }
-                catch (Exception e)
-                {
-                    err.Error(e);
-                }
-                finally
-                {
-                    IsFree = true;
-                }
-            });
         }
 
         /// <summary>
@@ -196,27 +178,28 @@ namespace RaspMat.ViewModels
         /// <param name="serializationService">Instance of a <see cref="ISerializationService"/> that will be used for <see cref="Matrix"/> serialization.</param>
         public GaussianWindowViewModel(IDialogService dialogService, ISerializationService serializationService, IErrorService errorService)
         {
-            err = errorService;
-            MatGaussComm = GenerateAsyncActionCommand(() => Gauss());
-            MatEchelonComm = GenerateAsyncActionCommand(() => Gauss(reducedEchelon: false));
-            MatTransposeComm = GenerateAsyncActionCommand(() =>
+            IAsyncCommandService asyncComm = new AsyncCommandService(() => IsFree = false, () => IsFree = true, exception => errorService.Error(exception));
+
+            MatGaussComm = asyncComm.GenerateAsyncActionCommand(() => Gauss());
+            MatEchelonComm = asyncComm.GenerateAsyncActionCommand(() => Gauss(reducedEchelon: false));
+            MatTransposeComm = asyncComm.GenerateAsyncActionCommand(() =>
             {
                 CurrentMatrix = Matrix.Transpose(CurrentMatrix);
             });
-            MatRemoveIComm = new DelegateCommand<bool?>(matrixLeftSide =>
+            MatRemoveIComm = asyncComm.GenerateAsyncActionCommand<bool?>(matrixLeftSide =>
             {
                 CurrentMatrix = Matrix.Slice(CurrentMatrix, matrixLeftSide ?? throw new ArgumentNullException(paramName: nameof(matrixLeftSide)));
             });
-            MatAddIComm = new DelegateCommand<bool?>(matrixLeftSide =>
+            MatAddIComm = asyncComm.GenerateAsyncActionCommand<bool?>(matrixLeftSide =>
             {
                 CurrentMatrix = Matrix.AddI(CurrentMatrix, matrixLeftSide ?? throw new ArgumentNullException(paramName: nameof(matrixLeftSide)));
             });
-            MatScaleComm = GenerateAsyncActionCommand(() =>
+            MatScaleComm = asyncComm.GenerateAsyncActionCommand(() =>
             {
                 CurrentMatrix *= FracScalar;
                 Scalar = string.Empty;
             });
-            RowScaleComm = GenerateAsyncActionCommand(() =>
+            RowScaleComm = asyncComm.GenerateAsyncActionCommand(() =>
             {
                 foreach (var rowId in SelectedRows.ToArray()) // ToArray() will copy the list in order to avoid modyfing the enumerated collection.
                 {
@@ -224,7 +207,7 @@ namespace RaspMat.ViewModels
                 }
                 Scalar = string.Empty;
             });
-            MatSwapRowsComm = GenerateAsyncActionCommand(() =>
+            MatSwapRowsComm = asyncComm.GenerateAsyncActionCommand(() =>
             {
                 if (SelectedRows.Count > 2)
                     throw new ArgumentOutOfRangeException(
@@ -234,27 +217,29 @@ namespace RaspMat.ViewModels
                 CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
             });
             UserInputComm = new DelegateCommand(() => NewDataGrid(dialogService));
-            GridSelectedRowComm = new DelegateCommand<SelectionChangedEventArgs>(args =>
+            GridSelectedRowComm = asyncComm.GenerateAsyncActionCommand<SelectionChangedEventArgs>(args =>
             {
+                // Remove all unselected rows.
                 foreach (DataRowView item in args.RemovedItems)
                 {
                     SelectedRows.Remove(DataGridRowToMatRow(item));
                 }
 
+                // Add all selected rows.
                 foreach (DataRowView item in args.AddedItems)
                 {
                     SelectedRows.Add(DataGridRowToMatRow(item));
                 }
             });
-            SerializeComm = GenerateAsyncActionCommand(() =>
+            SerializeComm = asyncComm.GenerateAsyncActionCommand(() =>
             {
                 serializationService.Serialize(CurrentMatrix);
             });
-            DeserializeComm = GenerateAsyncActionCommand(() =>
+            DeserializeComm = asyncComm.GenerateAsyncActionCommand(() =>
             {
-                var mat = serializationService.Deserialize<Matrix>();
-                if (mat is null) return;
-                CurrentMatrix = mat;
+                var matResult = serializationService.Deserialize<Matrix>();
+                if (!matResult.Successful) return;
+                CurrentMatrix = matResult.Result;
             });
         }
 

@@ -10,40 +10,40 @@
         d:DataContext="{d:DesignInstance vm:GaussianWindowViewModel, IsDesignTimeCreatable=False}" 
         Title="{x:Static prop:Resources.TITLE}"
         MinHeight="520"
-        MinWidth="850"
-        IsEnabled="{Binding IsFree}">
-    <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="Width" Value="120" />
-            <Setter Property="Height" Value="20" />
-            <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style TargetType="TextBox">
-            <Setter Property="Height" Value="20" />
-            <Setter Property="MinWidth" Value="40" />
-        </Style>
-        <Style TargetType="TextBlock">
-            <Setter Property="Height" Value="20" />
-            <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style TargetType="StackPanel">
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="Orientation" Value="Horizontal" />
-        </Style>
-        <Style TargetType="RadioButton">
-            <Setter Property="Margin" Value="10,5,10,5" />
-        </Style>
-        <Style x:Key="verticalStackpanel" TargetType="StackPanel">
-            <Setter Property="Orientation" Value="Vertical" />
-        </Style>
-    </Window.Resources>
-    <Grid>
+        MinWidth="850">
+    <Grid IsEnabled="{Binding IsFree}">
+        <Grid.Resources>
+            <Style TargetType="Button">
+                <Setter Property="Width" Value="120" />
+                <Setter Property="Height" Value="20" />
+                <Setter Property="Margin" Value="2" />
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="Height" Value="20" />
+                <Setter Property="MinWidth" Value="40" />
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="Height" Value="20" />
+                <Setter Property="Margin" Value="5,2,5,2" />
+            </Style>
+            <Style TargetType="StackPanel">
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="Orientation" Value="Horizontal" />
+            </Style>
+            <Style x:Key="verticalStackpanel" TargetType="StackPanel">
+                <Setter Property="Orientation" Value="Vertical" />
+            </Style>
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <StackPanel Style="{StaticResource verticalStackpanel}">
+            <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+            <StackPanel Style="{StaticResource verticalStackpanel}" Grid.Row="0">
                 <GroupBox Header="{x:Static prop:Resources.ELEMENTARY_MAT_OP}">
                     <StackPanel Orientation="Vertical">
                         <GroupBox Header="{x:Static prop:Resources.SCALE}">
@@ -69,21 +69,35 @@
                 <GroupBox Header="{x:Static prop:Resources.MAT_HALF}">
                     <StackPanel Orientation="Vertical">
                         <StackPanel>
-                            <RadioButton GroupName="Side" Content="{x:Static prop:Resources.LEFT}" x:Name="LeftSide" />
-                            <RadioButton GroupName="Side" Content="{x:Static prop:Resources.RIGHT}" IsChecked="True" />
+                            <StackPanel.Resources>
+                                <Style TargetType="RadioButton">
+                                    <Setter Property="Margin" Value="10,5,10,5" />
+                                    <Setter Property="GroupName" Value="Side" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <RadioButton Content="{x:Static prop:Resources.LEFT}" x:Name="LeftSide" />
+                            <RadioButton Content="{x:Static prop:Resources.RIGHT}" IsChecked="True" />
                         </StackPanel>
                         <StackPanel>
+                            <StackPanel.Resources>
+                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                    <Setter Property="CommandParameter" Value="{Binding Source={x:Reference LeftSide}, Path=IsChecked}" />
+                                </Style>
+                            </StackPanel.Resources>
                             <Button
                                 Content="{x:Static prop:Resources.INSERT_I}"
-                                Command="{Binding MatAddIComm}"
-                                CommandParameter="{Binding Source={x:Reference LeftSide}, Path=IsChecked}" />
+                                Command="{Binding MatAddIComm}" />
                             <Button
                                 Content="{x:Static prop:Resources.REMOVE_HALF}"
-                                Command="{Binding MatRemoveIComm}"
-                                CommandParameter="{Binding Source={x:Reference LeftSide}, Path=IsChecked}" />
+                                Command="{Binding MatRemoveIComm}" />
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
+            </StackPanel>
+            <StackPanel VerticalAlignment="Bottom" Grid.Row="1" Margin="5">
+                <!--<Button
+                    Content="{x:Static prop:Resources.STEPS}"
+                    Command="{Binding StepListWindowComm}" />-->
             </StackPanel>
         </Grid>
         <Grid Grid.Column="1" Grid.RowSpan="1">

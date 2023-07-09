@@ -322,6 +322,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Load.
+        /// </summary>
+        public static string LOAD {
+            get {
+                return ResourceManager.GetString("LOAD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Load matrix.
         /// </summary>
         public static string LOAD_MAT {
@@ -444,6 +453,15 @@ namespace RaspMat.Properties {
         public static string STEP_SWAP_ROWS {
             get {
                 return ResourceManager.GetString("STEP_SWAP_ROWS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Steps.
+        /// </summary>
+        public static string STEPS {
+            get {
+                return ResourceManager.GetString("STEPS", resourceCulture);
             }
         }
         

@@ -17,30 +17,25 @@
             <Setter Property="Width" Value="350" />
         </Style>
     </prism:Dialog.WindowStyle>
-    
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-
             <StackPanel Grid.Column="0">
                 <Label Content="{x:Static prop:Resources.IN_ROWS}" />
                 <TextBox Height="25" Text="{Binding Rows}" Margin="1" />
             </StackPanel>
-
             <StackPanel Grid.Column="1">
                 <Label Content="{x:Static prop:Resources.IN_COLUMNS}" />
                 <TextBox Height="25" Text="{Binding Columns}" Margin="1" />
             </StackPanel>
         </Grid>
-        
         <StackPanel Grid.Row="1" HorizontalAlignment="Center">
             <CheckBox Content="{x:Static prop:Resources.IN_ADD_ZEROS}" IsChecked="{Binding AddZeros}" HorizontalAlignment="Center" Margin="5" />
             <Button Command="{Binding CloseDialogCommand}" Content="{x:Static prop:Resources.OK}" Margin="5" />

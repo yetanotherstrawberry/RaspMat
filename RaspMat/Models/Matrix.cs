@@ -79,7 +79,7 @@ namespace RaspMat.Models
             return new Matrix(rows, columns, (row, col) => row == col ? 1 : 0);
         }
 
-        public static Matrix SwapMatrix(Matrix matrix, int a, int b)
+        public static Matrix SwapMatrix(IMatrix<Fraction> matrix, int a, int b)
         {
             var ret = Identity(matrix.Rows);
 
@@ -92,20 +92,11 @@ namespace RaspMat.Models
             return ret;
         }
 
-        public static Matrix AddToRowMatrix(Matrix matrix, int destination, int source, Fraction srcMultiplication)
+        public static Matrix AddToRowMatrix(IMatrix<Fraction> matrix, int destination, int source, Fraction srcMultiplication)
         {
             var ret = Identity(matrix.Rows);
 
             ret[destination, source] = srcMultiplication;
-
-            return ret;
-        }
-
-        public static Matrix AdditionMatrix(Matrix matrix, int destination, int source, Fraction scale)
-        {
-            var ret = Identity(matrix.Columns);
-
-            ret[source, destination] = scale;
 
             return ret;
         }
@@ -119,7 +110,7 @@ namespace RaspMat.Models
             return ret;
         }
 
-        public static Matrix AddI(Matrix matrix, bool onLeft)
+        public static Matrix AddI(IMatrix<Fraction> matrix, bool onLeft)
         {
             if (matrix.Rows != matrix.Columns)
                 throw new ArgumentException(message: Resources.ERR_MAT_NO_SQUARE, paramName: nameof(matrix));
@@ -168,7 +159,7 @@ namespace RaspMat.Models
 
         public static Matrix operator *(Matrix matrix, Fraction scale) => scale * matrix;
 
-        public static Matrix operator *(Matrix left, Matrix right)
+        public static Matrix operator *(Matrix left, IMatrix<Fraction> right)
         {
             if (left.Columns != right.Rows)
                 throw new ArgumentException(Resources.ERR_MULTIPLY_MAT_MISMATCH);
@@ -191,9 +182,9 @@ namespace RaspMat.Models
             return ret;
         }
 
-        public static Matrix Transpose(Matrix matrix)
+        public static Matrix Transpose(IMatrix<Fraction> matrix)
         {
-            return new Matrix(matrix.Columns, matrix.Rows, (row, col) => matrix[col][row]);
+            return new Matrix(matrix.Columns, matrix.Rows, (row, col) => matrix[col, row]);
         }
         #endregion StaticMethods
 
@@ -208,7 +199,7 @@ namespace RaspMat.Models
                     .ToArray()).ToArray());
         }
 
-        public DataTable ToDataTable() => DataTableHelpers.CreateDataTable(Rows, Columns, (row, col) => this[row, col]);
+        public DataTable ToDataTable() => DataTableHelpers.CreateStrDataTable(Rows, Columns, (row, col) => this[row, col]);
 
         public override string ToString()
         {
@@ -230,7 +221,7 @@ namespace RaspMat.Models
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Matrix mat) || Columns != mat.Columns || Rows != mat.Rows) return false;
+            if (!(obj is IMatrix<Fraction> mat) || Columns != mat.Columns || Rows != mat.Rows) return false;
 
             for (int row = 0; row < Rows; row++)
             {

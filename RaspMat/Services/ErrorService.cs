@@ -5,6 +5,9 @@ using System.Windows.Threading;
 
 namespace RaspMat.Services
 {
+    /// <summary>
+    /// Service for handling error messages and <see cref="Exception"/>s.
+    /// </summary>
     internal class ErrorService : IErrorService
     {
 

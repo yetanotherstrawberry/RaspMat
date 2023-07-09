@@ -112,19 +112,22 @@
     <Compile Include="Helpers\JaggedArrayHelper.cs" />
     <Compile Include="Interfaces\IAlgorithmResult.cs" />
     <Compile Include="Interfaces\IAsyncCommandService.cs" />
+    <Compile Include="Interfaces\IDeserializationResult.cs" />
     <Compile Include="Interfaces\IErrorService.cs" />
     <Compile Include="Interfaces\IFileService.cs" />
     <Compile Include="Interfaces\IMatrix.cs" />
     <Compile Include="Interfaces\ISerializationService.cs" />
+    <Compile Include="Models\DeserializationResult.cs" />
     <Compile Include="Models\MatAlgorithmResult.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Services\AsyncCommandService.cs" />
     <Compile Include="Services\ErrorService.cs" />
     <Compile Include="Services\FileService.cs" />
-    <Compile Include="Services\SerializationService.cs" />
+    <Compile Include="Services\JsonSerializationService.cs" />
     <Compile Include="ViewModels\StepListWindowViewModel.cs" />
     <Compile Include="ViewModels\GaussianWindowViewModel.cs" />
     <Compile Include="ViewModels\NewMatDialogViewModel.cs" />

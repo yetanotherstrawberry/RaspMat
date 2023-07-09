@@ -17,7 +17,7 @@
     <resheader name="version">2.0</resheader>
     <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
     <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my int string</value><comment>this is a comment</comment></data>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
     <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
     <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
         <value>[base64 mime encoded serialized .NET Framework object]</value>
@@ -183,6 +183,9 @@
   <data name="LEFT" xml:space="preserve">
     <value>Left</value>
   </data>
+  <data name="LOAD" xml:space="preserve">
+    <value>Load</value>
+  </data>
   <data name="LOAD_MAT" xml:space="preserve">
     <value>Load matrix</value>
   </data>
@@ -215,6 +218,9 @@
   </data>
   <data name="SCALE" xml:space="preserve">
     <value>Scale</value>
+  </data>
+  <data name="STEPS" xml:space="preserve">
+    <value>Steps</value>
   </data>
   <data name="STEP_MULTIPLY_ROW" xml:space="preserve">
     <value>Multiply row {0} by {1}.</value>

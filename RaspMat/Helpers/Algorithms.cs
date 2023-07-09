@@ -9,6 +9,13 @@ namespace RaspMat.Helpers
     internal static class Algorithms
     {
 
+        /// <summary>
+        /// Finds the greatest common divisor of the integers.
+        /// </summary>
+        /// <param name="a">An integer.</param>
+        /// <param name="b">An integer.</param>
+        /// <returns>Greatest common divisor of <paramref name="a"/> and <paramref name="b"/>. 1 if they are relatively prime.</returns>
+        /// <exception cref="DivideByZeroException">Both <paramref name="a"/> and <paramref name="b"/> are 0.</exception>
         public static long GreatestCommonDivisor(long a, long b)
         {
             if (a == 0 && b == 0)
@@ -29,11 +36,24 @@ namespace RaspMat.Helpers
             return a;
         }
 
+        /// <summary>
+        /// Finds the least common multiple of the integers. Uses <see cref="GreatestCommonDivisor(long, long)"/> and may throw its <see cref="Exception"/>.
+        /// </summary>
+        /// <param name="a">An integer.</param>
+        /// <param name="b">An integer.</param>
+        /// <returns>Least common multiple. 1 if <paramref name="a"/> and <paramref name="b"/> are equal.</returns>
         public static long LeastCommonMultiple(long a, long b)
             => Math.Abs(a * b) / GreatestCommonDivisor(a, b);
 
-        // https://en.wikipedia.org/wiki/Gaussian_elimination#Pseudocode
-        // https://apollo.astro.amu.edu.pl/PAD/pmwiki.php?n=Dybol.DydaktykaEliminacjaGaussa
+        /// <summary>
+        /// Performs Gaussian elimination on a <see cref="Matrix"/>. Returns all steps that were made with matrices. Does not modify the original matrix.
+        /// The implementation is based on
+        /// <see href="https://en.wikipedia.org/wiki/Gaussian_elimination#Pseudocode">en.wikipedia.org</see> and 
+        /// <see href="https://apollo.astro.amu.edu.pl/PAD/pmwiki.php?n=Dybol.DydaktykaEliminacjaGaussa">apollo.astro.amu.edu.pl</see> algorithms.
+        /// </summary>
+        /// <param name="matrix"><see cref="Matrix"/> to reduce. Will not be modified.</param>
+        /// <param name="reducedEchelon">Whether the resulting <see cref="Matrix"/> should be reduced row echelon (<see langword="true"/>) or row echelon (<see langword="false"/>).</param>
+        /// <returns>Steps and matrices created during elimination: <see cref="IList{T}"/> where <c>T</c> is <see cref="IAlgorithmResult{T}"/> where <c>T</c> is <see cref="Matrix"/>.</returns>
         public static IList<IAlgorithmResult<Matrix>> TotalGaussianElimination(this Matrix matrix, bool reducedEchelon = true)
         {
             var ret = new List<IAlgorithmResult<Matrix>>();

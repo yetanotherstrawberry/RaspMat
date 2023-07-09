@@ -4,23 +4,39 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:RaspMat.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:prop="clr-namespace:RaspMat.Properties"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:StepListWindowViewModel, IsDesignTimeCreatable=False}" 
-        Title="StepListWindow" Height="450" Width="800">
-    <Grid>
-        <ListBox ItemsSource="{Binding Steps}">
+        Title="{x:Static prop:Resources.STEPS}" Height="450" Width="800">
+    <ScrollViewer>
+        <ListBox HorizontalAlignment="Stretch" ItemsSource="{Binding Steps}" d:ItemsSource="{d:SampleData ItemCount=20}">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="TextWrapping" Value="Wrap" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+                <Style TargetType="Button">
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Padding" Value="2" />
+                </Style>
+            </ListBox.Resources>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="0,2">
+                    <Grid HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Title}" Grid.Column="0" />
-                        <Button Content="Matrix" Grid.Column="1" />
+                        <TextBlock Text="{Binding Step}" Grid.Column="0" />
+                        <Button Content="{x:Static prop:Resources.LOAD}" Grid.Column="1" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-    </Grid>
+    </ScrollViewer>
 </Window>
