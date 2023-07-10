@@ -6,12 +6,28 @@ using System.Windows.Input;
 
 namespace RaspMat.Services
 {
+    /// <summary>
+    /// A service to execute 
+    /// </summary>
     internal class AsyncCommandService : IAsyncCommandService
     {
 
+        /// <summary>
+        /// An <see cref="Action"/> to start when <see cref="ICommand.Execute(object)"/> <see cref="started"/> and <see cref="finished"/>.
+        /// </summary>
         private readonly Action started, finished;
+
+        /// <summary>
+        /// An <see cref="Action{T}"/> where <c>T</c> is <see cref="Exception"/> to execute when an <see cref="Exception"/> has been thrown.
+        /// </summary>
         private readonly Action<Exception> failed;
 
+        /// <summary>
+        /// Creates a new <see cref="AsyncCommandService"/> that performs <see cref="Action"/>s from parameters.
+        /// </summary>
+        /// <param name="commandStarted">An <see cref="Action"/> to start when <see cref="ICommand.Execute(object)"/> has been called.</param>
+        /// <param name="commandFinished">An <see cref="Action"/> to start when <see cref="ICommand.Execute(object)"/> has finished.</param>
+        /// <param name="commandError"><see cref="Action{Exception}"/> to execute when an <see cref="Exception"/> has been thrown.</param>
         public AsyncCommandService(Action commandStarted = null, Action commandFinished = null, Action<Exception> commandError = null)
         {
             started = commandStarted;
@@ -19,7 +35,7 @@ namespace RaspMat.Services
             failed = commandError;
         }
 
-        private async void TryExecAsync(Action action)
+        public async void TryExecAsync(Action action)
         {
             try
             {
@@ -37,12 +53,6 @@ namespace RaspMat.Services
             }
         }
 
-        /// <summary>
-        /// Generates an implementation of <see cref="ICommand"/> for an <see cref="Action"/> without parameters.
-        /// Ignores <see cref="ICommand.Execute(object)"/>'s and <see cref="ICommand.CanExecute(object)"/>'s parameter.
-        /// </summary>
-        /// <param name="action">A parameterless <see cref="Action"/> to execute on call to <see cref="ICommand.Execute(object)"/>.</param>
-        /// <returns>An <see cref="ICommand"/> which executes <paramref name="action"/> on call.</returns>
         public ICommand GenerateAsyncActionCommand(Action action, Func<bool> canExecute = null)
         {
             return new DelegateCommand(() => TryExecAsync(action), canExecute ?? (() => true));

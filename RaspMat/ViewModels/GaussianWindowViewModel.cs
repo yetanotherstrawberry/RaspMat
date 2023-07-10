@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -146,18 +147,26 @@ namespace RaspMat.ViewModels
         /// Creates a new DataGrid with size supplied in the dialog.
         /// </summary>
         /// <param name="dialogService"><see cref="IDialogService"/> that implements "NewMatDialog".</param>
-        private void NewDataGrid(IDialogService dialogService)
+        private void NewDataGrid(IDialogService dialogService, IAsyncCommandService asyncComm)
         {
             dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
             {
-                if (res.Result != ButtonResult.OK) return;
+                asyncComm.TryExecAsync(async () =>
+                {
+                    await Task.Run(() =>
+                    {
+                        if (res.Result != ButtonResult.OK) return;
 
-                var filler = res.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
+                        var filler = res.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
 
-                MatrixDataTable = DataTableHelpers.CreateStrDataTable(
-                    res.Parameters.GetValue<int>(Resources._ROWS),
-                    res.Parameters.GetValue<int>(Resources._COLS),
-                    (row, column) => filler);
+                        var ret = DataTableHelpers.CreateStrDataTable(
+                            res.Parameters.GetValue<int>(Resources._ROWS),
+                            res.Parameters.GetValue<int>(Resources._COLS),
+                            (row, column) => filler);
+
+                        MatrixDataTable = ret;
+                    });
+                });
             });
         }
 
@@ -178,28 +187,28 @@ namespace RaspMat.ViewModels
         /// <param name="serializationService">Instance of a <see cref="ISerializationService"/> that will be used for <see cref="Matrix"/> serialization.</param>
         public GaussianWindowViewModel(IDialogService dialogService, ISerializationService serializationService, IErrorService errorService)
         {
-            IAsyncCommandService asyncComm = new AsyncCommandService(() => IsFree = false, () => IsFree = true, exception => errorService.Error(exception));
+            IAsyncCommandService asyncSrv = new AsyncCommandService(() => IsFree = false, () => IsFree = true, exception => errorService.Error(exception));
 
-            MatGaussComm = asyncComm.GenerateAsyncActionCommand(() => Gauss());
-            MatEchelonComm = asyncComm.GenerateAsyncActionCommand(() => Gauss(reducedEchelon: false));
-            MatTransposeComm = asyncComm.GenerateAsyncActionCommand(() =>
+            MatGaussComm = asyncSrv.GenerateAsyncActionCommand(() => Gauss());
+            MatEchelonComm = asyncSrv.GenerateAsyncActionCommand(() => Gauss(reducedEchelon: false));
+            MatTransposeComm = asyncSrv.GenerateAsyncActionCommand(() =>
             {
                 CurrentMatrix = Matrix.Transpose(CurrentMatrix);
             });
-            MatRemoveIComm = asyncComm.GenerateAsyncActionCommand<bool?>(matrixLeftSide =>
+            MatRemoveIComm = asyncSrv.GenerateAsyncActionCommand<bool?>(matrixLeftSide =>
             {
                 CurrentMatrix = Matrix.Slice(CurrentMatrix, matrixLeftSide ?? throw new ArgumentNullException(paramName: nameof(matrixLeftSide)));
             });
-            MatAddIComm = asyncComm.GenerateAsyncActionCommand<bool?>(matrixLeftSide =>
+            MatAddIComm = asyncSrv.GenerateAsyncActionCommand<bool?>(matrixLeftSide =>
             {
                 CurrentMatrix = Matrix.AddI(CurrentMatrix, matrixLeftSide ?? throw new ArgumentNullException(paramName: nameof(matrixLeftSide)));
             });
-            MatScaleComm = asyncComm.GenerateAsyncActionCommand(() =>
+            MatScaleComm = asyncSrv.GenerateAsyncActionCommand(() =>
             {
                 CurrentMatrix *= FracScalar;
                 Scalar = string.Empty;
             });
-            RowScaleComm = asyncComm.GenerateAsyncActionCommand(() =>
+            RowScaleComm = asyncSrv.GenerateAsyncActionCommand(() =>
             {
                 foreach (var rowId in SelectedRows.ToArray()) // ToArray() will copy the list in order to avoid modyfing the enumerated collection.
                 {
@@ -207,7 +216,7 @@ namespace RaspMat.ViewModels
                 }
                 Scalar = string.Empty;
             });
-            MatSwapRowsComm = asyncComm.GenerateAsyncActionCommand(() =>
+            MatSwapRowsComm = asyncSrv.GenerateAsyncActionCommand(() =>
             {
                 if (SelectedRows.Count > 2)
                     throw new ArgumentOutOfRangeException(
@@ -216,8 +225,8 @@ namespace RaspMat.ViewModels
                         message: string.Format(Resources.ERR_ROWS, 2));
                 CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
             });
-            UserInputComm = new DelegateCommand(() => NewDataGrid(dialogService));
-            GridSelectedRowComm = asyncComm.GenerateAsyncActionCommand<SelectionChangedEventArgs>(args =>
+            UserInputComm = new DelegateCommand(() => NewDataGrid(dialogService, asyncSrv));
+            GridSelectedRowComm = asyncSrv.GenerateAsyncActionCommand<SelectionChangedEventArgs>(args =>
             {
                 // Remove all unselected rows.
                 foreach (DataRowView item in args.RemovedItems)
@@ -231,11 +240,11 @@ namespace RaspMat.ViewModels
                     SelectedRows.Add(DataGridRowToMatRow(item));
                 }
             });
-            SerializeComm = asyncComm.GenerateAsyncActionCommand(() =>
+            SerializeComm = asyncSrv.GenerateAsyncActionCommand(() =>
             {
                 serializationService.Serialize(CurrentMatrix);
             });
-            DeserializeComm = asyncComm.GenerateAsyncActionCommand(() =>
+            DeserializeComm = asyncSrv.GenerateAsyncActionCommand(() =>
             {
                 var matResult = serializationService.Deserialize<Matrix>();
                 if (!matResult.Successful) return;

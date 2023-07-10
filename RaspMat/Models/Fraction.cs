@@ -2,6 +2,7 @@
 using RaspMat.Helpers;
 using RaspMat.Properties;
 using System;
+using System.Numerics;
 
 namespace RaspMat.Models
 {
@@ -11,12 +12,12 @@ namespace RaspMat.Models
         /// <summary>
         /// Numerator (upper part) of this fraction.
         /// </summary>
-        public long Numerator { get; }
+        public BigInteger Numerator { get; }
 
         /// <summary>
         /// Denominator (lower part) of this fraction.
         /// </summary>
-        public long Denominator { get; }
+        public BigInteger Denominator { get; }
 
         /// <summary>
         /// Creates a new <see cref="Fraction"/>. If the <paramref name="denominator"/> is negative, it and <paramref name="numerator"/> will be multiplied by -1.
@@ -25,7 +26,7 @@ namespace RaspMat.Models
         /// <param name="denominator">Denominator (lower part) of the fraction. Cannot be 0.</param>
         /// <exception cref="DivideByZeroException">0 equals <paramref name="denominator"/>.</exception>
         [JsonConstructor]
-        public Fraction(long numerator, long denominator = 1)
+        public Fraction(BigInteger numerator, BigInteger denominator)
         {
             if (denominator == 0)
                 throw new DivideByZeroException();
@@ -49,7 +50,7 @@ namespace RaspMat.Models
         /// <summary>
         /// Creates a new <see cref="Fraction"/> which is equal to 0.
         /// </summary>
-        public static Fraction Zero => new Fraction(0);
+        public static Fraction Zero => new Fraction(0, 1);
 
         /// <summary>
         /// Removes all parentheses and creates a new <see cref="Fraction"/> based on <paramref name="fraction"/>.
@@ -59,14 +60,14 @@ namespace RaspMat.Models
         /// <exception cref="ArgumentException"><paramref name="fraction"/> has more than 2 or no parts when split by '/'.</exception>
         public static Fraction Parse(string fraction)
         {
-            var integers = Array.ConvertAll(fraction.Replace(" ", string.Empty).Split('/'), str => int.Parse(str.TrimStart('(').TrimEnd(')')));
+            var integers = Array.ConvertAll(fraction.Replace(" ", string.Empty).Split('/'), str => BigInteger.Parse(str.TrimStart('(').TrimEnd(')')));
 
             if (integers.Length < 1)
                 throw new ArgumentException(message: Resources.ERR_NO_INTS, paramName: nameof(fraction));
             if (integers.Length > 2)
                 throw new ArgumentException(message: Resources.ERR_TOO_MANY_INTS, paramName: nameof(fraction));
 
-            return integers.Length > 1 ? new Fraction(integers[0], integers[1]) : new Fraction(integers[0]);
+            return integers.Length > 1 ? new Fraction(integers[0], integers[1]) : new Fraction(integers[0], 1);
         }
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace RaspMat.Models
             => !(a == b);
 
         public static implicit operator Fraction(int numerator)
-            => new Fraction(numerator);
+            => new Fraction(numerator, 1);
 
         /// <summary>
         /// Same as <see cref="operator ==(Fraction, Fraction)"/>, but also checks if <paramref name="obj"/> is a <see cref="Fraction"/>.

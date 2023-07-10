@@ -3,6 +3,7 @@ using RaspMat.Models;
 using RaspMat.Properties;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace RaspMat.Helpers
 {
@@ -16,15 +17,15 @@ namespace RaspMat.Helpers
         /// <param name="b">An integer.</param>
         /// <returns>Greatest common divisor of <paramref name="a"/> and <paramref name="b"/>. 1 if they are relatively prime.</returns>
         /// <exception cref="DivideByZeroException">Both <paramref name="a"/> and <paramref name="b"/> are 0.</exception>
-        public static long GreatestCommonDivisor(long a, long b)
+        public static BigInteger GreatestCommonDivisor(BigInteger a, BigInteger b)
         {
             if (a == 0 && b == 0)
                 throw new DivideByZeroException();
             if (a == 0) return b;
             if (b == 0) return a;
 
-            a = Math.Abs(a);
-            b = Math.Abs(b);
+            a = BigInteger.Abs(a);
+            b = BigInteger.Abs(b);
 
             while (b != 0)
             {
@@ -37,13 +38,21 @@ namespace RaspMat.Helpers
         }
 
         /// <summary>
-        /// Finds the least common multiple of the integers. Uses <see cref="GreatestCommonDivisor(long, long)"/> and may throw its <see cref="Exception"/>.
+        /// Finds the least common multiple of the integers. Uses <see cref="GreatestCommonDivisor(BigInteger, BigInteger)"/> and may throw its <see cref="Exception"/>.
         /// </summary>
         /// <param name="a">An integer.</param>
         /// <param name="b">An integer.</param>
         /// <returns>Least common multiple. 1 if <paramref name="a"/> and <paramref name="b"/> are equal.</returns>
-        public static long LeastCommonMultiple(long a, long b)
-            => Math.Abs(a * b) / GreatestCommonDivisor(a, b);
+        public static BigInteger LeastCommonMultiple(BigInteger a, BigInteger b)
+        {
+            var multiply = BigInteger.Abs(a * b);
+            if (multiply == 0) throw new Exception();
+            var gcd = GreatestCommonDivisor(a, b);
+            if (gcd == 0) throw new Exception();
+            var ret = multiply / gcd;
+            if (ret == 0) throw new Exception();
+            return ret;
+        }
 
         /// <summary>
         /// Performs Gaussian elimination on a <see cref="Matrix"/>. Returns all steps that were made with matrices. Does not modify the original matrix.
