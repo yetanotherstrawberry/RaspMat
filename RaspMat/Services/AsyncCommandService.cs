@@ -35,13 +35,13 @@ namespace RaspMat.Services
             failed = commandError;
         }
 
-        public async void TryExecAsync(Action action)
+        public async void TryExecAsync(Task task)
         {
             try
             {
                 started?.Invoke();
-                if (action is null) return;
-                await Task.Run(action);
+                if (task is null) return;
+                await task;
             }
             catch (Exception exception)
             {
@@ -51,6 +51,11 @@ namespace RaspMat.Services
             {
                 finished?.Invoke();
             }
+        }
+
+        public void TryExecAsync(Action action)
+        {
+            TryExecAsync(Task.Run(action));
         }
 
         public ICommand GenerateAsyncActionCommand(Action action, Func<bool> canExecute = null)

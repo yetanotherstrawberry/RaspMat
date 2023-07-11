@@ -144,33 +144,6 @@ namespace RaspMat.ViewModels
         }
 
         /// <summary>
-        /// Creates a new DataGrid with size supplied in the dialog.
-        /// </summary>
-        /// <param name="dialogService"><see cref="IDialogService"/> that implements "NewMatDialog".</param>
-        private void NewDataGrid(IDialogService dialogService, IAsyncCommandService asyncComm)
-        {
-            dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
-            {
-                asyncComm.TryExecAsync(async () =>
-                {
-                    await Task.Run(() =>
-                    {
-                        if (res.Result != ButtonResult.OK) return;
-
-                        var filler = res.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
-
-                        var ret = DataTableHelpers.CreateStrDataTable(
-                            res.Parameters.GetValue<int>(Resources._ROWS),
-                            res.Parameters.GetValue<int>(Resources._COLS),
-                            (row, column) => filler);
-
-                        MatrixDataTable = ret;
-                    });
-                });
-            });
-        }
-
-        /// <summary>
         /// Gets the number of a row in the <see cref="Matrix"/>.
         /// </summary>
         /// <param name="rowView"><see cref="DataRow"/> of the <see cref="MatrixDataTable"/>.</param>
@@ -225,7 +198,25 @@ namespace RaspMat.ViewModels
                         message: string.Format(Resources.ERR_ROWS, 2));
                 CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
             });
-            UserInputComm = new DelegateCommand(() => NewDataGrid(dialogService, asyncSrv));
+            UserInputComm = new DelegateCommand(() =>
+            {
+                dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
+                {
+                    asyncSrv.TryExecAsync(Task.Run(() =>
+                    {
+                        if (res.Result != ButtonResult.OK) return;
+
+                        var filler = res.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
+
+                        var ret = DataTableHelpers.CreateStrDataTable(
+                            res.Parameters.GetValue<int>(Resources._ROWS),
+                            res.Parameters.GetValue<int>(Resources._COLS),
+                            (row, column) => filler);
+
+                        MatrixDataTable = ret;
+                    }));
+                });
+            });
             GridSelectedRowComm = asyncSrv.GenerateAsyncActionCommand<SelectionChangedEventArgs>(args =>
             {
                 // Remove all unselected rows.

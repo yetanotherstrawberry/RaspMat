@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace RaspMat.Interfaces
@@ -28,6 +29,12 @@ namespace RaspMat.Interfaces
         /// </summary>
         /// <param name="action"><see cref="Action"/> to be executed.</param>
         void TryExecAsync(Action action);
+
+        /// <summary>
+        /// Tries to execute a <paramref name="task"/>.
+        /// </summary>
+        /// <param name="task"><see cref="Task"/> to be executed.</param>
+        void TryExecAsync(Task task);
 
     }
 }
