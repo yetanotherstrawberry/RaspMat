@@ -18,21 +18,14 @@ namespace RaspMat.Services
         private readonly Action started, finished;
 
         /// <summary>
-        /// An <see cref="Action{T}"/> where <c>T</c> is <see cref="Exception"/> to execute when an <see cref="Exception"/> has been thrown.
-        /// </summary>
-        private readonly Action<Exception> failed;
-
-        /// <summary>
         /// Creates a new <see cref="AsyncCommandService"/> that performs <see cref="Action"/>s from parameters.
         /// </summary>
         /// <param name="commandStarted">An <see cref="Action"/> to start when <see cref="ICommand.Execute(object)"/> has been called.</param>
         /// <param name="commandFinished">An <see cref="Action"/> to start when <see cref="ICommand.Execute(object)"/> has finished.</param>
-        /// <param name="commandError"><see cref="Action{Exception}"/> to execute when an <see cref="Exception"/> has been thrown.</param>
-        public AsyncCommandService(Action commandStarted = null, Action commandFinished = null, Action<Exception> commandError = null)
+        public AsyncCommandService(Action commandStarted = null, Action commandFinished = null)
         {
             started = commandStarted;
             finished = commandFinished;
-            failed = commandError;
         }
 
         public async void TryExecAsync(Task task)
@@ -42,10 +35,6 @@ namespace RaspMat.Services
                 started?.Invoke();
                 if (task is null) return;
                 await task;
-            }
-            catch (Exception exception)
-            {
-                failed?.Invoke(exception);
             }
             finally
             {

@@ -3,6 +3,9 @@ using System.Data;
 
 namespace RaspMat.Helpers
 {
+    /// <summary>
+    /// Static class for helpers for <see cref="DataTable"/>s.
+    /// </summary>
     internal static class DataTableHelpers
     {
 

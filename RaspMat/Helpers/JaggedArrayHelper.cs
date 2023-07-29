@@ -15,15 +15,17 @@ namespace RaspMat.Helpers
         /// <typeparam name="T">Input array type.</typeparam>
         /// <param name="input">Array to be copied.</param>
         /// <param name="startCol">Column (2nd dimension) index to start from.</param>
-        /// <param name="colLength">Designated length of the 2nd dimension. Will copy everything past starting index if null.</param>
+        /// <param name="colLength">Designated length of the 2nd dimension. Will copy everything past starting index if <see langword="null"/>.</param>
+        /// <param name="startRow">Row (1st dimension) index to start from.</param>
+        /// <param name="rowLength">Designated length of the 1st dimension. Will copy everything past starting index if <see langword="null"/>.</param>
         /// <returns>New array with elements copied from input.</returns>
-        public static T[][] Copy<T>(this T[][] input, int startCol = 0, int? colLength = null)
+        public static T[][] Copy<T>(this T[][] input, int startCol = 0, int? colLength = null, int startRow = 0, int? rowLength = null)
         {
-            var ret = new T[input.Length][];
+            var ret = new T[rowLength ?? input.Length][];
 
-            Parallel.For(0, ret.Length, row =>
+            Parallel.For(startRow, ret.Length, row =>
             {
-                ret[row] = new T[colLength ?? input[row].Length - startCol];
+                ret[row] = new T[colLength ?? (input[row].Length - startCol)];
                 Array.Copy(input[row], startCol, ret[row], 0, ret[row].Length);
             });
 

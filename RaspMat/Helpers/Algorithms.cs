@@ -1,58 +1,16 @@
-﻿using RaspMat.Interfaces;
+﻿using RaspMat.DTOs;
+using RaspMat.Interfaces;
 using RaspMat.Models;
 using RaspMat.Properties;
-using System;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace RaspMat.Helpers
 {
+    /// <summary>
+    /// Static class for holding algorithms.
+    /// </summary>
     internal static class Algorithms
     {
-
-        /// <summary>
-        /// Finds the greatest common divisor of the integers.
-        /// </summary>
-        /// <param name="a">An integer.</param>
-        /// <param name="b">An integer.</param>
-        /// <returns>Greatest common divisor of <paramref name="a"/> and <paramref name="b"/>. 1 if they are relatively prime.</returns>
-        /// <exception cref="DivideByZeroException">Both <paramref name="a"/> and <paramref name="b"/> are 0.</exception>
-        public static BigInteger GreatestCommonDivisor(BigInteger a, BigInteger b)
-        {
-            if (a == 0 && b == 0)
-                throw new DivideByZeroException();
-            if (a == 0) return b;
-            if (b == 0) return a;
-
-            a = BigInteger.Abs(a);
-            b = BigInteger.Abs(b);
-
-            while (b != 0)
-            {
-                var c = a % b;
-                a = b;
-                b = c;
-            }
-
-            return a;
-        }
-
-        /// <summary>
-        /// Finds the least common multiple of the integers. Uses <see cref="GreatestCommonDivisor(BigInteger, BigInteger)"/> and may throw its <see cref="Exception"/>.
-        /// </summary>
-        /// <param name="a">An integer.</param>
-        /// <param name="b">An integer.</param>
-        /// <returns>Least common multiple. 1 if <paramref name="a"/> and <paramref name="b"/> are equal.</returns>
-        public static BigInteger LeastCommonMultiple(BigInteger a, BigInteger b)
-        {
-            var multiply = BigInteger.Abs(a * b);
-            if (multiply == 0) throw new Exception();
-            var gcd = GreatestCommonDivisor(a, b);
-            if (gcd == 0) throw new Exception();
-            var ret = multiply / gcd;
-            if (ret == 0) throw new Exception();
-            return ret;
-        }
 
         /// <summary>
         /// Performs Gaussian elimination on a <see cref="Matrix"/>. Returns all steps that were made with matrices. Does not modify the original matrix.
@@ -63,9 +21,14 @@ namespace RaspMat.Helpers
         /// <param name="matrix"><see cref="Matrix"/> to reduce. Will not be modified.</param>
         /// <param name="reducedEchelon">Whether the resulting <see cref="Matrix"/> should be reduced row echelon (<see langword="true"/>) or row echelon (<see langword="false"/>).</param>
         /// <returns>Steps and matrices created during elimination: <see cref="IList{T}"/> where <c>T</c> is <see cref="IAlgorithmResult{T}"/> where <c>T</c> is <see cref="Matrix"/>.</returns>
-        public static IList<IAlgorithmResult<Matrix>> TotalGaussianElimination(this Matrix matrix, bool reducedEchelon = true)
+        public static IList<AlgorithmStepDTO<Matrix>> GaussianElimination(this Matrix matrix, bool reducedEchelon = true)
         {
-            var ret = new List<IAlgorithmResult<Matrix>>();
+            AlgorithmStepDTO<Matrix> GenerateStep(string text, Matrix stepMatrix, params object[] interpolation)
+            {
+                return new AlgorithmStepDTO<Matrix>(string.Format(text, interpolation), stepMatrix);
+            }
+
+            var ret = new List<AlgorithmStepDTO<Matrix>>();
             var row = 0;
             var col = 0;
 
@@ -91,13 +54,7 @@ namespace RaspMat.Helpers
                     if (shift != row && row < matrix.Rows && shift < matrix.Rows)
                     {
                         matrix = Matrix.SwapMatrix(matrix, row, shift) * matrix;
-                        ret.Add(
-                            new MatAlgorithmResult(
-                                string.Format(
-                                    Resources.STEP_SWAP_ROWS,
-                                    row.ToString(),
-                                    shift.ToString()),
-                                matrix));
+                        ret.Add(GenerateStep(Resources.STEP_SWAP_ROWS, matrix, row + 1, shift + 1));
                     }
                 }
 
@@ -107,13 +64,7 @@ namespace RaspMat.Helpers
                     if (reciprocal != 1)
                     {
                         matrix = Matrix.MultiplicationMatrix(matrix.Rows, row, reciprocal) * matrix;
-                        ret.Add(
-                            new MatAlgorithmResult(
-                                string.Format(
-                                    Resources.STEP_MULTIPLY_ROW,
-                                    row.ToString(),
-                                    reciprocal.ToString()),
-                                matrix));
+                        ret.Add(GenerateStep(Resources.STEP_MULTIPLY_ROW, matrix, row + 1, reciprocal));
                     }
 
                     reciprocal = matrix[row, col].Reciprocal();
@@ -125,22 +76,16 @@ namespace RaspMat.Helpers
                         if (multiplier != 0)
                         {
                             matrix = Matrix.AddToRowMatrix(matrix, destination, row, multiplier) * matrix;
-                            ret.Add(
-                                new MatAlgorithmResult(
-                                    string.Format(
-                                        Resources.STEP_SUM_ROWS,
-                                        row.ToString(),
-                                        multiplier.ToString(),
-                                        destination.ToString()),
-                                    matrix));
+                            ret.Add(GenerateStep(Resources.STEP_SUM_ROWS, matrix, row + 1, multiplier, destination + 1));
                         }
                     }
                 }
+
                 row++;
                 col++;
             }
 
-            // Subtract from all rows above the current one it's value multiplied by the ratio,
+            // Subtract from all rows above the current one its value multiplied by the ratio,
             // so that all rows above have 0 in the column of the leading 1 of the current row.
             if (reducedEchelon)
             {
@@ -159,14 +104,7 @@ namespace RaspMat.Helpers
                         if (multiplier != 0)
                         {
                             matrix = Matrix.AddToRowMatrix(matrix, destination, currentRow, multiplier) * matrix;
-                            ret.Add(
-                                new MatAlgorithmResult(
-                                    string.Format(
-                                        Resources.STEP_SUM_ROWS,
-                                        currentRow.ToString(),
-                                        multiplier.ToString(),
-                                        destination.ToString()),
-                                matrix));
+                            ret.Add(GenerateStep(Resources.STEP_SUM_ROWS, matrix, currentRow + 1, multiplier, destination + 1));
                         }
                     }
                 }
@@ -174,6 +112,17 @@ namespace RaspMat.Helpers
 
             return ret;
         }
+
+        public static IList<AlgorithmStepDTO<Matrix>> InverseMatrix(this Matrix matrix)
+        {
+            var ret = new List<AlgorithmStepDTO<Matrix>>();
+            var mat = Matrix.AddI(matrix, onLeft: false);
+            mat.GaussianElimination(reducedEchelon: true);
+            mat = Matrix.Slice(mat, removeLeft: true);
+
+            return ret;
+        }
+
         /*
         private static string[] StrToStrVecs(string vec, char vectorsSplitter = ';')
             => Array.ConvertAll(vec.Split(vectorsSplitter), str => str.TrimStart('(').TrimEnd(')'));

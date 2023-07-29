@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:s="clr-namespace:System;assembly=mscorlib"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:prop="clr-namespace:RaspMat.Properties"
         xmlns:vm="clr-namespace:RaspMat.ViewModels"
@@ -11,7 +12,7 @@
         Title="{x:Static prop:Resources.TITLE}"
         MinHeight="520"
         MinWidth="850">
-    <Grid IsEnabled="{Binding IsFree}">
+    <Grid >
         <Grid.Resources>
             <Style TargetType="Button">
                 <Setter Property="Width" Value="120" />
@@ -39,20 +40,21 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-            <StackPanel Style="{StaticResource verticalStackpanel}" Grid.Row="0">
+            <StackPanel Style="{StaticResource verticalStackpanel}">
                 <GroupBox Header="{x:Static prop:Resources.ELEMENTARY_MAT_OP}">
                     <StackPanel Orientation="Vertical">
                         <GroupBox Header="{x:Static prop:Resources.SCALE}">
                             <StackPanel Orientation="Vertical">
                                 <StackPanel>
                                     <TextBlock Text="{x:Static prop:Resources.SCALAR}" />
-                                    <TextBox Text="{Binding Scalar}" />
+                                    <TextBox x:Name="Scalar" />
                                 </StackPanel>
                                 <StackPanel>
+                                    <StackPanel.Resources>
+                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                            <Setter Property="CommandParameter" Value="{Binding Source={x:Reference Scalar}, Path=Text}" />
+                                        </Style>
+                                    </StackPanel.Resources>
                                     <Button Command="{Binding MatScaleComm}" Content="{x:Static prop:Resources.MATRIX}" />
                                     <Button Command="{Binding RowScaleComm}" Content="{x:Static prop:Resources.ROW}" />
                                 </StackPanel>
@@ -89,15 +91,15 @@
                                 Command="{Binding MatAddIComm}" />
                             <Button
                                 Content="{x:Static prop:Resources.REMOVE_HALF}"
-                                Command="{Binding MatRemoveIComm}" />
+                                Command="{Binding MatSliceComm}" />
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
-            <StackPanel VerticalAlignment="Bottom" Grid.Row="1" Margin="5">
-                <!--<Button
+            <StackPanel VerticalAlignment="Bottom" Grid.Row="1">
+                <Button
                     Content="{x:Static prop:Resources.STEPS}"
-                    Command="{Binding StepListWindowComm}" />-->
+                    Command="{Binding StepListWindowComm}" />
             </StackPanel>
         </Grid>
         <Grid Grid.Column="1" Grid.RowSpan="1">
@@ -108,8 +110,16 @@
             </Grid.RowDefinitions>
             <GroupBox Header="{x:Static prop:Resources.ALGORITHMS}" Grid.Row="0">
                 <StackPanel>
-                    <Button Command="{Binding MatGaussComm}" Content="{x:Static prop:Resources.REDUCED}" />
-                    <Button Command="{Binding MatEchelonComm}" Content="{x:Static prop:Resources.ECHELON}" />
+                    <Button Content="{x:Static prop:Resources.REDUCED}" Command="{Binding MatGaussComm}">
+                        <Button.CommandParameter>
+                            <s:Boolean>True</s:Boolean>
+                        </Button.CommandParameter>
+                    </Button>
+                    <Button Content="{x:Static prop:Resources.ECHELON}" Command="{Binding MatGaussComm}">
+                        <Button.CommandParameter>
+                            <s:Boolean>False</s:Boolean>
+                        </Button.CommandParameter>
+                    </Button>
                 </StackPanel>
             </GroupBox>
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
@@ -121,7 +131,8 @@
                     CanUserAddRows="False"
                     ColumnWidth="SizeToCells"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Center">
+                    HorizontalAlignment="Center"
+                    IsEnabled="{Binding IsFree}">
                     <DataGrid.Resources>
                         <SolidColorBrush
                             x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"

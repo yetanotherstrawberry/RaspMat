@@ -1,21 +1,23 @@
-﻿using Newtonsoft.Json;
-using RaspMat.Helpers;
-using RaspMat.Properties;
+﻿using RaspMat.Properties;
 using System;
+using System.Linq;
 using System.Numerics;
 
 namespace RaspMat.Models
 {
+    /// <summary>
+    /// A readonly struct containing 2 <see cref="BigInteger"/>s. Do not use the parameterless (default) struct constructor.
+    /// </summary>
     internal readonly struct Fraction
     {
 
         /// <summary>
-        /// Numerator (upper part) of this fraction.
+        /// Numerator (upper part) of this <see cref="Fraction"/>.
         /// </summary>
         public BigInteger Numerator { get; }
 
         /// <summary>
-        /// Denominator (lower part) of this fraction.
+        /// Denominator (lower part) of this <see cref="Fraction"/>.
         /// </summary>
         public BigInteger Denominator { get; }
 
@@ -25,20 +27,20 @@ namespace RaspMat.Models
         /// <param name="numerator">Numerator (upper part) of the fraction.</param>
         /// <param name="denominator">Denominator (lower part) of the fraction. Cannot be 0.</param>
         /// <exception cref="DivideByZeroException">0 equals <paramref name="denominator"/>.</exception>
-        [JsonConstructor]
         public Fraction(BigInteger numerator, BigInteger denominator)
         {
-            if (denominator == 0)
+            if (denominator.IsZero)
                 throw new DivideByZeroException();
-            else if (denominator < 0)
+
+            if (denominator < BigInteger.Zero)
             {
-                denominator *= -1;
-                numerator *= -1;
+                denominator = BigInteger.Negate(denominator);
+                numerator = BigInteger.Negate(numerator);
             }
 
-            if (denominator != 1)
+            if (!denominator.IsOne)
             {
-                var gcd = Algorithms.GreatestCommonDivisor(numerator, denominator);
+                var gcd = BigInteger.GreatestCommonDivisor(numerator, denominator);
                 numerator /= gcd;
                 denominator /= gcd;
             }
@@ -50,7 +52,7 @@ namespace RaspMat.Models
         /// <summary>
         /// Creates a new <see cref="Fraction"/> which is equal to 0.
         /// </summary>
-        public static Fraction Zero => new Fraction(0, 1);
+        public static Fraction Zero => new Fraction(BigInteger.Zero, BigInteger.One);
 
         /// <summary>
         /// Removes all parentheses and creates a new <see cref="Fraction"/> based on <paramref name="fraction"/>.
@@ -62,12 +64,12 @@ namespace RaspMat.Models
         {
             var integers = Array.ConvertAll(fraction.Replace(" ", string.Empty).Split('/'), str => BigInteger.Parse(str.TrimStart('(').TrimEnd(')')));
 
-            if (integers.Length < 1)
+            if (!integers.Any())
                 throw new ArgumentException(message: Resources.ERR_NO_INTS, paramName: nameof(fraction));
             if (integers.Length > 2)
                 throw new ArgumentException(message: Resources.ERR_TOO_MANY_INTS, paramName: nameof(fraction));
 
-            return integers.Length > 1 ? new Fraction(integers[0], integers[1]) : new Fraction(integers[0], 1);
+            return integers.Length > 1 ? new Fraction(integers.First(), integers.Last()) : new Fraction(integers.First(), BigInteger.One);
         }
 
         /// <summary>
@@ -78,7 +80,7 @@ namespace RaspMat.Models
 
         public static Fraction operator +(Fraction a, Fraction b)
         {
-            var lcm = Algorithms.LeastCommonMultiple(a.Denominator, b.Denominator);
+            var lcm = BigInteger.Abs(a.Denominator * b.Denominator) / BigInteger.GreatestCommonDivisor(a.Denominator, b.Denominator);
             return new Fraction((a.Numerator * (lcm / a.Denominator)) + (b.Numerator * (lcm / b.Denominator)), lcm);
         }
 
@@ -86,7 +88,7 @@ namespace RaspMat.Models
             => a + new Fraction(-b.Numerator, b.Denominator);
 
         public static Fraction operator -(Fraction a)
-            => a * -1;
+            => new Fraction(BigInteger.Negate(a.Numerator), a.Denominator);
 
         public static Fraction operator *(Fraction a, Fraction b)
             => new Fraction(a.Numerator * b.Numerator, a.Denominator * b.Denominator);
@@ -100,30 +102,23 @@ namespace RaspMat.Models
         public static bool operator !=(Fraction a, Fraction b)
             => !(a == b);
 
-        public static implicit operator Fraction(int numerator)
-            => new Fraction(numerator, 1);
+        public static implicit operator Fraction(long numerator)
+            => new Fraction(numerator, BigInteger.One);
 
-        /// <summary>
-        /// Same as <see cref="operator ==(Fraction, Fraction)"/>, but also checks if <paramref name="obj"/> is a <see cref="Fraction"/>.
-        /// </summary>
-        /// <param name="obj">An <see cref="object"/> to be checked if it is a <see cref="Fraction"/> and equal to the one this method is executed from.</param>
-        /// <returns>A <see cref="bool"/> value indicating whether both <see cref="object"/>s are equal <see cref="Fraction"/>s.</returns>
         public override bool Equals(object obj)
             => obj is Fraction fraction && this == fraction;
 
         public override int GetHashCode()
             => (int)((Numerator % (int.MaxValue / 2)) + (Denominator % (int.MaxValue / 2)));
 
-        /// <summary>
-        /// Gets a human-readible representation of a <see cref="Fraction"/>, like "-1/2".
-        /// </summary>
-        /// <returns><see cref="Fraction"/> converted to <see cref="string"/>.</returns>
         public override string ToString()
         {
-            var ret = Numerator.ToString();
-            if (Denominator != 1)
-                ret += "/" + Denominator;
-            return ret;
+            if (Denominator.IsOne)
+            {
+                return Numerator.ToString();
+            }
+
+            return string.Join("/", Numerator.ToString(), Denominator.ToString());
         }
 
     }

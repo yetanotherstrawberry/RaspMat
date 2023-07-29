@@ -5,8 +5,8 @@ namespace RaspMat.Interfaces
     /// <summary>
     /// A two-dimensional matrix.
     /// </summary>
-    /// <typeparam name="TNumber"><see cref="Type"/> of the value in each cell.</typeparam>
-    internal interface IMatrix<TNumber>
+    /// <typeparam name="TCell"><see cref="Type"/> of the value in each cell.</typeparam>
+    internal interface IMatrix<TCell>
     {
 
         /// <summary>
@@ -15,7 +15,7 @@ namespace RaspMat.Interfaces
         /// <param name="row">Index of the row of the matrix.</param>
         /// <param name="column">Index of the column of the matrix.</param>
         /// <returns>Cell with indexes specified.</returns>
-        TNumber this[int row, int column] { get; }
+        TCell this[int row, int column] { get; }
 
         /// <summary>
         /// Returns the number of rows.

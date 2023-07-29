@@ -49,12 +49,12 @@ namespace RaspMat.Models
             FractionMatrix = JaggedArrayHelper.Create(rows, cols, values);
         }
 
-        private Matrix(Fraction[][] fractionMatrix, bool copy)
+        [JsonConstructor]
+#pragma warning disable IDE0051 // Remove unused private members
+        private Matrix(Fraction[][] fractionMatrix)
+#pragma warning restore IDE0051 // Remove unused private members
         {
-            if (copy)
-                FractionMatrix = fractionMatrix.Copy();
-            else
-                FractionMatrix = fractionMatrix;
+            FractionMatrix = fractionMatrix;
         }
 
         public Matrix(string[][] input)
@@ -62,10 +62,7 @@ namespace RaspMat.Models
             FractionMatrix = input.Convert(str => Fraction.Parse(str));
         }
 
-        [JsonConstructor]
-        public Matrix(Fraction[][] fractionMatrix) : this(fractionMatrix, copy: true) { }
-        public Matrix(int rows, int cols) : this(rows, cols, (row, col) => Fraction.Zero) { }
-        public Matrix(int size) : this(size, size) { }
+        public Matrix(int rows, int columns) : this(rows, columns, (row, column) => Fraction.Zero) { }
         #endregion Constructors
 
         #region StaticMethods
@@ -132,14 +129,14 @@ namespace RaspMat.Models
             return ret;
         }
 
-        public static Matrix Slice(Matrix matrix, bool removeFromLeft)
+        public static Matrix Slice(Matrix matrix, bool removeLeft)
         {
-            if (matrix.Columns % 2 != 0 || matrix.Rows != (matrix.Columns / 2))
+            if (matrix.Columns % 2 != 0)
                 throw new ArgumentException(message: Resources.ERR_MAT_BAD_SHAPE, paramName: nameof(matrix));
 
             var colHalf = matrix.Columns / 2;
 
-            return new Matrix(JaggedArrayHelper.Copy(matrix.FractionMatrix, removeFromLeft ? colHalf : 0, colHalf));
+            return new Matrix(matrix.Rows, colHalf, (row, column) => removeLeft ? matrix[row, column] : matrix[row, column + colHalf]);
         }
 
         public static Matrix operator *(Fraction scale, Matrix matrix)
@@ -191,12 +188,7 @@ namespace RaspMat.Models
         #region Methods
         public static Matrix Parse(DataTable dataTable)
         {
-            return new Matrix(
-                dataTable.AsEnumerable()
-                .Select(
-                    row => row.ItemArray
-                    .Select(cell => cell.ToString())
-                    .ToArray()).ToArray());
+            return new Matrix(dataTable.Rows.Count, dataTable.Columns.Count, (row, column) => Fraction.Parse(dataTable.Rows[row][column].ToString()));
         }
 
         public DataTable ToDataTable() => DataTableHelpers.CreateStrDataTable(Rows, Columns, (row, col) => this[row, col]);

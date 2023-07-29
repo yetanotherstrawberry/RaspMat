@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace RaspMat.Views
 {
@@ -9,7 +10,7 @@ namespace RaspMat.Views
     {
 
         /// <summary>
-        /// Initializes XAML.
+        /// Initializes XAML and shows the <see cref="Window"/>.
         /// </summary>
         public NewMatDialog()
         {

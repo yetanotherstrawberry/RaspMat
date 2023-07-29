@@ -46,7 +46,7 @@ namespace RaspMat.Services
         }
 
         /// <summary>
-        /// Creates a service for handling file I/O. Prompt the user with <see cref="FileDialog"/>s for file selection.
+        /// Creates a service for handling file I/O. Prompts the user with <see cref="FileDialog"/>s for file selection.
         /// </summary>
         /// <param name="fileFilter">Filter for file selection. Use <see cref="string.Empty"/> to allow all extensions.</param>
         public FileService(string fileFilter = "")

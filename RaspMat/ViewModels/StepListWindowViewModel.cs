@@ -1,38 +1,39 @@
 ﻿using Prism.Mvvm;
-using RaspMat.Interfaces;
+using RaspMat.DTOs;
 using RaspMat.Models;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace RaspMat.ViewModels
 {
     /// <summary>
-    /// ViewModel for the list of <see cref="IAlgorithmResult{T}"/> where <c>T</c> is <see cref="Matrix"/>.
+    /// ViewModel for the list of <see cref="AlgorithmStepDTO{T}"/> where <c>T</c> is <see cref="Matrix"/>.
     /// </summary>
     internal class StepListWindowViewModel : BindableBase
     {
 
         /// <summary>
-        /// Field for <see cref="Steps"/>.
+        /// Replaces the list of steps.
         /// </summary>
-        private IList<IAlgorithmResult<Matrix>> steps;
+        /// <param name="steps"><see cref="Steps"/> to be shown to the user.</param>
+        public void ChangeSteps(IList<AlgorithmStepDTO<Matrix>> steps) => Steps = steps;
 
         /// <summary>
         /// Steps of the algorithm shown to the user.
         /// </summary>
-        public IList<IAlgorithmResult<Matrix>> Steps
+        public IList<AlgorithmStepDTO<Matrix>> Steps
         {
-            get => steps;
-            private set => SetProperty(ref steps, value);
+            get => _steps;
+            private set => SetProperty(ref _steps, value);
         }
+        private IList<AlgorithmStepDTO<Matrix>> _steps;
 
         /// <summary>
         /// Creates a new instance of <see cref="StepListWindowViewModel"/> with <paramref name="steps"/> for a <see cref="Matrix"/>.
         /// </summary>
         /// <param name="steps"><see cref="IAlgorithmResult{T}.Step"/>s to be shown to the user.</param>
-        public StepListWindowViewModel(IList<IAlgorithmResult<Matrix>> steps)
+        public StepListWindowViewModel(IList<AlgorithmStepDTO<Matrix>> steps)
         {
-            Steps = steps;
+            _steps = steps;
         }
 
     }

@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace RaspMat.Tests
 {
+    /// <summary>
+    /// Tests for the <see cref="Matrix"/> class.
+    /// </summary>
     public class MatTests
     {
 
@@ -13,22 +16,14 @@ namespace RaspMat.Tests
         [SetUp]
         public void Setup()
         {
-            equalToIdentity = new Matrix(new Fraction[][]
-            {
-                new Fraction[]
-                {
-                    1, 2, 2,
-                },
-                new Fraction[]
-                {
-                    1, 0, 1,
-                },
-                new Fraction[]
-                {
-                    1, 1, 1,
-                },
-            });
+            var mat = new[] {
+                1, 2, 2,
+                1, 0, 1,
+                1, 1, 1 };
+            equalToIdentity = new Matrix(3, 3, (row, column) => mat[row + column]);
+
             identity = Matrix.Identity(3);
+
             zero = new Matrix(new string[][]{
                 new string[]
                 {
@@ -44,7 +39,7 @@ namespace RaspMat.Tests
         [Test]
         public void ZeroEqualsZero()
         {
-            var zeroInt = new Matrix(2);
+            var zeroInt = new Matrix(2, 2);
             Assert.AreEqual(zeroInt, zero);
         }
 
@@ -58,7 +53,7 @@ namespace RaspMat.Tests
         [Test]
         public void GaussIdentityTest()
         {
-            Assert.AreEqual(Matrix.Identity(3), Algorithms.TotalGaussianElimination(equalToIdentity).Last().Result);
+            Assert.AreEqual(Matrix.Identity(3), Algorithms.GaussianElimination(equalToIdentity).Last().Result);
         }
 
     }

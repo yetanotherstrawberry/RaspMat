@@ -1,15 +1,19 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
+using RaspMat.DTOs;
 using RaspMat.Helpers;
 using RaspMat.Interfaces;
 using RaspMat.Models;
 using RaspMat.Properties;
 using RaspMat.Services;
+using RaspMat.Views;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -22,51 +26,238 @@ namespace RaspMat.ViewModels
     internal class GaussianWindowViewModel : BindableBase
     {
 
-        public ICommand MatSwapRowsComm { get; }
-        public ICommand MatScaleComm { get; }
-        public ICommand RowScaleComm { get; }
-        public ICommand MatAddIComm { get; }
-        public ICommand MatRemoveIComm { get; }
-        public ICommand MatTransposeComm { get; }
-        public ICommand MatGaussComm { get; }
-        public ICommand MatEchelonComm { get; }
-        public ICommand UserInputComm { get; }
+        private readonly Action _lockUI, _unlockUI;
+        private readonly Expression<Func<bool>> _checkIsFreeExpr;
+        private readonly Func<bool> _checkIsFree;
+        private readonly ISerializationService _serializationService;
+        private readonly IDialogService _dialogService;
+        private readonly IFileService _fileService;
+
+        private ICommand GenerateCommand(Action action, bool blockable = true)
+        {
+            return blockable ? new AsyncDelegateCommand(action, _lockUI, _unlockUI, _checkIsFree, _checkIsFreeExpr) : new AsyncDelegateCommand(action);
+        }
+
+        private ICommand GenerateCommand<TParameter>(Action<TParameter> action, bool blockable = true)
+        {
+            return blockable ? new AsyncDelegateCommand<TParameter>(action, _lockUI, _unlockUI, _ => _checkIsFree(), _checkIsFreeExpr) : new AsyncDelegateCommand<TParameter>(action);
+        }
+
+        /// <summary>
+        /// Swaps selected 2 rows of <see cref="CurrentMatrix"/>. Throws when more than 2 or no rows selected. Selection of 1 row is valid.
+        /// </summary>
+        public ICommand MatSwapRowsComm
+        {
+            get
+            {
+                if (_matSwapRowsComm is null)
+                {
+                    _matSwapRowsComm = GenerateCommand(() =>
+                    {
+                        if (SelectedRows.Count > 2)
+                            throw new ArgumentOutOfRangeException(nameof(SelectedRows.Count), SelectedRows.Count, string.Format(Resources.ERR_ROWS, 2));
+                        CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
+                    });
+                }
+                return _matSwapRowsComm;
+            }
+        }
+        private ICommand _matSwapRowsComm;
+
+        /// <summary>
+        /// Multiplies <see cref="CurrentMatrix"/> by a scalar.
+        /// </summary>
+        public ICommand MatScaleComm
+        {
+            get
+            {
+                if (_matScaleComm is null)
+                {
+                    _matScaleComm = GenerateCommand<string>(scalar => CurrentMatrix *= Fraction.Parse(scalar));
+                }
+                return _matScaleComm;
+            }
+        }
+        private ICommand _matScaleComm;
+
+        /// <summary>
+        /// Multiplies selected rows of <see cref="CurrentMatrix"/> by a scalar. Any selection (including no rows) is valid.
+        /// </summary>
+        public ICommand RowScaleComm
+        {
+            get
+            {
+                if (_rowsScaleComm is null)
+                {
+                    _rowsScaleComm = GenerateCommand<string>(scalar =>
+                    {
+                        var temp = CurrentMatrix;
+                        foreach (var rowId in SelectedRows)
+                        {
+                            temp = Matrix.MultiplicationMatrix(temp.Rows, rowId, Fraction.Parse(scalar)) * temp;
+                        }
+                        CurrentMatrix = temp;
+                    });
+                }
+                return _rowsScaleComm;
+            }
+        }
+        private ICommand _rowsScaleComm;
+
+        /// <summary>
+        /// Adds identity-like rows to the selected half (left or right) of the <see cref="CurrentMatrix"/>.
+        /// </summary>
+        public ICommand MatAddIComm
+        {
+            get
+            {
+                if (_matAddIComm is null)
+                {
+                    _matAddIComm = GenerateCommand<bool>(left => CurrentMatrix = Matrix.AddI(CurrentMatrix, left));
+                }
+                return _matAddIComm;
+            }
+        }
+        private ICommand _matAddIComm;
+
+        /// <summary>
+        /// Removes a selected half (left or right) of the <see cref="CurrentMatrix"/>.
+        /// </summary>
+        public ICommand MatSliceComm
+        {
+            get
+            {
+                if (_matSliceComm is null)
+                {
+                    _matSliceComm = GenerateCommand<bool>(left => CurrentMatrix = Matrix.Slice(CurrentMatrix, left));
+                }
+                return _matSliceComm;
+            }
+        }
+        private ICommand _matSliceComm;
+
+        /// <summary>
+        /// Performes a Gaussian elimination on <see cref="CurrentMatrix"/>. A <see cref="bool"/> parameter sets whether the row echelon result should be reduced.
+        /// </summary>
+        public ICommand MatGaussComm
+        {
+            get
+            {
+                if (_matGaussComm is null)
+                {
+                    _matGaussComm = GenerateCommand<bool>(reduced =>
+                    {
+                        var steps = CurrentMatrix.GaussianElimination(reduced);
+
+                        if (steps.Count > 0)
+                        {
+                            Steps = steps;
+                            CurrentMatrix = Steps.Last().Result;
+                        }
+                    });
+                }
+                return _matGaussComm;
+            }
+        }
+        private ICommand _matGaussComm;
+
+        /// <summary>
+        /// Transposes (swaps rows with columns) the <see cref="CurrentMatrix"/>.
+        /// </summary>
+        public ICommand MatTransposeComm
+        {
+            get
+            {
+                if (_matTransposeComm is null)
+                {
+                    _matTransposeComm = GenerateCommand(() => CurrentMatrix = Matrix.Transpose(CurrentMatrix));
+                }
+                return _matTransposeComm;
+            }
+        }
+        private ICommand _matTransposeComm;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ICommand UserInputComm
+        {
+            get
+            {
+                if (_userInputComm is null)
+                {
+                    _userInputComm = new DelegateCommand(() => _dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
+                    {
+                        GenerateCommand(() =>
+                        {
+                            if (res.Result != ButtonResult.OK) return;
+
+                            var filler = res.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
+
+                            var ret = DataTableHelpers.CreateStrDataTable(
+                                res.Parameters.GetValue<int>(Resources._ROWS),
+                                res.Parameters.GetValue<int>(Resources._COLS),
+                                (row, column) => filler);
+
+                            MatrixDataTable = ret;
+                        }).Execute(default);
+                    }));
+                }
+                return _userInputComm;
+            }
+        }
+        private ICommand _userInputComm;
+
         public ICommand GridSelectedRowComm { get; }
         public ICommand SerializeComm { get; }
         public ICommand DeserializeComm { get; }
-        public ICommand StepListWindowComm { get; }
 
         /// <summary>
-        /// Field for <see cref="MatrixDataTable"/>.
+        /// Shows a view containg that list of steps taken by an algorithm.
         /// </summary>
-        private DataTable matrixDataTable = new Matrix(new Fraction[][]
+        public ICommand StepListWindowComm
         {
-            new Fraction[]
+            get
             {
-                1, 2, 2,
-            },
-            new Fraction[]
-            {
-                1, 0, 1,
-            },
-            new Fraction[]
-            {
-                1, 1, 1,
-            },
-        }).ToDataTable();
+                if (_stepListViewComm is null)
+                {
+                    _stepListViewComm = new DelegateCommand(() =>
+                    {
+                        // TODO: Use service to create window
+                        var vm = new StepListWindowViewModel(Steps);
+                        PropertyChanged += (object sender, PropertyChangedEventArgs args) =>
+                        {
+                            if (args.PropertyName.Equals(nameof(Steps)))
+                            {
+                                vm.ChangeSteps(Steps);
+                            }
+                        };
+
+                        var window = new StepListWindow
+                        {
+                            DataContext = vm,
+                        };
+                        window.Show();
+                    });
+                }
+                return _stepListViewComm;
+            }
+        }
+        private ICommand _stepListViewComm;
 
         /// <summary>
         /// <see cref="DataTable"/> visible to the user. Will be converted to <see cref="Matrix"/> when <see cref="CurrentMatrix"/> is accessed.
         /// </summary>
         public DataTable MatrixDataTable
         {
-            get => matrixDataTable;
+            get => _matrixDataTable;
             set
             {
-                SetProperty(ref matrixDataTable, value);
+                SetProperty(ref _matrixDataTable, value);
                 SelectedRows.Clear();
             }
         }
+        private DataTable _matrixDataTable = new Matrix(3, 4, (row, column) => row + column + 1).ToDataTable();
 
         /// <summary>
         /// Indexes of rows of the <see cref="MatrixDataTable"/> currently selected by the user.
@@ -83,74 +274,37 @@ namespace RaspMat.ViewModels
         }
 
         /// <summary>
-        /// Field for <see cref="IsFree"/>.
-        /// </summary>
-        private bool isFree = true;
-
-        /// <summary>
-        /// Indicates whether UI should be blocked because of an ongoing operation.
+        /// Indicates whether UI should be blocked (<see langword="false"/>) because of an ongoing operation.
         /// </summary>
         public bool IsFree
         {
-            get => isFree;
-            private set => SetProperty(ref isFree, value);
+            get => _isFree;
+            private set
+            {
+                SetProperty(ref _isFree, value);
+            }
         }
-
-        /// <summary>
-        /// Field for <see cref="Steps"/>.
-        /// </summary>
-        private IList<IAlgorithmResult<Matrix>> steps = new List<IAlgorithmResult<Matrix>>();
+        private bool _isFree = true;
 
         /// <summary>
         /// Steps performed by algorithms. Notifies about the value change.
         /// </summary>
-        public IList<IAlgorithmResult<Matrix>> Steps
+        public IList<AlgorithmStepDTO<Matrix>> Steps
         {
             get => steps;
             set => SetProperty(ref steps, value);
         }
+        private IList<AlgorithmStepDTO<Matrix>> steps = new List<AlgorithmStepDTO<Matrix>>();
 
         /// <summary>
-        /// Field for <see cref="Scalar"/>.
-        /// </summary>
-        private string scalar = string.Empty;
-
-        /// <summary>
-        /// Scalar from the user.
-        /// </summary>
-        public string Scalar
-        {
-            get => scalar;
-            set => SetProperty(ref scalar, value);
-        }
-
-        /// <summary>
-        /// Converts <see cref="Scalar"/> to a <see cref="Fraction"/>.
-        /// </summary>
-        private Fraction FracScalar => Fraction.Parse(Scalar);
-
-        /// <summary>
-        /// Performs a Gaussian Elimination on <see cref="CurrentMatrix"/> and replaces it. Assigns <see cref="Steps"/> based on the algorithm.
-        /// </summary>
-        private void Gauss(bool reducedEchelon = true)
-        {
-            var steps = CurrentMatrix.TotalGaussianElimination(reducedEchelon);
-
-            if (steps.Count > 0)
-            {
-                Steps = steps;
-                CurrentMatrix = steps.Last().Result;
-            }
-        }
-
-        /// <summary>
-        /// Gets the number of a row in the <see cref="Matrix"/>.
+        /// Gets the index of a row in the <see cref="Matrix"/>. -1 if not found.
         /// </summary>
         /// <param name="rowView"><see cref="DataRow"/> of the <see cref="MatrixDataTable"/>.</param>
-        /// <returns>Number of the row.</returns>
+        /// <returns>Index of the row or -1.</returns>
         private int DataGridRowToMatRow(DataRowView rowView)
         {
-            return MatrixDataTable.Rows.IndexOf(rowView.Row);
+            var ret = MatrixDataTable.Rows.IndexOf(rowView.Row);
+            return ret;
         }
 
         /// <summary>
@@ -158,66 +312,21 @@ namespace RaspMat.ViewModels
         /// </summary>
         /// <param name="dialogService">Instance of a <see cref="IDialogService"/> that will be used for user input.</param>
         /// <param name="serializationService">Instance of a <see cref="ISerializationService"/> that will be used for <see cref="Matrix"/> serialization.</param>
-        public GaussianWindowViewModel(IDialogService dialogService, ISerializationService serializationService, IErrorService errorService)
+        public GaussianWindowViewModel(IDialogService dialogService, ISerializationService serializationService, IFileService fileService)
         {
-            IAsyncCommandService asyncSrv = new AsyncCommandService(() => IsFree = false, () => IsFree = true, exception => errorService.Error(exception));
+            _dialogService = dialogService;
+            _fileService = fileService;
+            _serializationService = serializationService;
 
-            MatGaussComm = asyncSrv.GenerateAsyncActionCommand(() => Gauss());
-            MatEchelonComm = asyncSrv.GenerateAsyncActionCommand(() => Gauss(reducedEchelon: false));
-            MatTransposeComm = asyncSrv.GenerateAsyncActionCommand(() =>
-            {
-                CurrentMatrix = Matrix.Transpose(CurrentMatrix);
-            });
-            MatRemoveIComm = asyncSrv.GenerateAsyncActionCommand<bool?>(matrixLeftSide =>
-            {
-                CurrentMatrix = Matrix.Slice(CurrentMatrix, matrixLeftSide ?? throw new ArgumentNullException(paramName: nameof(matrixLeftSide)));
-            });
-            MatAddIComm = asyncSrv.GenerateAsyncActionCommand<bool?>(matrixLeftSide =>
-            {
-                CurrentMatrix = Matrix.AddI(CurrentMatrix, matrixLeftSide ?? throw new ArgumentNullException(paramName: nameof(matrixLeftSide)));
-            });
-            MatScaleComm = asyncSrv.GenerateAsyncActionCommand(() =>
-            {
-                CurrentMatrix *= FracScalar;
-                Scalar = string.Empty;
-            });
-            RowScaleComm = asyncSrv.GenerateAsyncActionCommand(() =>
-            {
-                foreach (var rowId in SelectedRows.ToArray()) // ToArray() will copy the list in order to avoid modyfing the enumerated collection.
-                {
-                    CurrentMatrix = Matrix.MultiplicationMatrix(CurrentMatrix.Rows, rowId, FracScalar) * CurrentMatrix;
-                }
-                Scalar = string.Empty;
-            });
-            MatSwapRowsComm = asyncSrv.GenerateAsyncActionCommand(() =>
-            {
-                if (SelectedRows.Count > 2)
-                    throw new ArgumentOutOfRangeException(
-                        paramName: nameof(SelectedRows.Count),
-                        actualValue: SelectedRows.Count,
-                        message: string.Format(Resources.ERR_ROWS, 2));
-                CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
-            });
-            UserInputComm = new DelegateCommand(() =>
-            {
-                dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
-                {
-                    asyncSrv.TryExecAsync(Task.Run(() =>
-                    {
-                        if (res.Result != ButtonResult.OK) return;
+            _lockUI = () => IsFree = false;
+            _unlockUI = () => IsFree = true;
+            _checkIsFreeExpr = () => IsFree;
+            _checkIsFree = _checkIsFreeExpr.Compile();
 
-                        var filler = res.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
 
-                        var ret = DataTableHelpers.CreateStrDataTable(
-                            res.Parameters.GetValue<int>(Resources._ROWS),
-                            res.Parameters.GetValue<int>(Resources._COLS),
-                            (row, column) => filler);
+            IAsyncCommandService asyncService = new AsyncCommandService(_lockUI, _unlockUI);
 
-                        MatrixDataTable = ret;
-                    }));
-                });
-            });
-            GridSelectedRowComm = asyncSrv.GenerateAsyncActionCommand<SelectionChangedEventArgs>(args =>
+            GridSelectedRowComm = asyncService.GenerateAsyncActionCommand<SelectionChangedEventArgs>(args =>
             {
                 // Remove all unselected rows.
                 foreach (DataRowView item in args.RemovedItems)
@@ -231,15 +340,23 @@ namespace RaspMat.ViewModels
                     SelectedRows.Add(DataGridRowToMatRow(item));
                 }
             });
-            SerializeComm = asyncSrv.GenerateAsyncActionCommand(() =>
+            SerializeComm = new DelegateCommand(() =>
             {
-                serializationService.Serialize(CurrentMatrix);
+                var stream = fileService.NewFile(); // FileDialog must be called from the main thread.
+                asyncService.TryExecAsync(Task.Run(() =>
+                {
+                    serializationService.Serialize(CurrentMatrix, stream);
+                }));
             });
-            DeserializeComm = asyncSrv.GenerateAsyncActionCommand(() =>
+            DeserializeComm = new DelegateCommand(() =>
             {
-                var matResult = serializationService.Deserialize<Matrix>();
-                if (!matResult.Successful) return;
-                CurrentMatrix = matResult.Result;
+                var stream = fileService.OpenFile(); // FileDialog must be called from the main thread.
+                asyncService.TryExecAsync(Task.Run(() =>
+                {
+                    var matResult = serializationService.Deserialize<Matrix>(stream);
+                    if (!matResult.Successful) return;
+                    CurrentMatrix = matResult.Result;
+                }));
             });
         }
 

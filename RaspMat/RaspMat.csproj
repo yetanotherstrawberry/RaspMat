@@ -108,17 +108,16 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\AsyncDelegateCommand.cs" />
     <Compile Include="Helpers\DataTableHelpers.cs" />
     <Compile Include="Helpers\JaggedArrayHelper.cs" />
-    <Compile Include="Interfaces\IAlgorithmResult.cs" />
     <Compile Include="Interfaces\IAsyncCommandService.cs" />
-    <Compile Include="Interfaces\IDeserializationResult.cs" />
     <Compile Include="Interfaces\IErrorService.cs" />
     <Compile Include="Interfaces\IFileService.cs" />
     <Compile Include="Interfaces\IMatrix.cs" />
     <Compile Include="Interfaces\ISerializationService.cs" />
-    <Compile Include="Models\DeserializationResult.cs" />
-    <Compile Include="Models\MatAlgorithmResult.cs" />
+    <Compile Include="DTOs\DeserializationResultDTO.cs" />
+    <Compile Include="DTOs\AlgorithmStepDTO.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
