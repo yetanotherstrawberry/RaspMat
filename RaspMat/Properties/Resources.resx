@@ -165,6 +165,9 @@
   <data name="ERR_TOO_SMALL_MAT" xml:space="preserve">
     <value>The matrix must have at least {0} column(s) and {1} row(s).</value>
   </data>
+  <data name="GAUSS_ELIM" xml:space="preserve">
+    <value>Gaussian elimination</value>
+  </data>
   <data name="IDENTITY_MAT" xml:space="preserve">
     <value>Identity matrix</value>
   </data>

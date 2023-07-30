@@ -6,15 +6,14 @@ using RaspMat.Helpers;
 using RaspMat.Interfaces;
 using RaspMat.Models;
 using RaspMat.Properties;
-using RaspMat.Services;
 using RaspMat.Views;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -23,7 +22,7 @@ namespace RaspMat.ViewModels
     /// <summary>
     /// ViewModel for the Gaussian elimination algorithm of a <see cref="Matrix"/>.
     /// </summary>
-    internal class GaussianWindowViewModel : BindableBase
+    internal class GaussianUserControlViewModel : BindableBase
     {
 
         private readonly Action _lockUI, _unlockUI;
@@ -33,14 +32,19 @@ namespace RaspMat.ViewModels
         private readonly IDialogService _dialogService;
         private readonly IFileService _fileService;
 
-        private ICommand GenerateCommand(Action action, bool blockable = true)
+        private int DataGridRowToMatRow(DataRowView rowView)
         {
-            return blockable ? new AsyncDelegateCommand(action, _lockUI, _unlockUI, _checkIsFree, _checkIsFreeExpr) : new AsyncDelegateCommand(action);
+            return MatrixDataTable.Rows.IndexOf(rowView.Row);
         }
 
-        private ICommand GenerateCommand<TParameter>(Action<TParameter> action, bool blockable = true)
+        private ICommand GenerateCommand(Action action)
         {
-            return blockable ? new AsyncDelegateCommand<TParameter>(action, _lockUI, _unlockUI, _ => _checkIsFree(), _checkIsFreeExpr) : new AsyncDelegateCommand<TParameter>(action);
+            return new AsyncDelegateCommand(action, _lockUI, _unlockUI, _checkIsFree, _checkIsFreeExpr);
+        }
+
+        private ICommand GenerateCommand<TParameter>(Action<TParameter> action)
+        {
+            return new AsyncDelegateCommand<TParameter>(action, _lockUI, _unlockUI, _ => _checkIsFree(), _checkIsFreeExpr);
         }
 
         /// <summary>
@@ -178,39 +182,117 @@ namespace RaspMat.ViewModels
         private ICommand _matTransposeComm;
 
         /// <summary>
-        /// 
+        /// Handles the input from user. Recreates <see cref="MatrixDataTable"/> based on <see cref="IDialogResult"/> parameter.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when <see cref="UserInputComm"/> has been <see cref="ICommand.Execute(object)"/>d,
+        /// but <see cref="_userInputCommHander"/>'s <see cref="ICommand.CanExecute(object)"/> return <see langword="false"/>.
+        /// </exception>
         public ICommand UserInputComm
         {
             get
             {
-                if (_userInputComm is null)
+                if (_userInputCommDialog is null)
                 {
-                    _userInputComm = new DelegateCommand(() => _dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
+                    var comm = new DelegateCommand(() => _dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
                     {
-                        GenerateCommand(() =>
+                        if (_userInputCommHander is null)
                         {
-                            if (res.Result != ButtonResult.OK) return;
+                            _userInputCommHander = GenerateCommand<IDialogResult>(result =>
+                            {
+                                if (result.Result != ButtonResult.OK) return;
 
-                            var filler = res.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
+                                var filler = result.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
 
-                            var ret = DataTableHelpers.CreateStrDataTable(
-                                res.Parameters.GetValue<int>(Resources._ROWS),
-                                res.Parameters.GetValue<int>(Resources._COLS),
-                                (row, column) => filler);
+                                var ret = DataTableHelpers.CreateStrDataTable(
+                                    result.Parameters.GetValue<int>(Resources._ROWS),
+                                    result.Parameters.GetValue<int>(Resources._COLS),
+                                    (row, column) => filler);
 
-                            MatrixDataTable = ret;
-                        }).Execute(default);
+                                MatrixDataTable = ret;
+                            });
+                        }
+                        if (!_userInputCommHander.CanExecute(res))
+                            throw new InvalidOperationException();
+                        _userInputCommHander.Execute(res);
                     }));
+                    comm.ObservesCanExecute(_checkIsFreeExpr);
+                    _userInputCommDialog = comm;
                 }
-                return _userInputComm;
+                return _userInputCommDialog;
             }
         }
-        private ICommand _userInputComm;
+        private ICommand _userInputCommDialog;
+        private ICommand _userInputCommHander;
 
-        public ICommand GridSelectedRowComm { get; }
-        public ICommand SerializeComm { get; }
-        public ICommand DeserializeComm { get; }
+        /// <summary>
+        /// Stores indexes of rows selected by the user. Pass <see cref="SelectionChangedEventArgs"/> as a parameter.
+        /// </summary>
+        public ICommand GridSelectedRowComm
+        {
+            get
+            {
+                if (_gridSelectedRowComm is null)
+                {
+                    _gridSelectedRowComm = GenerateCommand<SelectionChangedEventArgs>(args =>
+                    {
+                        // Remove all unselected rows.
+                        foreach (DataRowView item in args.RemovedItems)
+                        {
+                            SelectedRows.Remove(DataGridRowToMatRow(item));
+                        }
+
+                        // Add all selected rows.
+                        foreach (DataRowView item in args.AddedItems)
+                        {
+                            SelectedRows.Add(DataGridRowToMatRow(item));
+                        }
+                    });
+                }
+                return _gridSelectedRowComm;
+            }
+        }
+        private ICommand _gridSelectedRowComm;
+
+        /// <summary>
+        /// Serializes the <see cref="CurrentMatrix"/> using <see cref="ISerializationService.Serialize{TDeserialized}(TDeserialized, Stream)"/>.
+        /// </summary>
+        public ICommand SerializeComm
+        {
+            get
+            {
+                if (_serializeCommStream is null)
+                {
+                    _serializeCommStream = GenerateCommand(() =>
+                    {
+                        _serializationService.Serialize(CurrentMatrix, _fileService.NewFile());
+                    });
+                }
+                return _serializeCommStream;
+            }
+        }
+        private ICommand _serializeCommStream;
+
+        /// <summary>
+        /// Deserializes into <see cref="CurrentMatrix"/> using <see cref="ISerializationService.Deserialize{TDeserialized}(Stream)"/>.
+        /// </summary>
+        public ICommand DeserializeComm
+        {
+            get
+            {
+                if (_deserializeComm is null)
+                {
+                    _deserializeComm = GenerateCommand(() =>
+                    {
+                        var matResult = _serializationService.Deserialize<Matrix>(_fileService.OpenFile());
+                        if (!matResult.Successful) return;
+                        CurrentMatrix = matResult.Result;
+                    });
+                }
+                return _deserializeComm;
+            }
+        }
+        private ICommand _deserializeComm;
 
         /// <summary>
         /// Shows a view containg that list of steps taken by an algorithm.
@@ -221,7 +303,7 @@ namespace RaspMat.ViewModels
             {
                 if (_stepListViewComm is null)
                 {
-                    _stepListViewComm = new DelegateCommand(() =>
+                    var comm = new DelegateCommand(() =>
                     {
                         // TODO: Use service to create window
                         var vm = new StepListWindowViewModel(Steps);
@@ -229,7 +311,7 @@ namespace RaspMat.ViewModels
                         {
                             if (args.PropertyName.Equals(nameof(Steps)))
                             {
-                                vm.ChangeSteps(Steps);
+                                vm.Steps = Steps;
                             }
                         };
 
@@ -239,11 +321,14 @@ namespace RaspMat.ViewModels
                         };
                         window.Show();
                     });
+                    comm.ObservesCanExecute(_checkIsFreeExpr);
+                    _stepListViewComm = comm;
                 }
                 return _stepListViewComm;
             }
         }
         private ICommand _stepListViewComm;
+
 
         /// <summary>
         /// <see cref="DataTable"/> visible to the user. Will be converted to <see cref="Matrix"/> when <see cref="CurrentMatrix"/> is accessed.
@@ -279,10 +364,7 @@ namespace RaspMat.ViewModels
         public bool IsFree
         {
             get => _isFree;
-            private set
-            {
-                SetProperty(ref _isFree, value);
-            }
+            private set => SetProperty(ref _isFree, value);
         }
         private bool _isFree = true;
 
@@ -297,22 +379,11 @@ namespace RaspMat.ViewModels
         private IList<AlgorithmStepDTO<Matrix>> steps = new List<AlgorithmStepDTO<Matrix>>();
 
         /// <summary>
-        /// Gets the index of a row in the <see cref="Matrix"/>. -1 if not found.
-        /// </summary>
-        /// <param name="rowView"><see cref="DataRow"/> of the <see cref="MatrixDataTable"/>.</param>
-        /// <returns>Index of the row or -1.</returns>
-        private int DataGridRowToMatRow(DataRowView rowView)
-        {
-            var ret = MatrixDataTable.Rows.IndexOf(rowView.Row);
-            return ret;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="GaussianWindowViewModel"/> for a <see cref="Matrix"/> and implements its commands.
+        /// Creates a new <see cref="GaussianUserControlViewModel"/> for a <see cref="Matrix"/> and implements its commands.
         /// </summary>
         /// <param name="dialogService">Instance of a <see cref="IDialogService"/> that will be used for user input.</param>
         /// <param name="serializationService">Instance of a <see cref="ISerializationService"/> that will be used for <see cref="Matrix"/> serialization.</param>
-        public GaussianWindowViewModel(IDialogService dialogService, ISerializationService serializationService, IFileService fileService)
+        public GaussianUserControlViewModel(IDialogService dialogService, ISerializationService serializationService, IFileService fileService)
         {
             _dialogService = dialogService;
             _fileService = fileService;
@@ -322,42 +393,6 @@ namespace RaspMat.ViewModels
             _unlockUI = () => IsFree = true;
             _checkIsFreeExpr = () => IsFree;
             _checkIsFree = _checkIsFreeExpr.Compile();
-
-
-            IAsyncCommandService asyncService = new AsyncCommandService(_lockUI, _unlockUI);
-
-            GridSelectedRowComm = asyncService.GenerateAsyncActionCommand<SelectionChangedEventArgs>(args =>
-            {
-                // Remove all unselected rows.
-                foreach (DataRowView item in args.RemovedItems)
-                {
-                    SelectedRows.Remove(DataGridRowToMatRow(item));
-                }
-
-                // Add all selected rows.
-                foreach (DataRowView item in args.AddedItems)
-                {
-                    SelectedRows.Add(DataGridRowToMatRow(item));
-                }
-            });
-            SerializeComm = new DelegateCommand(() =>
-            {
-                var stream = fileService.NewFile(); // FileDialog must be called from the main thread.
-                asyncService.TryExecAsync(Task.Run(() =>
-                {
-                    serializationService.Serialize(CurrentMatrix, stream);
-                }));
-            });
-            DeserializeComm = new DelegateCommand(() =>
-            {
-                var stream = fileService.OpenFile(); // FileDialog must be called from the main thread.
-                asyncService.TryExecAsync(Task.Run(() =>
-                {
-                    var matResult = serializationService.Deserialize<Matrix>(stream);
-                    if (!matResult.Successful) return;
-                    CurrentMatrix = matResult.Result;
-                }));
-            });
         }
 
     }

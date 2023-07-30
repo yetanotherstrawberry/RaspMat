@@ -12,7 +12,8 @@ namespace RaspMat.Helpers
         private readonly Action _start, _finished;
         private readonly Func<TParameter, bool> _canExecute;
 
-        public AsyncDelegateCommand(Action<TParameter> action = null, Action start = null, Action finished = null, Func<TParameter, bool> canExecute = null, Expression<Func<bool>> canExecuteChanged = null) : base()
+        public AsyncDelegateCommand(Action<TParameter> action = null, Action start = null, Action finished = null, Func<TParameter, bool> canExecute = null, Expression<Func<bool>> canExecuteChanged = null)
+            : base()
         {
             _action = action;
             _canExecute = canExecute;

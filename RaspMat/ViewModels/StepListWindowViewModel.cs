@@ -12,18 +12,12 @@ namespace RaspMat.ViewModels
     {
 
         /// <summary>
-        /// Replaces the list of steps.
-        /// </summary>
-        /// <param name="steps"><see cref="Steps"/> to be shown to the user.</param>
-        public void ChangeSteps(IList<AlgorithmStepDTO<Matrix>> steps) => Steps = steps;
-
-        /// <summary>
         /// Steps of the algorithm shown to the user.
         /// </summary>
         public IList<AlgorithmStepDTO<Matrix>> Steps
         {
             get => _steps;
-            private set => SetProperty(ref _steps, value);
+            set => SetProperty(ref _steps, value);
         }
         private IList<AlgorithmStepDTO<Matrix>> _steps;
 

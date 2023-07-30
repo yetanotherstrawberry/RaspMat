@@ -268,6 +268,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Gaussian elimination.
+        /// </summary>
+        public static string GAUSS_ELIM {
+            get {
+                return ResourceManager.GetString("GAUSS_ELIM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Identity matrix.
         /// </summary>
         public static string IDENTITY_MAT {

@@ -1,18 +1,17 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 
 namespace RaspMat.Views
 {
     /// <summary>
-    /// Interaction logic for NewMatDialog.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class NewMatDialog : UserControl
+    public partial class MainWindow : Window
     {
 
         /// <summary>
         /// Initializes XAML.
         /// </summary>
-        public NewMatDialog()
+        public MainWindow()
         {
             InitializeComponent();
         }

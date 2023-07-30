@@ -111,8 +111,6 @@
     <Compile Include="Helpers\AsyncDelegateCommand.cs" />
     <Compile Include="Helpers\DataTableHelpers.cs" />
     <Compile Include="Helpers\JaggedArrayHelper.cs" />
-    <Compile Include="Interfaces\IAsyncCommandService.cs" />
-    <Compile Include="Interfaces\IErrorService.cs" />
     <Compile Include="Interfaces\IFileService.cs" />
     <Compile Include="Interfaces\IMatrix.cs" />
     <Compile Include="Interfaces\ISerializationService.cs" />
@@ -123,20 +121,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Services\AsyncCommandService.cs" />
-    <Compile Include="Services\ErrorService.cs" />
-    <Compile Include="Services\FileService.cs" />
+    <Compile Include="Services\Win32FileService.cs" />
     <Compile Include="Services\JsonSerializationService.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\StepListWindowViewModel.cs" />
-    <Compile Include="ViewModels\GaussianWindowViewModel.cs" />
+    <Compile Include="ViewModels\GaussianUserControlViewModel.cs" />
     <Compile Include="ViewModels\NewMatDialogViewModel.cs" />
+    <Compile Include="Views\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\NewMatDialog.xaml.cs">
       <DependentUpon>NewMatDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\StepListWindow.xaml.cs">
       <DependentUpon>StepListWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\GaussianWindow.xaml">
+    <Page Include="Views\GaussianUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -144,10 +144,14 @@
     <Compile Include="Models\Fraction.cs" />
     <Compile Include="Models\Matrix.cs" />
     <Compile Include="Helpers\MathParser.cs" />
-    <Compile Include="Views\GaussianWindow.xaml.cs">
-      <DependentUpon>GaussianWindow.xaml</DependentUpon>
+    <Compile Include="Views\GaussianUserControl.xaml.cs">
+      <DependentUpon>GaussianUserControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\NewMatDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

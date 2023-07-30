@@ -3,13 +3,13 @@
 namespace RaspMat.Views
 {
     /// <summary>
-    /// Interaction logic for StepListWindow.xaml
+    /// Interaction logic for "StepListWindow.xaml".
     /// </summary>
     public partial class StepListWindow : Window
     {
 
         /// <summary>
-        /// Initializes XAML and shows the <see cref="Window"/>.
+        /// Initializes XAML.
         /// </summary>
         public StepListWindow()
         {

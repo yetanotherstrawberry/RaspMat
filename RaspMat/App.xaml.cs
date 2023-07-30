@@ -1,10 +1,12 @@
 ﻿using Prism.Ioc;
+using Prism.Mvvm;
 using Prism.Unity;
 using RaspMat.Interfaces;
 using RaspMat.Services;
+using RaspMat.ViewModels;
 using RaspMat.Views;
-using System;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace RaspMat
 {
@@ -14,22 +16,19 @@ namespace RaspMat
     public partial class App : PrismApplication
     {
 
-        /// <summary>
-        /// Service used to handle error messages and <see cref="Exception"/>s.
-        /// </summary>
-        private readonly IErrorService errorService = new ErrorService();
-
-        protected override Window CreateShell()
+        private void ExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
-            return Container.Resolve<GaussianWindow>();
+            MessageBox.Show(args.Exception.Message, RaspMat.Properties.Resources.ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
+            args.Handled = true;
         }
+
+        protected override Window CreateShell() => Container.Resolve<MainWindow>();
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterDialog<NewMatDialog>(name: RaspMat.Properties.Resources._NEW_MAT_DIALOG);
-            containerRegistry.RegisterInstance<IFileService>(new FileService(RaspMat.Properties.Resources._FILE_FILTER));
+            containerRegistry.RegisterDialog<NewMatDialog>(RaspMat.Properties.Resources._NEW_MAT_DIALOG);
+            containerRegistry.RegisterSingleton<IFileService, Win32FileService>();
             containerRegistry.RegisterSingleton<ISerializationService, JsonSerializationService>();
-            containerRegistry.RegisterInstance(errorService);
         }
 
         /// <summary>
@@ -37,7 +36,8 @@ namespace RaspMat
         /// </summary>
         public App()
         {
-            DispatcherUnhandledException += errorService.ExceptionHandler;
+            ViewModelLocationProvider.Register<GaussianUserControl, GaussianUserControlViewModel>();
+            DispatcherUnhandledException += ExceptionHandler;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace RaspMat
         /// </summary>
         ~App()
         {
-            DispatcherUnhandledException -= errorService.ExceptionHandler;
+            DispatcherUnhandledException -= ExceptionHandler;
         }
 
     }
