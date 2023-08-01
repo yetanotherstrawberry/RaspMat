@@ -15,9 +15,14 @@
         Height="540"
         Width="900">
     <Grid>
+        <Grid.Resources>
+            <Style x:Key="ViewModelLocator">
+                <Setter Property="prism:ViewModelLocator.AutoWireViewModel" Value="True" />
+            </Style>
+        </Grid.Resources>
         <TabControl>
             <TabItem Header="{x:Static prop:Resources.GAUSS_ELIM}">
-                <local:GaussianUserControl prism:ViewModelLocator.AutoWireViewModel="True" />
+                <local:GaussianUserControl Style="{StaticResource ViewModelLocator}" />
             </TabItem>
         </TabControl>
     </Grid>

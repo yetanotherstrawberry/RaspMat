@@ -1,9 +1,7 @@
 ﻿using Prism.Ioc;
-using Prism.Mvvm;
 using Prism.Unity;
 using RaspMat.Interfaces;
 using RaspMat.Services;
-using RaspMat.ViewModels;
 using RaspMat.Views;
 using System.Windows;
 using System.Windows.Threading;
@@ -36,7 +34,6 @@ namespace RaspMat
         /// </summary>
         public App()
         {
-            ViewModelLocationProvider.Register<GaussianUserControl, GaussianUserControlViewModel>();
             DispatcherUnhandledException += ExceptionHandler;
         }
 

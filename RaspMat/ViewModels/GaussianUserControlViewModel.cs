@@ -329,7 +329,6 @@ namespace RaspMat.ViewModels
         }
         private ICommand _stepListViewComm;
 
-
         /// <summary>
         /// <see cref="DataTable"/> visible to the user. Will be converted to <see cref="Matrix"/> when <see cref="CurrentMatrix"/> is accessed.
         /// </summary>
@@ -383,6 +382,7 @@ namespace RaspMat.ViewModels
         /// </summary>
         /// <param name="dialogService">Instance of a <see cref="IDialogService"/> that will be used for user input.</param>
         /// <param name="serializationService">Instance of a <see cref="ISerializationService"/> that will be used for <see cref="Matrix"/> serialization.</param>
+        /// <param name="fileService">Instance of <see cref="IFileService"/> that will be used as <see cref="Stream"/> source for <paramref name="serializationService"/>.</param>
         public GaussianUserControlViewModel(IDialogService dialogService, ISerializationService serializationService, IFileService fileService)
         {
             _dialogService = dialogService;

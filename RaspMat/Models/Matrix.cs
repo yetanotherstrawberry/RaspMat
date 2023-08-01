@@ -136,7 +136,7 @@ namespace RaspMat.Models
 
             var colHalf = matrix.Columns / 2;
 
-            return new Matrix(matrix.Rows, colHalf, (row, column) => removeLeft ? matrix[row, column] : matrix[row, column + colHalf]);
+            return new Matrix(matrix.Rows, colHalf, (row, column) => removeLeft ? matrix[row, column + colHalf] : matrix[row, column]);
         }
 
         public static Matrix operator *(Fraction scale, Matrix matrix)

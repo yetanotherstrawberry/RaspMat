@@ -9,7 +9,7 @@ using System.Windows;
 namespace RaspMat.Services
 {
     /// <summary>
-    /// Service implementing I/O using <see cref="FileDialog"/>.
+    /// Service implementing I/O using <see cref="FileDialog"/>s.
     /// </summary>
     internal class Win32FileService : IFileService
     {
@@ -34,7 +34,7 @@ namespace RaspMat.Services
                 {
                     dialog = (TDialog)_dialogs[typeof(TDialog)];
                 }
-                
+
                 if (dialog.ShowDialog() ?? false)
                 {
                     return dialog;

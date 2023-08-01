@@ -1,16 +1,15 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace RaspMat.Views
 {
     /// <summary>
-    /// Interaction logic for GaussianWindow.xaml
+    /// Interaction logic for <see cref="GaussianUserControl"/>.
     /// </summary>
     public partial class GaussianUserControl : UserControl
     {
 
         /// <summary>
-        /// Initializes XAML and shows the <see cref="Window"/>.
+        /// Initializes XAML.
         /// </summary>
         public GaussianUserControl()
         {
