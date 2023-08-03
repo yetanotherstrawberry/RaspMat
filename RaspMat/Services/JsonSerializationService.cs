@@ -11,9 +11,6 @@ namespace RaspMat.Services
     internal class JsonSerializationService : ISerializationService
     {
 
-        /// <summary>
-        /// Instance of a serializer.
-        /// </summary>
         private readonly JsonSerializer serializer = new JsonSerializer();
 
         public DeserializationResultDTO<TDeserialized> Deserialize<TDeserialized>(Stream stream)

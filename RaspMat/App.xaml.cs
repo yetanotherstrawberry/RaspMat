@@ -1,4 +1,5 @@
 ﻿using Prism.Ioc;
+using Prism.Mvvm;
 using Prism.Unity;
 using RaspMat.Interfaces;
 using RaspMat.Services;
@@ -24,15 +25,17 @@ namespace RaspMat
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterDialog<NewMatDialog>(RaspMat.Properties.Resources._NEW_MAT_DIALOG);
             containerRegistry.RegisterSingleton<IFileService, Win32FileService>();
             containerRegistry.RegisterSingleton<ISerializationService, JsonSerializationService>();
+            containerRegistry.RegisterSingleton<IStepViewService, StepWindowService>();
+
+            containerRegistry.RegisterDialog<NewMatDialog>(RaspMat.Properties.Resources._NEW_MAT_DIALOG);
         }
 
         /// <summary>
         /// Creates the main class of this <see cref="Application"/>. Binds <see cref="Application.DispatcherUnhandledException"/>.
         /// </summary>
-        public App()
+        public App() : base()
         {
             DispatcherUnhandledException += ExceptionHandler;
         }

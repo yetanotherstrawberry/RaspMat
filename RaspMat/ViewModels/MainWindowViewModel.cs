@@ -13,7 +13,7 @@ namespace RaspMat.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
-            // Main window does not require any dependencies.
+            // Main window does not require any dependencies nor functionality.
         }
 
     }

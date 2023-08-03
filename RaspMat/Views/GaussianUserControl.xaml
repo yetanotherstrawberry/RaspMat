@@ -12,7 +12,7 @@
         d:Background="White"
         d:MinHeight="350"
         d:MinWidth="800">
-    <Grid >
+    <Grid>
         <Grid.Resources>
             <Style TargetType="Button">
                 <Setter Property="Width" Value="120" />
@@ -96,7 +96,12 @@
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
-            <StackPanel VerticalAlignment="Bottom" Grid.Row="1">
+            <StackPanel VerticalAlignment="Bottom">
+                <StackPanel.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                        <Setter Property="Margin" Value="2,2,2,8" />
+                    </Style>
+                </StackPanel.Resources>
                 <Button
                     Content="{x:Static prop:Resources.STEPS}"
                     Command="{Binding StepListWindowComm}" />

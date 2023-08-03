@@ -1,9 +1,10 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 
 namespace RaspMat.Views
 {
     /// <summary>
-    /// Interaction logic for "StepListWindow.xaml".
+    /// Interaction logic for <see cref="StepListWindow"/>.
     /// </summary>
     public partial class StepListWindow : Window
     {

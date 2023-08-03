@@ -1,4 +1,5 @@
 ﻿using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using RaspMat.DTOs;
@@ -6,7 +7,6 @@ using RaspMat.Helpers;
 using RaspMat.Interfaces;
 using RaspMat.Models;
 using RaspMat.Properties;
-using RaspMat.Views;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,6 +31,8 @@ namespace RaspMat.ViewModels
         private readonly ISerializationService _serializationService;
         private readonly IDialogService _dialogService;
         private readonly IFileService _fileService;
+        private readonly IEventAggregator _eventAggregator;
+        private readonly IStepViewService _stepViewService;
 
         private int DataGridRowToMatRow(DataRowView rowView)
         {
@@ -45,6 +47,19 @@ namespace RaspMat.ViewModels
         private ICommand GenerateCommand<TParameter>(Action<TParameter> action)
         {
             return new AsyncDelegateCommand<TParameter>(action, _lockUI, _unlockUI, _ => _checkIsFree(), _checkIsFreeExpr);
+        }
+
+        private void LoadSteps(object sender, PropertyChangedEventArgs eventArguments)
+        {
+            if (eventArguments.PropertyName.Equals(nameof(Steps)))
+            {
+                _eventAggregator.GetEvent<Events.LoadStepsEvent>().Publish(Steps);
+            }
+        }
+
+        private void LoadMatrix(Matrix matrix)
+        {
+            CurrentMatrix = matrix;
         }
 
         /// <summary>
@@ -303,26 +318,7 @@ namespace RaspMat.ViewModels
             {
                 if (_stepListViewComm is null)
                 {
-                    var comm = new DelegateCommand(() =>
-                    {
-                        // TODO: Use service to create window
-                        var vm = new StepListWindowViewModel(Steps);
-                        PropertyChanged += (object sender, PropertyChangedEventArgs args) =>
-                        {
-                            if (args.PropertyName.Equals(nameof(Steps)))
-                            {
-                                vm.Steps = Steps;
-                            }
-                        };
-
-                        var window = new StepListWindow
-                        {
-                            DataContext = vm,
-                        };
-                        window.Show();
-                    });
-                    comm.ObservesCanExecute(_checkIsFreeExpr);
-                    _stepListViewComm = comm;
+                    _stepListViewComm = GenerateCommand(_stepViewService.Toggle);
                 }
                 return _stepListViewComm;
             }
@@ -383,16 +379,30 @@ namespace RaspMat.ViewModels
         /// <param name="dialogService">Instance of a <see cref="IDialogService"/> that will be used for user input.</param>
         /// <param name="serializationService">Instance of a <see cref="ISerializationService"/> that will be used for <see cref="Matrix"/> serialization.</param>
         /// <param name="fileService">Instance of <see cref="IFileService"/> that will be used as <see cref="Stream"/> source for <paramref name="serializationService"/>.</param>
-        public GaussianUserControlViewModel(IDialogService dialogService, ISerializationService serializationService, IFileService fileService)
+        /// <param name="eventAggregator">Event aggregator that will be used for inter-viewmodel communication.</param>
+        /// <param name="stepViewService">Implementation for showing a view with steps of an algorithm.</param>
+        public GaussianUserControlViewModel(IDialogService dialogService, ISerializationService serializationService, IFileService fileService, IEventAggregator eventAggregator, IStepViewService stepViewService)
         {
             _dialogService = dialogService;
             _fileService = fileService;
             _serializationService = serializationService;
+            _eventAggregator = eventAggregator;
+            _stepViewService = stepViewService;
 
             _lockUI = () => IsFree = false;
             _unlockUI = () => IsFree = true;
             _checkIsFreeExpr = () => IsFree;
             _checkIsFree = _checkIsFreeExpr.Compile();
+
+            PropertyChanged += LoadSteps;
+
+            _eventAggregator.GetEvent<Events.LoadMatrixEvent>().Subscribe(LoadMatrix, ThreadOption.UIThread);
+        }
+
+        ~GaussianUserControlViewModel()
+        {
+            PropertyChanged -= LoadSteps;
+            _eventAggregator.GetEvent<Events.LoadMatrixEvent>().Unsubscribe(LoadMatrix);
         }
 
     }

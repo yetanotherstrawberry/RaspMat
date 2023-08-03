@@ -1,4 +1,5 @@
 ﻿<Window x:Class="RaspMat.Views.StepListWindow"
+        Name="Wi"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,7 +8,9 @@
         xmlns:prop="clr-namespace:RaspMat.Properties"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:StepListWindowViewModel, IsDesignTimeCreatable=False}" 
-        Title="{x:Static prop:Resources.STEPS}" Height="450" Width="800">
+        Title="{x:Static prop:Resources.STEPS}"
+        Height="450"
+        Width="800">
     <ListBox HorizontalAlignment="Stretch" ItemsSource="{Binding Steps}" d:ItemsSource="{d:SampleData ItemCount=20}">
         <ListBox.ItemContainerStyle>
             <Style TargetType="ListBoxItem">
@@ -21,16 +24,19 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock
-                            Text="{Binding Step}"
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            TextWrapping="Wrap" />
-                    <!--<Button
-                            Content="{x:Static prop:Resources.LOAD}"
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Padding="2" />-->
+                    <TextBlock 
+                        Text="{Binding Step}"
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        TextWrapping="Wrap" />
+                    <Button
+                        Content="{x:Static prop:Resources.LOAD}"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Padding="2"
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor, 
+                            AncestorType={x:Type Window}}, Path=DataContext.LoadMatrix}"
+                        CommandParameter="{Binding Result}" />
                 </Grid>
             </DataTemplate>
         </ListBox.ItemTemplate>
