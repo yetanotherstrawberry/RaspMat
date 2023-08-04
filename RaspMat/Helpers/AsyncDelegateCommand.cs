@@ -12,7 +12,12 @@ namespace RaspMat.Helpers
         private readonly Action _start, _finished;
         private readonly Func<TParameter, bool> _canExecute;
 
-        public AsyncDelegateCommand(Action<TParameter> action = null, Action start = null, Action finished = null, Func<TParameter, bool> canExecute = null, Expression<Func<bool>> canExecuteChanged = null)
+        public AsyncDelegateCommand(
+            Action<TParameter> action = null,
+            Action start = null,
+            Action finished = null,
+            Func<TParameter, bool> canExecute = null,
+            Expression<Func<bool>> canExecuteChanged = null)
             : base()
         {
             _action = action;
@@ -41,8 +46,18 @@ namespace RaspMat.Helpers
 
     internal sealed class AsyncDelegateCommand : AsyncDelegateCommand<object>
     {
-        public AsyncDelegateCommand(Action action = null, Action start = null, Action finished = null, Func<bool> canExecute = null, Expression<Func<bool>> canExecuteChanged = null)
-            : base(_ => action?.Invoke(), start, finished, _ => canExecute?.Invoke() ?? true, canExecuteChanged)
+        public AsyncDelegateCommand(
+            Action action = null,
+            Action start = null,
+            Action finished = null,
+            Func<bool> canExecute = null,
+            Expression<Func<bool>> canExecuteChanged = null)
+            : base(
+                  _ => action?.Invoke(),
+                  start,
+                  finished,
+                  _ => canExecute?.Invoke() ?? true,
+                  canExecuteChanged)
         {
             // This class allows to create parameterless commands. This constructor hides the parameter by setting its type to object and ignoring any value.
         }

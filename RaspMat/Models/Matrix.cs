@@ -57,11 +57,6 @@ namespace RaspMat.Models
             FractionMatrix = fractionMatrix;
         }
 
-        public Matrix(string[][] input)
-        {
-            FractionMatrix = input.Convert(str => Fraction.Parse(str));
-        }
-
         public Matrix(int rows, int columns) : this(rows, columns, (row, column) => Fraction.Zero) { }
         #endregion Constructors
 
@@ -116,8 +111,8 @@ namespace RaspMat.Models
 
             // Copies the original matrix to the left side of the returned matrix if onRight is true.
             for (int row = 0; row < matrix.Rows; row++)
-                for (int col = 0, shift = ret.Rows; col < matrix.Columns; col++, shift++)
-                    ret[row, onLeft ? shift : col] = matrix[row, col];
+                for (int column = 0, shift = ret.Rows; column < matrix.Columns; column++, shift++)
+                    ret[row, onLeft ? shift : column] = matrix[row, column];
 
             /*
              * Assigns I to the matrix.
@@ -205,7 +200,11 @@ namespace RaspMat.Models
                     if (j < Columns - 1)
                         retSB.Append("\t");
                 }
-                retSB.AppendLine();
+
+                if (i < Rows - 1)
+                {
+                    retSB.AppendLine();
+                }
             }
 
             return retSB.ToString();

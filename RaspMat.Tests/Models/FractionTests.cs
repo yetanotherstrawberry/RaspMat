@@ -2,12 +2,12 @@ using NUnit.Framework;
 using RaspMat.Models;
 using System;
 
-namespace RaspMat.Tests
+namespace RaspMat.Tests.Models
 {
     /// <summary>
-    /// Tests for <see cref="Fraction"/>s.
+    /// Tests for <see cref="Fraction"/>.
     /// </summary>
-    public class FracTests
+    public class FractionTests
     {
 
         private readonly Fraction _one = new Fraction(1, 1);
