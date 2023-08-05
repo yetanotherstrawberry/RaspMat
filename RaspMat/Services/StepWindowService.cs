@@ -18,9 +18,8 @@ namespace RaspMat.Services
                 if (!_stepViewWindow?.IsLoaded ?? true)
                 {
                     _stepViewWindow = new StepListWindow();
+                    ViewModelLocator.SetAutoWireViewModel(_stepViewWindow, true);
                 }
-
-                ViewModelLocator.SetAutoWireViewModel(_stepViewWindow, true);
 
                 if (_stepViewWindow.IsVisible)
                     _stepViewWindow.Close();

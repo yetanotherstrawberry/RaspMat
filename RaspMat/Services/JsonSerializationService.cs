@@ -11,10 +11,12 @@ namespace RaspMat.Services
     internal class JsonSerializationService : ISerializationService
     {
 
+        private readonly IFileService _fileService;
         private readonly JsonSerializer serializer = new JsonSerializer();
 
-        public DeserializationResultDTO<TDeserialized> Deserialize<TDeserialized>(Stream stream)
+        public DeserializationResultDTO<TDeserialized> Deserialize<TDeserialized>()
         {
+            var stream = _fileService.OpenFile();
             if (stream is null) return new DeserializationResultDTO<TDeserialized>(); // No file selected by the user.
 
             using (stream)
@@ -25,8 +27,9 @@ namespace RaspMat.Services
             }
         }
 
-        public void Serialize<TDeserialized>(TDeserialized serialized, Stream stream)
+        public void Serialize<TDeserialized>(TDeserialized serialized)
         {
+            var stream = _fileService.NewFile();
             if (stream is null) return; // No file selected - cancel silently.
 
             using (stream)
@@ -34,6 +37,15 @@ namespace RaspMat.Services
             {
                 serializer.Serialize(writer, serialized);
             }
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="JsonSerializationService"/>.
+        /// </summary>
+        /// <param name="fileService">A service used for streaming the (de)serialized data.</param>
+        public JsonSerializationService(IFileService fileService)
+        {
+            _fileService = fileService;
         }
 
     }

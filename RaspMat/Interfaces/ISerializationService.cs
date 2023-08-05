@@ -16,7 +16,7 @@ namespace RaspMat.Interfaces
         /// <typeparam name="TDeserialized"><see cref="Type"/> of <paramref name="instance"/>.</typeparam>
         /// <param name="instance">An instance to be serialized.</param
         /// <param name="stream"><see cref="Stream"/> to serialize to.</param>
-        void Serialize<TDeserialized>(TDeserialized instance, Stream stream);
+        void Serialize<TDeserialized>(TDeserialized instance);
 
         /// <summary>
         /// Requests deserialization and returns an instance of <typeparamref name="TDeserialized"/>.
@@ -28,7 +28,7 @@ namespace RaspMat.Interfaces
         /// <see cref="IDeserializationResult{TDeserialized}.Result"/> indicates whether deserialization was successful.
         /// If it is <see langword="false"/>, <see cref="IDeserializationResult{TDeserialized}.Result"/> will be equal to default.
         /// </returns>
-        DeserializationResultDTO<TDeserialized> Deserialize<TDeserialized>(Stream stream);
+        DeserializationResultDTO<TDeserialized> Deserialize<TDeserialized>();
 
     }
 }

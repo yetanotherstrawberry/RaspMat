@@ -30,7 +30,6 @@ namespace RaspMat.ViewModels
         private readonly Func<bool> _checkIsFree;
         private readonly ISerializationService _serializationService;
         private readonly IDialogService _dialogService;
-        private readonly IFileService _fileService;
         private readonly IEventAggregator _eventAggregator;
         private readonly IStepViewService _stepViewService;
 
@@ -280,7 +279,7 @@ namespace RaspMat.ViewModels
                 {
                     _serializeCommStream = GenerateCommand(() =>
                     {
-                        _serializationService.Serialize(CurrentMatrix, _fileService.NewFile());
+                        _serializationService.Serialize(CurrentMatrix);
                     });
                 }
                 return _serializeCommStream;
@@ -299,7 +298,7 @@ namespace RaspMat.ViewModels
                 {
                     _deserializeComm = GenerateCommand(() =>
                     {
-                        var matResult = _serializationService.Deserialize<Matrix>(_fileService.OpenFile());
+                        var matResult = _serializationService.Deserialize<Matrix>();
                         if (!matResult.Successful) return;
                         CurrentMatrix = matResult.Result;
                     });
@@ -378,13 +377,11 @@ namespace RaspMat.ViewModels
         /// </summary>
         /// <param name="dialogService">Instance of a <see cref="IDialogService"/> that will be used for user input.</param>
         /// <param name="serializationService">Instance of a <see cref="ISerializationService"/> that will be used for <see cref="Matrix"/> serialization.</param>
-        /// <param name="fileService">Instance of <see cref="IFileService"/> that will be used as <see cref="Stream"/> source for <paramref name="serializationService"/>.</param>
         /// <param name="eventAggregator">Event aggregator that will be used for inter-viewmodel communication.</param>
         /// <param name="stepViewService">Implementation for showing a view with steps of an algorithm.</param>
-        public GaussianUserControlViewModel(IDialogService dialogService, ISerializationService serializationService, IFileService fileService, IEventAggregator eventAggregator, IStepViewService stepViewService)
+        public GaussianUserControlViewModel(IDialogService dialogService, ISerializationService serializationService, IEventAggregator eventAggregator, IStepViewService stepViewService)
         {
             _dialogService = dialogService;
-            _fileService = fileService;
             _serializationService = serializationService;
             _eventAggregator = eventAggregator;
             _stepViewService = stepViewService;
@@ -396,13 +393,13 @@ namespace RaspMat.ViewModels
 
             PropertyChanged += LoadSteps;
 
-            _eventAggregator.GetEvent<Events.LoadMatrixEvent>().Subscribe(LoadMatrix, ThreadOption.UIThread);
+            _eventAggregator?.GetEvent<Events.LoadMatrixEvent>().Subscribe(LoadMatrix, ThreadOption.UIThread);
         }
 
         ~GaussianUserControlViewModel()
         {
             PropertyChanged -= LoadSteps;
-            _eventAggregator.GetEvent<Events.LoadMatrixEvent>().Unsubscribe(LoadMatrix);
+            _eventAggregator?.GetEvent<Events.LoadMatrixEvent>().Unsubscribe(LoadMatrix);
         }
 
     }

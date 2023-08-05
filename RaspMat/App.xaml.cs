@@ -1,5 +1,4 @@
 ﻿using Prism.Ioc;
-using Prism.Mvvm;
 using Prism.Unity;
 using RaspMat.Interfaces;
 using RaspMat.Services;
@@ -33,7 +32,7 @@ namespace RaspMat
         }
 
         /// <summary>
-        /// Creates the main class of this <see cref="Application"/>. Binds <see cref="Application.DispatcherUnhandledException"/>.
+        /// Creates the main class of this <see cref="Application"/>, register types and binds <see cref="Application.DispatcherUnhandledException"/>.
         /// </summary>
         public App() : base()
         {
