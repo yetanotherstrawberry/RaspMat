@@ -88,6 +88,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to en-US.
+        /// </summary>
+        public static string _DEF_LOCALE {
+            get {
+                return ResourceManager.GetString("_DEF_LOCALE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to JSON|*.json|*|*.*.
         /// </summary>
         public static string _FILE_FILTER {
@@ -151,6 +160,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /.
+        /// </summary>
+        public static string DIVIDE_SIGN {
+            get {
+                return ResourceManager.GetString("DIVIDE_SIGN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Row echelon.
         /// </summary>
         public static string ECHELON {
@@ -174,6 +192,24 @@ namespace RaspMat.Properties {
         public static string ENTER_MATRIX {
             get {
                 return ResourceManager.GetString("ENTER_MATRIX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to =.
+        /// </summary>
+        public static string EQUALITY_SIGN {
+            get {
+                return ResourceManager.GetString("EQUALITY_SIGN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  .
+        /// </summary>
+        public static string EQUATION_SPACER {
+            get {
+                return ResourceManager.GetString("EQUATION_SPACER", resourceCulture);
             }
         }
         
@@ -367,11 +403,38 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to -.
+        /// </summary>
+        public static string MINUS_SIGN {
+            get {
+                return ResourceManager.GetString("MINUS_SIGN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to *.
+        /// </summary>
+        public static string MULTIPLY_SIGN {
+            get {
+                return ResourceManager.GetString("MULTIPLY_SIGN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
         public static string OK {
             get {
                 return ResourceManager.GetString("OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to +.
+        /// </summary>
+        public static string PLUS_SIGN {
+            get {
+                return ResourceManager.GetString("PLUS_SIGN", resourceCulture);
             }
         }
         

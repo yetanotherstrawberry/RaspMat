@@ -126,6 +126,9 @@
   <data name="DET_ZERO" xml:space="preserve">
     <value>Cannot inverse this matrix, because its determinant is zero.</value>
   </data>
+  <data name="DIVIDE_SIGN" xml:space="preserve">
+    <value>/</value>
+  </data>
   <data name="ECHELON" xml:space="preserve">
     <value>Row echelon</value>
   </data>
@@ -134,6 +137,13 @@
   </data>
   <data name="ENTER_MATRIX" xml:space="preserve">
     <value>New matrix</value>
+  </data>
+  <data name="EQUALITY_SIGN" xml:space="preserve">
+    <value>=</value>
+  </data>
+  <data name="EQUATION_SPACER" xml:space="preserve">
+    <value> </value>
+    <comment>A spacer between parts of the equation. Usually a space.</comment>
   </data>
   <data name="ERROR" xml:space="preserve">
     <value>Error</value>
@@ -198,8 +208,17 @@
   <data name="MAT_HALF" xml:space="preserve">
     <value>Matrix slicing</value>
   </data>
+  <data name="MINUS_SIGN" xml:space="preserve">
+    <value>-</value>
+  </data>
+  <data name="MULTIPLY_SIGN" xml:space="preserve">
+    <value>*</value>
+  </data>
   <data name="OK" xml:space="preserve">
     <value>OK</value>
+  </data>
+  <data name="PLUS_SIGN" xml:space="preserve">
+    <value>+</value>
   </data>
   <data name="REDUCED" xml:space="preserve">
     <value>Reduced row echelon</value>
@@ -257,6 +276,10 @@
   <data name="_COLS" xml:space="preserve">
     <value>Cols</value>
     <comment>Do not translate. Used internally as a name for a parameter.</comment>
+  </data>
+  <data name="_DEF_LOCALE" xml:space="preserve">
+    <value>en-US</value>
+    <comment>Default locale (language) of this application.</comment>
   </data>
   <data name="_FILE_FILTER" xml:space="preserve">
     <value>JSON|*.json|*|*.*</value>

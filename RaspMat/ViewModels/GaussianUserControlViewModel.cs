@@ -74,7 +74,7 @@ namespace RaspMat.ViewModels
                     {
                         if (SelectedRows.Count > 2)
                             throw new ArgumentOutOfRangeException(nameof(SelectedRows.Count), SelectedRows.Count, string.Format(Resources.ERR_ROWS, 2));
-                        CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
+                        LoadMatrix(Matrix.SwapMatrix(CurrentMatrix, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix);
                     });
                 }
                 return _matSwapRowsComm;
@@ -379,12 +379,12 @@ namespace RaspMat.ViewModels
         /// <param name="serializationService">Instance of a <see cref="ISerializationService"/> that will be used for <see cref="Matrix"/> serialization.</param>
         /// <param name="eventAggregator">Event aggregator that will be used for inter-viewmodel communication.</param>
         /// <param name="stepViewService">Implementation for showing a view with steps of an algorithm.</param>
-        public GaussianUserControlViewModel(IDialogService dialogService, ISerializationService serializationService, IEventAggregator eventAggregator, IStepViewService stepViewService)
+        public GaussianUserControlViewModel(IDialogService dialogService, ISerializationService serializationService, IStepViewService stepViewService, IEventAggregator eventAggregator)
         {
             _dialogService = dialogService;
             _serializationService = serializationService;
-            _eventAggregator = eventAggregator;
             _stepViewService = stepViewService;
+            _eventAggregator = eventAggregator;
 
             _lockUI = () => IsFree = false;
             _unlockUI = () => IsFree = true;
@@ -392,14 +392,13 @@ namespace RaspMat.ViewModels
             _checkIsFree = _checkIsFreeExpr.Compile();
 
             PropertyChanged += LoadSteps;
-
-            _eventAggregator?.GetEvent<Events.LoadMatrixEvent>().Subscribe(LoadMatrix, ThreadOption.UIThread);
+            _eventAggregator.GetEvent<Events.LoadMatrixEvent>().Subscribe(LoadMatrix, ThreadOption.UIThread);
         }
 
         ~GaussianUserControlViewModel()
         {
             PropertyChanged -= LoadSteps;
-            _eventAggregator?.GetEvent<Events.LoadMatrixEvent>().Unsubscribe(LoadMatrix);
+            _eventAggregator.GetEvent<Events.LoadMatrixEvent>().Unsubscribe(LoadMatrix);
         }
 
     }

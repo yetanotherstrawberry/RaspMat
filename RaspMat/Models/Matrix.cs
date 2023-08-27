@@ -5,6 +5,7 @@ using RaspMat.Properties;
 using System;
 using System.Data;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -227,16 +228,10 @@ namespace RaspMat.Models
 
         public override int GetHashCode()
         {
-            var ret = 0;
-            for (int row = 0; row < Rows; row++)
-            {
-                ret = (int)((ret + (this[row, 0].Numerator % int.MaxValue)) % int.MaxValue);
-            }
-            for (int column = 0; column < Columns; column++)
-            {
-                ret = (int)((ret + (this[0, column].Denominator % int.MaxValue)) % int.MaxValue);
-            }
-            return ret;
+            return (int)(FractionMatrix
+                .Aggregate((rowA, rowB) => rowA.Concat(rowB).ToArray())
+                .SelectMany(fraction => new[] { fraction.Numerator, fraction.Denominator })
+                .Aggregate((a, b) => BigInteger.Add(a, b)) % int.MaxValue);
         }
         #endregion Methods
 

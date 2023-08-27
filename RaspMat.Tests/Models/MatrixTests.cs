@@ -124,7 +124,11 @@ namespace RaspMat.Tests.Models
         [Test]
         public void ToStringTest()
         {
-            Assert.AreEqual("0\t0" + Environment.NewLine + "0\t0", zero.ToString());
+            string ConcatRows(params object[] strings) => string.Join(Environment.NewLine, strings);
+            string ConcatColumns(params object[] strings) => string.Join("\t", strings);
+
+            Assert.AreEqual(ConcatRows(ConcatColumns(0, 0), ConcatColumns(0, 0)), zero.ToString());
+            Assert.AreEqual(ConcatRows(ConcatColumns(1, 0, 0), ConcatColumns(0, 1, 0), ConcatColumns(0, 0, 1)), identity.ToString());
         }
 
         [Test]

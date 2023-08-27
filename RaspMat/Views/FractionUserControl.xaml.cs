@@ -3,15 +3,15 @@
 namespace RaspMat.Views
 {
     /// <summary>
-    /// Interaction logic for NewMatDialog.xaml
+    /// Interaction logic for <see cref="FractionUserControl"/>.
     /// </summary>
-    public partial class NewMatDialog : UserControl
+    public partial class FractionUserControl : UserControl
     {
 
         /// <summary>
         /// Initializes XAML.
         /// </summary>
-        public NewMatDialog()
+        public FractionUserControl()
         {
             InitializeComponent();
         }

@@ -73,6 +73,17 @@ namespace RaspMat.Models
         }
 
         /// <summary>
+        /// Parses <paramref name="numerator"/> and <paramref name="denominator"/> using <see cref="BigInteger.Parse(string)"/> and executes constructor of <see cref="BigInteger"/>.
+        /// </summary>
+        /// <param name="numerator">Numerator (upper part) to be parsed.</param>
+        /// <param name="denominator">Denominator (lower part) to be parsed.</param>
+        /// <returns>New <see cref="BigInteger"/>.</returns>
+        public static Fraction Parse(string numerator, string denominator)
+        {
+            return new Fraction(BigInteger.Parse(numerator), BigInteger.Parse(denominator));
+        }
+
+        /// <summary>
         /// Returnes a new <see cref="Fraction"/> such that it is equal to 1 when multiplied by the object it was created from.
         /// </summary>
         /// <returns>New <see cref="Fraction"/> based on the object it was called from with <see cref="Denominator"/> and <see cref="Numerator"/> swapped.</returns>
@@ -109,17 +120,10 @@ namespace RaspMat.Models
             => obj is Fraction fraction && this == fraction;
 
         public override int GetHashCode()
-            => (int)((Numerator % (int.MaxValue / 2)) + (Denominator % (int.MaxValue / 2)));
+            => (int)((Numerator % (int.MaxValue / 2)) + (Denominator % (int.MaxValue / 2 + 1)));
 
         public override string ToString()
-        {
-            if (Denominator.IsOne)
-            {
-                return Numerator.ToString();
-            }
-
-            return string.Join("/", Numerator.ToString(), Denominator.ToString());
-        }
+            => Denominator.IsOne ? Numerator.ToString() : string.Join("/", Numerator, Denominator);
 
     }
 }

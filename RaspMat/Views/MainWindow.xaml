@@ -24,6 +24,9 @@
             <TabItem Header="{x:Static prop:Resources.GAUSS_ELIM}">
                 <local:GaussianUserControl Style="{StaticResource ViewModelLocator}" />
             </TabItem>
+            <TabItem Header="Fractions">
+                <local:FractionUserControl Style="{StaticResource ViewModelLocator}" />
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

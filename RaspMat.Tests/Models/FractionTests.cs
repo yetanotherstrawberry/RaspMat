@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using RaspMat.Models;
 using System;
+using System.Numerics;
 
 namespace RaspMat.Tests.Models
 {
@@ -45,7 +46,7 @@ namespace RaspMat.Tests.Models
             var half = new Fraction(1, 2);
             Assert.True(half.Reciprocal() == 2);
             Assert.AreEqual(_one, new Fraction(2, 2).Reciprocal());
-            Assert.False(half == 2);
+            Assert.True(half != 2);
         }
 
         [Test]
@@ -54,7 +55,7 @@ namespace RaspMat.Tests.Models
             Assert.True(Fraction.Zero * Fraction.Zero == 0);
             Assert.True(_one * Fraction.Zero == 0);
             Assert.True(_one * 0 == 0);
-            Assert.False(_one * 1 == 0);
+            Assert.True(_one * 1 != 0);
         }
 
         [Test]
@@ -92,12 +93,50 @@ namespace RaspMat.Tests.Models
         {
             Assert.Throws<DivideByZeroException>(() =>
             {
-                var undefined = new Fraction(1, 0);
+                var badValue = new Fraction(1, 0);
             });
             Assert.Throws<DivideByZeroException>(() =>
             {
-                var undefined = _one / 0;
+                var badValue = _one / 0;
             });
+        }
+
+        [Test]
+        public void Equality()
+        {
+            Assert.True(_one.Equals(_one));
+            Assert.True(_one.Equals(new Fraction(1, 1)));
+            Assert.False(_one.Equals(new Fraction(0, 1)));
+            Assert.False(_one.Equals(new object()));
+        }
+
+        [Test]
+        public void Hash()
+        {
+            Assert.AreEqual(_one.GetHashCode(), _one.GetHashCode());
+            Assert.AreEqual(_one.GetHashCode(), _one.Reciprocal().GetHashCode());
+            Assert.AreNotEqual(_one.GetHashCode(), new Fraction(1, 2).GetHashCode());
+            Assert.DoesNotThrow(() =>
+            {
+                new Fraction(int.MaxValue, int.MaxValue).GetHashCode();
+                new Fraction((long)int.MaxValue * 2, long.MaxValue).GetHashCode();
+            });
+        }
+
+        [Test]
+        public void StringTest()
+        {
+            Assert.AreEqual(1.ToString(), _one.ToString());
+            Assert.AreEqual("-1/2", new Fraction(-1, 2).ToString());
+        }
+
+        [Test]
+        public void Getters()
+        {
+            Assert.AreEqual(BigInteger.One, _one.Numerator);
+            Assert.AreEqual(BigInteger.One, _one.Denominator);
+            Assert.AreNotEqual(BigInteger.Zero, _one.Numerator);
+            Assert.AreNotEqual(BigInteger.Zero, _one.Denominator);
         }
 
     }

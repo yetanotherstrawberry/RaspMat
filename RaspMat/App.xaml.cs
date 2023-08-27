@@ -3,6 +3,9 @@ using Prism.Unity;
 using RaspMat.Interfaces;
 using RaspMat.Services;
 using RaspMat.Views;
+using System;
+using System.Globalization;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -14,10 +17,15 @@ namespace RaspMat
     public partial class App : PrismApplication
     {
 
+        /// <summary>
+        /// Displays the <see cref="Exception"/> and sets <see cref="DispatcherUnhandledExceptionEventArgs.Handled"/> to <see langword="true"/>.
+        /// </summary>
+        /// <param name="sender">An <see cref="object"/> that threw the <see cref="Exception"/>.</param>
+        /// <param name="args">An instance which will have its <see cref="DispatcherUnhandledExceptionEventArgs.Handled"/> set by this method.</param>
         private void ExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
             MessageBox.Show(args.Exception.Message, RaspMat.Properties.Resources.ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
-            args.Handled = true;
+            args.Handled = true; // Do not crash the application if possible.
         }
 
         protected override Window CreateShell() => Container.Resolve<MainWindow>();
@@ -32,16 +40,14 @@ namespace RaspMat
         }
 
         /// <summary>
-        /// Creates the main class of this <see cref="Application"/>, register types and binds <see cref="Application.DispatcherUnhandledException"/>.
+        /// Creates the main class of this <see cref="Application"/>, binds <see cref="Application.DispatcherUnhandledException"/> and sets <see cref="Thread.CurrentThread.CurrentUICulture"/>.
         /// </summary>
         public App() : base()
         {
             DispatcherUnhandledException += ExceptionHandler;
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
         }
 
-        /// <summary>
-        /// Unbinds <see cref="Application.DispatcherUnhandledException"/>.
-        /// </summary>
         ~App()
         {
             DispatcherUnhandledException -= ExceptionHandler;

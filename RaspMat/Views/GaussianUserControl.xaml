@@ -129,7 +129,7 @@
             </GroupBox>
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
                 <DataGrid
-                    ItemsSource="{Binding MatrixDataTable}"
+                    ItemsSource="{Binding MatrixDataTable, IsAsync=True}"
                     SelectionMode="Extended"
                     SelectionUnit="FullRow"
                     HeadersVisibility="None"
