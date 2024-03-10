@@ -66,6 +66,7 @@ namespace RaspMat.Helpers
         {
             // This class allows to create parameterless commands. This constructor hides the parameter by setting its type to object and ignoring any value.
         }
+
     }
 
 }

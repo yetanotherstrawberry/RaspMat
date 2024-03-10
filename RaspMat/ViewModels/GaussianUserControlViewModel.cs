@@ -2,11 +2,10 @@
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
-using RaspMat.DTOs;
 using RaspMat.Helpers;
-using RaspMat.Interfaces;
 using RaspMat.Models;
 using RaspMat.Properties;
+using RaspMat.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,8 +29,8 @@ namespace RaspMat.ViewModels
         private readonly Func<bool> _checkIsFree;
         private readonly ISerializationService _serializationService;
         private readonly IDialogService _dialogService;
-        private readonly IEventAggregator _eventAggregator;
         private readonly IStepViewService _stepViewService;
+        private readonly IEventAggregator _eventAggregator;
 
         private int DataGridRowToMatRow(DataRowView rowView)
         {
@@ -50,7 +49,7 @@ namespace RaspMat.ViewModels
 
         private void LoadSteps(object sender, PropertyChangedEventArgs eventArguments)
         {
-            if (eventArguments.PropertyName.Equals(nameof(Steps)))
+            if (string.Equals(eventArguments.PropertyName, nameof(Steps)))
             {
                 _eventAggregator.GetEvent<Events.LoadStepsEvent>().Publish(Steps);
             }
@@ -200,7 +199,7 @@ namespace RaspMat.ViewModels
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// Thrown when <see cref="UserInputComm"/> has been <see cref="ICommand.Execute(object)"/>d,
-        /// but <see cref="_userInputCommHander"/>'s <see cref="ICommand.CanExecute(object)"/> return <see langword="false"/>.
+        /// but <see cref="_userInputCommHander"/>'s <see cref="ICommand.CanExecute(object)"/> returns <see langword="false"/>.
         /// </exception>
         public ICommand UserInputComm
         {
@@ -208,7 +207,7 @@ namespace RaspMat.ViewModels
             {
                 if (_userInputCommDialog is null)
                 {
-                    var comm = new DelegateCommand(() => _dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
+                    var command = new DelegateCommand(() => _dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
                     {
                         if (_userInputCommHander is null)
                         {
@@ -227,11 +226,11 @@ namespace RaspMat.ViewModels
                             });
                         }
                         if (!_userInputCommHander.CanExecute(res))
-                            throw new InvalidOperationException();
+                            throw new InvalidOperationException(nameof(ICommand.CanExecute));
                         _userInputCommHander.Execute(res);
                     }));
-                    comm.ObservesCanExecute(_checkIsFreeExpr);
-                    _userInputCommDialog = comm;
+                    command.ObservesCanExecute(_checkIsFreeExpr);
+                    _userInputCommDialog = command;
                 }
                 return _userInputCommDialog;
             }
@@ -279,7 +278,7 @@ namespace RaspMat.ViewModels
                 {
                     _serializeCommStream = GenerateCommand(() =>
                     {
-                        _serializationService.Serialize(CurrentMatrix);
+                        _serializationService.Serialize(CurrentMatrix).Wait();
                     });
                 }
                 return _serializeCommStream;
@@ -298,9 +297,10 @@ namespace RaspMat.ViewModels
                 {
                     _deserializeComm = GenerateCommand(() =>
                     {
-                        var matResult = _serializationService.Deserialize<Matrix>();
-                        if (!matResult.Successful) return;
-                        CurrentMatrix = matResult.Result;
+                        var task = _serializationService.Deserialize<Matrix>();
+                        task.Wait();
+                        if (task.Result is null) return;
+                        CurrentMatrix = task.Result;
                     });
                 }
                 return _deserializeComm;
@@ -365,12 +365,12 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Steps performed by algorithms. Notifies about the value change.
         /// </summary>
-        public IList<AlgorithmStepDTO<Matrix>> Steps
+        public IList<AlgorithmStep<Matrix>> Steps
         {
             get => steps;
             set => SetProperty(ref steps, value);
         }
-        private IList<AlgorithmStepDTO<Matrix>> steps = new List<AlgorithmStepDTO<Matrix>>();
+        private IList<AlgorithmStep<Matrix>> steps = new List<AlgorithmStep<Matrix>>();
 
         /// <summary>
         /// Creates a new <see cref="GaussianUserControlViewModel"/> for a <see cref="Matrix"/> and implements its commands.
@@ -391,14 +391,8 @@ namespace RaspMat.ViewModels
             _checkIsFreeExpr = () => IsFree;
             _checkIsFree = _checkIsFreeExpr.Compile();
 
+            _eventAggregator.GetEvent<Events.LoadMatrixEvent>().Subscribe(LoadMatrix);
             PropertyChanged += LoadSteps;
-            _eventAggregator.GetEvent<Events.LoadMatrixEvent>().Subscribe(LoadMatrix, ThreadOption.UIThread);
-        }
-
-        ~GaussianUserControlViewModel()
-        {
-            PropertyChanged -= LoadSteps;
-            _eventAggregator.GetEvent<Events.LoadMatrixEvent>().Unsubscribe(LoadMatrix);
         }
 
     }

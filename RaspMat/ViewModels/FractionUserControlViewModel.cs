@@ -55,7 +55,12 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Denominator of the left <see cref="Fraction"/> of the equation.
         /// </summary>
-        public string LeftFractionLowerInput { get; set; }
+        public string LeftFractionLowerInput
+        {
+            get => _leftFractionLowerInput;
+            set => SetProperty(ref _leftFractionLowerInput, value);
+        }
+        private string _leftFractionLowerInput = string.Empty;
 
         /// <summary>
         /// Numerator of the right <see cref="Fraction"/> of the equation.
@@ -65,7 +70,12 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Denominator of the right <see cref="Fraction"/> of the equation.
         /// </summary>
-        public string RightFractionLowerInput { get; set; }
+        public string RightFractionLowerInput
+        {
+            get => _rightFractionLowerInput;
+            set => SetProperty(ref _rightFractionLowerInput, value);
+        }
+        private string _rightFractionLowerInput = string.Empty;
 
         private Fraction LeftFraction => Fraction.Parse(LeftFractionUpperInput, LeftFractionLowerInput);
 
@@ -95,6 +105,9 @@ namespace RaspMat.ViewModels
 
                     _calculateCommand = new AsyncDelegateCommand<string>(operationType =>
                     {
+                        if (string.IsNullOrWhiteSpace(LeftFractionLowerInput)) LeftFractionLowerInput = "1";
+                        if (string.IsNullOrWhiteSpace(RightFractionLowerInput)) RightFractionLowerInput = "1";
+
                         switch (_operations[operationType])
                         {
                             case OperationType.Add:

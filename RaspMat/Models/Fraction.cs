@@ -30,7 +30,7 @@ namespace RaspMat.Models
         public Fraction(BigInteger numerator, BigInteger denominator)
         {
             if (denominator.IsZero)
-                throw new DivideByZeroException();
+                throw new DivideByZeroException(nameof(denominator));
 
             if (denominator < BigInteger.Zero)
             {
@@ -76,11 +76,11 @@ namespace RaspMat.Models
         /// Parses <paramref name="numerator"/> and <paramref name="denominator"/> using <see cref="BigInteger.Parse(string)"/> and executes constructor of <see cref="BigInteger"/>.
         /// </summary>
         /// <param name="numerator">Numerator (upper part) to be parsed.</param>
-        /// <param name="denominator">Denominator (lower part) to be parsed.</param>
+        /// <param name="denominator">Denominator (lower part) to be parsed. If <see langword="null"/> or <see cref="string.Empty"/> or contains only white charactes will be parsed as 1.</param>
         /// <returns>New <see cref="BigInteger"/>.</returns>
         public static Fraction Parse(string numerator, string denominator)
         {
-            return new Fraction(BigInteger.Parse(numerator), BigInteger.Parse(denominator));
+            return new Fraction(BigInteger.Parse(numerator), string.IsNullOrWhiteSpace(denominator) ? BigInteger.One : BigInteger.Parse(denominator));
         }
 
         /// <summary>

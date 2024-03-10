@@ -98,30 +98,24 @@
     <Compile Include="Helpers\DataTableHelpers.cs" />
     <Compile Include="Helpers\Events.cs" />
     <Compile Include="Helpers\JaggedArrayHelper.cs" />
-    <Compile Include="Interfaces\IFileService.cs" />
-    <Compile Include="Interfaces\IMatrix.cs" />
-    <Compile Include="Interfaces\ISerializationService.cs" />
-    <Compile Include="DTOs\DeserializationResultDTO.cs" />
-    <Compile Include="DTOs\AlgorithmStepDTO.cs" />
-    <Compile Include="Interfaces\IStepViewService.cs" />
+    <Compile Include="Services\Interfaces\IFileService.cs" />
+    <Compile Include="Services\Interfaces\ISerializationService.cs" />
+    <Compile Include="Models\AlgorithmStep.cs" />
+    <Compile Include="Services\Interfaces\IStepViewService.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="Services\StepWindowService.cs" />
-    <Compile Include="Services\Win32FileService.cs" />
+    <Compile Include="Services\StepWPFWindowService.cs" />
+    <Compile Include="Services\Win32WPFFileService.cs" />
     <Compile Include="Services\JsonSerializationService.cs" />
     <Compile Include="ViewModels\FractionUserControlViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\StepListWindowViewModel.cs" />
     <Compile Include="ViewModels\GaussianUserControlViewModel.cs" />
     <Compile Include="ViewModels\NewMatDialogViewModel.cs" />
+    <Compile Include="Views\CommonWindow.cs" />
     <Compile Include="Views\FractionUserControl.xaml.cs">
       <DependentUpon>FractionUserControl.xaml</DependentUpon>
     </Compile>
@@ -172,10 +166,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -194,7 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
-      <Version>1.1.39</Version>
+      <Version>1.1.77</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
@@ -209,8 +199,6 @@
       <Version>4.5.4</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

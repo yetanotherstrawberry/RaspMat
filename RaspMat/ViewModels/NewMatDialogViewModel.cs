@@ -1,5 +1,4 @@
 ﻿using Prism.Commands;
-using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using RaspMat.Properties;
 using System;
@@ -7,7 +6,7 @@ using System.Windows.Input;
 
 namespace RaspMat.ViewModels
 {
-    internal class NewMatDialogViewModel : BindableBase, IDialogAware
+    internal class NewMatDialogViewModel : IDialogAware
     {
 
         public ICommand CloseDialogCommand { get; }
@@ -24,13 +23,13 @@ namespace RaspMat.ViewModels
 
         protected void CloseDialog()
         {
-            var ret = new DialogResult(ButtonResult.OK);
+            var result = new DialogResult(ButtonResult.OK);
 
-            ret.Parameters.Add(Resources._ROWS, int.Parse(Rows));
-            ret.Parameters.Add(Resources._COLS, int.Parse(Columns));
-            ret.Parameters.Add(Resources._ADD_ZEROS, AddZeros);
+            result.Parameters.Add(Resources._ROWS, int.Parse(Rows));
+            result.Parameters.Add(Resources._COLS, int.Parse(Columns));
+            result.Parameters.Add(Resources._ADD_ZEROS, AddZeros);
 
-            RequestClose?.Invoke(ret);
+            RequestClose?.Invoke(result);
         }
 
         public NewMatDialogViewModel()

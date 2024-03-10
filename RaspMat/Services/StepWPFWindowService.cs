@@ -1,12 +1,12 @@
 ﻿using Prism.Mvvm;
-using RaspMat.Interfaces;
+using RaspMat.Services.Interfaces;
 using RaspMat.ViewModels;
 using RaspMat.Views;
 using System.Windows;
 
 namespace RaspMat.Services
 {
-    internal class StepWindowService : IStepViewService
+    internal class StepWPFWindowService : IStepViewService
     {
 
         private Window _stepViewWindow;
@@ -17,7 +17,10 @@ namespace RaspMat.Services
             {
                 if (!_stepViewWindow?.IsLoaded ?? true)
                 {
-                    _stepViewWindow = new StepListWindow();
+                    _stepViewWindow = new StepListWindow()
+                    {
+                        Owner = Application.Current.MainWindow,
+                    };
                     ViewModelLocator.SetAutoWireViewModel(_stepViewWindow, true);
                 }
 
@@ -28,7 +31,7 @@ namespace RaspMat.Services
             });
         }
 
-        public StepWindowService()
+        public StepWPFWindowService()
         {
             ViewModelLocationProvider.Register<StepListWindow, StepListWindowViewModel>();
         }

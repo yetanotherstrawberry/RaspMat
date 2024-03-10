@@ -1,9 +1,10 @@
 ﻿using Microsoft.Win32;
-using RaspMat.Interfaces;
 using RaspMat.Properties;
+using RaspMat.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace RaspMat.Services
@@ -11,20 +12,20 @@ namespace RaspMat.Services
     /// <summary>
     /// Service implementing I/O using <see cref="FileDialog"/>s.
     /// </summary>
-    internal class Win32FileService : IFileService
+    internal class Win32WPFFileService : IFileService
     {
 
         private readonly IDictionary<Type, FileDialog> _dialogs = new Dictionary<Type, FileDialog>();
 
-        private TDialog CreateDialog<TDialog>() where TDialog : FileDialog, new()
+        private async Task<TDialog> CreateDialog<TDialog>() where TDialog : FileDialog, new()
         {
             // Dialogs must be created and shown from the main (UI) thread.
-            return Application.Current.Dispatcher.Invoke(() =>
+            return await Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 TDialog dialog;
                 if (!_dialogs.ContainsKey(typeof(TDialog)))
                 {
-                    dialog = new TDialog
+                    dialog = new TDialog()
                     {
                         Filter = Resources._FILE_FILTER,
                     };
@@ -35,22 +36,25 @@ namespace RaspMat.Services
                     dialog = (TDialog)_dialogs[typeof(TDialog)];
                 }
 
-                if (dialog.ShowDialog() ?? false)
+                if (dialog.ShowDialog(Application.Current.MainWindow) ?? false)
                 {
                     return dialog;
                 }
+
                 return null;
             });
         }
 
-        public Stream OpenFile()
+        public async Task<Stream> OpenFileAsync()
         {
-            return CreateDialog<OpenFileDialog>()?.OpenFile();
+            var dialog = await CreateDialog<OpenFileDialog>().ConfigureAwait(false);
+            return dialog?.OpenFile();
         }
 
-        public Stream NewFile()
+        public async Task<Stream> NewFileAsync()
         {
-            return CreateDialog<SaveFileDialog>()?.OpenFile();
+            var dialog = await CreateDialog<SaveFileDialog>().ConfigureAwait(false);
+            return dialog?.OpenFile();
         }
 
     }

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using RaspMat.DTOs;
-using RaspMat.Interfaces;
+using RaspMat.Services.Interfaces;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace RaspMat.Services
 {
@@ -14,22 +14,22 @@ namespace RaspMat.Services
         private readonly IFileService _fileService;
         private readonly JsonSerializer serializer = new JsonSerializer();
 
-        public DeserializationResultDTO<TDeserialized> Deserialize<TDeserialized>()
+        public async Task<TDeserialized> Deserialize<TDeserialized>() where TDeserialized : class // Constraint forces value to be nullable.
         {
-            var stream = _fileService.OpenFile();
-            if (stream is null) return new DeserializationResultDTO<TDeserialized>(); // No file selected by the user.
+            var stream = await _fileService.OpenFileAsync();
+            if (stream is null) return null; // No file selected by the user.
 
             using (stream)
             using (var reader = new StreamReader(stream))
             using (var jsonReader = new JsonTextReader(reader))
             {
-                return new DeserializationResultDTO<TDeserialized>(successful: true, serializer.Deserialize<TDeserialized>(jsonReader));
+                return serializer.Deserialize<TDeserialized>(jsonReader);
             }
         }
 
-        public void Serialize<TDeserialized>(TDeserialized serialized)
+        public async Task Serialize<TDeserialized>(TDeserialized serialized) where TDeserialized : class
         {
-            var stream = _fileService.NewFile();
+            var stream = await _fileService.NewFileAsync();
             if (stream is null) return; // No file selected - cancel silently.
 
             using (stream)

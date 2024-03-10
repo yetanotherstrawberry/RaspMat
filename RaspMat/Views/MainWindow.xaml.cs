@@ -1,11 +1,9 @@
-﻿using System.Windows;
-
-namespace RaspMat.Views
+﻿namespace RaspMat.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for <see cref="MainWindow"/>.
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : CommonWindow
     {
 
         /// <summary>

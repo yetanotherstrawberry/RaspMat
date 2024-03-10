@@ -1,6 +1,5 @@
 ﻿using Prism.Events;
 using Prism.Mvvm;
-using RaspMat.DTOs;
 using RaspMat.Helpers;
 using RaspMat.Models;
 using System.Collections.Generic;
@@ -9,14 +8,14 @@ using System.Windows.Input;
 namespace RaspMat.ViewModels
 {
     /// <summary>
-    /// ViewModel for the list of <see cref="AlgorithmStepDTO{T}"/> where <c>T</c> is <see cref="Matrix"/>.
+    /// ViewModel for the list of <see cref="AlgorithmStep{T}"/> where <c>T</c> is <see cref="Matrix"/>.
     /// </summary>
     internal class StepListWindowViewModel : BindableBase
     {
 
         private readonly IEventAggregator _eventAggregator;
 
-        private void Update(ICollection<AlgorithmStepDTO<Matrix>> steps)
+        private void Update(ICollection<AlgorithmStep<Matrix>> steps)
         {
             Steps = steps;
         }
@@ -24,12 +23,12 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Steps of the algorithm shown to the user.
         /// </summary>
-        public ICollection<AlgorithmStepDTO<Matrix>> Steps
+        public ICollection<AlgorithmStep<Matrix>> Steps
         {
             get => _steps;
             private set => SetProperty(ref _steps, value);
         }
-        private ICollection<AlgorithmStepDTO<Matrix>> _steps;
+        private ICollection<AlgorithmStep<Matrix>> _steps;
 
         /// <summary>
         /// Loads a <see cref="Matrix"/> selected by the user to the main view.
@@ -54,12 +53,7 @@ namespace RaspMat.ViewModels
         public StepListWindowViewModel(IEventAggregator eventAggregator)
         {
             _eventAggregator = eventAggregator;
-            _eventAggregator.GetEvent<Events.LoadStepsEvent>().Subscribe(Update, ThreadOption.UIThread);
-        }
-
-        ~StepListWindowViewModel()
-        {
-            _eventAggregator.GetEvent<Events.LoadStepsEvent>().Unsubscribe(Update);
+            _eventAggregator.GetEvent<Events.LoadStepsEvent>().Subscribe(Update);
         }
 
     }

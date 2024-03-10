@@ -1,4 +1,4 @@
-﻿namespace RaspMat.Interfaces
+﻿namespace RaspMat.Services.Interfaces
 {
     /// <summary>
     /// Contains logic for interacting with view for steps of an algorithm.

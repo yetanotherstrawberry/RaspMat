@@ -127,29 +127,32 @@
                     </Button>
                 </StackPanel>
             </GroupBox>
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
-                <DataGrid
-                    ItemsSource="{Binding MatrixDataTable, IsAsync=True}"
-                    SelectionMode="Extended"
-                    SelectionUnit="FullRow"
-                    HeadersVisibility="None"
-                    CanUserAddRows="False"
-                    ColumnWidth="SizeToCells"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    IsEnabled="{Binding IsFree}">
-                    <DataGrid.Resources>
-                        <SolidColorBrush
-                            x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
-                            Color="{x:Static SystemColors.ActiveCaptionColor}"/>
-                    </DataGrid.Resources>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding GridSelectedRowComm}" PassEventArgsToCommand="True" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </DataGrid>
-            </ScrollViewer>
+            <DataGrid
+                Grid.Row="1"
+                Margin="2"
+                ItemsSource="{Binding MatrixDataTable}"
+                ScrollViewer.CanContentScroll="True"
+                EnableRowVirtualization="True"
+                EnableColumnVirtualization="True"
+                SelectionMode="Extended"
+                SelectionUnit="FullRow"
+                HeadersVisibility="None"
+                CanUserAddRows="False"
+                ColumnWidth="SizeToCells"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                IsEnabled="{Binding IsFree}">
+                <DataGrid.Resources>
+                    <SolidColorBrush
+                        x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                        Color="{x:Static SystemColors.ActiveCaptionColor}"/>
+                </DataGrid.Resources>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding GridSelectedRowComm}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </DataGrid>
             <GroupBox Header="{x:Static prop:Resources.MATRIX}" Grid.Row="2">
                 <StackPanel>
                     <Button Content="{x:Static prop:Resources.ENTER_MATRIX}" Command="{Binding UserInputComm}" />

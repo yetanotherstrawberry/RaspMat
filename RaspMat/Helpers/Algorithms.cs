@@ -1,6 +1,4 @@
-﻿using RaspMat.DTOs;
-using RaspMat.Interfaces;
-using RaspMat.Models;
+﻿using RaspMat.Models;
 using RaspMat.Properties;
 using System.Collections.Generic;
 
@@ -21,14 +19,14 @@ namespace RaspMat.Helpers
         /// <param name="matrix"><see cref="Matrix"/> to reduce. Will not be modified.</param>
         /// <param name="reducedEchelon">Whether the resulting <see cref="Matrix"/> should be reduced row echelon (<see langword="true"/>) or row echelon (<see langword="false"/>).</param>
         /// <returns>Steps and matrices created during elimination: <see cref="IList{T}"/> where <c>T</c> is <see cref="IAlgorithmResult{T}"/> where <c>T</c> is <see cref="Matrix"/>.</returns>
-        public static IList<AlgorithmStepDTO<Matrix>> GaussianElimination(this Matrix matrix, bool reducedEchelon = true)
+        public static IList<AlgorithmStep<Matrix>> GaussianElimination(this Matrix matrix, bool reducedEchelon = true)
         {
-            AlgorithmStepDTO<Matrix> GenerateStep(string text, Matrix stepMatrix, params object[] interpolation)
+            AlgorithmStep<Matrix> GenerateStep(string text, Matrix stepMatrix, params object[] interpolation)
             {
-                return new AlgorithmStepDTO<Matrix>(string.Format(text, interpolation), stepMatrix);
+                return new AlgorithmStep<Matrix>(string.Format(text, interpolation), stepMatrix);
             }
 
-            var ret = new List<AlgorithmStepDTO<Matrix>>();
+            var ret = new List<AlgorithmStep<Matrix>>();
             var row = 0;
             var col = 0;
 
@@ -112,10 +110,10 @@ namespace RaspMat.Helpers
 
             return ret;
         }
-
-        public static IList<AlgorithmStepDTO<Matrix>> InverseMatrix(this Matrix matrix)
+        /*
+        public static IList<AlgorithmStep<Matrix>> InverseMatrix(this Matrix matrix)
         {
-            var ret = new List<AlgorithmStepDTO<Matrix>>();
+            var ret = new List<AlgorithmStep<Matrix>>();
             var mat = Matrix.AddI(matrix, onLeft: false);
             mat.GaussianElimination(reducedEchelon: true);
             mat = Matrix.Slice(mat, removeLeft: true);
@@ -123,7 +121,7 @@ namespace RaspMat.Helpers
             return ret;
         }
 
-        /*
+        
         private static string[] StrToStrVecs(string vec, char vectorsSplitter = ';')
             => Array.ConvertAll(vec.Split(vectorsSplitter), str => str.TrimStart('(').TrimEnd(')'));
 
