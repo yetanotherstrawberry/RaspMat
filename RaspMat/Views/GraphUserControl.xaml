@@ -1,0 +1,45 @@
+﻿<local:UserControlBase x:Class="RaspMat.Views.GraphUserControl"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:RaspMat.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:prop="clr-namespace:RaspMat.Properties"
+             xmlns:local="clr-namespace:RaspMat.Views"
+             xmlns:wpfgraphcontrol="http://mlsagl"
+             mc:Ignorable="d"
+             d:MinHeight="350"
+             d:MinWidth="800"
+             d:DataContext="{d:DesignInstance vm:GraphUserControlViewModel, IsDesignTimeCreatable=False}"
+             d:Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.Resources>
+            <Style TargetType="StackPanel">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="Margin" Value="80,5,80,5" />
+            </Style>
+            <Style TargetType="Separator">
+                <Setter Property="Margin" Value="60,5,60,5" />
+            </Style>
+        </Grid.Resources>
+
+        <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
+            <ComboBox ItemsSource="{Binding Nodes}" DisplayMemberPath="Label.Text" />
+            <Button Click="Button_Click" Content="Add node"/>
+        </StackPanel>
+
+        <StackPanel x:Name="spanel" HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Stretch" Grid.Column="1" />
+
+    </Grid>
+</local:UserControlBase>

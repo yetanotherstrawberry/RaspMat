@@ -57,7 +57,7 @@ namespace RaspMat.Models
             FractionMatrix = fractionMatrix;
         }
 
-        public Matrix(int rows, int columns) : this(rows, columns, (row, column) => Fraction.Zero) { }
+        public Matrix(int rows, int columns) : this(rows, columns, (row, column) => 0) { }
         #endregion Constructors
 
         #region StaticMethods
@@ -186,7 +186,7 @@ namespace RaspMat.Models
             return new Matrix(dataTable.Rows.Count, dataTable.Columns.Count, (row, column) => Fraction.Parse(dataTable.Rows[row][column].ToString()));
         }
 
-        public DataTable ToDataTable() => DataTableHelpers.CreateStrDataTable(Rows, Columns, (row, col) => this[row, col]);
+        public DataTable ToDataTable() => DataTableHelpers.CreateStrDataTable((row, col) => this[row, col], Rows, Columns);
 
         public override string ToString()
         {

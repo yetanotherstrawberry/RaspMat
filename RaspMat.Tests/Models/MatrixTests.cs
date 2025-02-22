@@ -58,57 +58,57 @@ namespace RaspMat.Tests.Models
         public void ZeroEqualsZero()
         {
             var zeroInt = new Matrix(2, 2);
-            Assert.AreEqual(zeroInt, zero);
+            Assert.Equals(zeroInt, zero);
         }
 
         [Test]
         public void IdentityEqualsIdentity()
         {
-            var matI = new Matrix(3, 3, (row, col) => row == col ? Fraction.Parse("1") : 0);
-            Assert.AreEqual(matI, identity);
+            var matI = new Matrix(3, 3, (row, col) => row == col ? 1 : 0);
+            Assert.That(matI, Is.EqualTo(identity));
         }
 
         [Test]
         public void GaussIdentityTest()
         {
-            Assert.AreEqual(Matrix.Identity(3), equalToIdentity.GaussianElimination().Last().Result);
+            Assert.That(Matrix.Identity(3), Is.EqualTo(equalToIdentity.GaussianElimination().Last().Result));
         }
 
         [Test]
         public void EqualsTest()
         {
-            Assert.True(equalToIdentity.Equals(equalToIdentity));
-            Assert.False(equalToIdentity.Equals(identity));
-            Assert.False(equalToIdentity.Equals(new object()));
+            Assert.That(equalToIdentity.Equals(equalToIdentity));
+            Assert.That(equalToIdentity.Equals(identity));
+            Assert.That(equalToIdentity.Equals(new object()));
         }
 
         [Test]
         public void GetHashTest()
         {
-            Assert.AreEqual(identity.GetHashCode(), identity.GetHashCode());
-            Assert.AreNotEqual(identity.GetHashCode(), equalToIdentity.GetHashCode());
-            Assert.AreEqual(equalToIdentity.GetHashCode(), equalToIdentity.GetHashCode());
+            Assert.That(identity.GetHashCode(), Is.EqualTo(identity.GetHashCode()));
+            Assert.That(identity.GetHashCode(), Is.Not.EqualTo(equalToIdentity.GetHashCode()));
+            Assert.That(equalToIdentity.GetHashCode(), Is.EqualTo(equalToIdentity.GetHashCode()));
         }
 
         [Test]
         public void TransposeTest()
         {
-            Assert.AreEqual(identity, Matrix.Transpose(identity));
-            Assert.AreNotEqual(identity, Matrix.Transpose(equalToIdentity));
-            Assert.AreEqual(verticalOnes, Matrix.Transpose(horizontalOnes));
-            Assert.AreNotEqual(verticalOnes, horizontalOnes);
+            Assert.That(identity, Is.EqualTo(Matrix.Transpose(identity)));
+            Assert.That(identity, Is.Not.EqualTo(Matrix.Transpose(equalToIdentity)));
+            Assert.That(verticalOnes, Is.EqualTo(Matrix.Transpose(horizontalOnes)));
+            Assert.That(verticalOnes, Is.Not.EqualTo(horizontalOnes));
         }
 
         [Test]
         public void AddISliceTest()
         {
             var addedI = Matrix.AddI(identity, onLeft: true);
-            Assert.AreEqual(identity, Matrix.Slice(addedI, removeLeft: true));
-            Assert.AreEqual(identity, Matrix.Slice(addedI, removeLeft: false));
+            Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: true)));
+            Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: false)));
 
             addedI = Matrix.AddI(identity, onLeft: false);
-            Assert.AreEqual(identity, Matrix.Slice(addedI, removeLeft: true));
-            Assert.AreEqual(identity, Matrix.Slice(addedI, removeLeft: false));
+            Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: true)));
+            Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: false)));
 
             var temp = new[]
             {
@@ -118,7 +118,7 @@ namespace RaspMat.Tests.Models
             };
             var expected = new Matrix(3, 6, (row, column) => temp[row * 6 + column]);
             addedI = Matrix.AddI(equalToIdentity, onLeft: false);
-            Assert.AreEqual(expected, addedI);
+            Assert.That(expected, Is.EqualTo(addedI));
         }
 
         [Test]
@@ -127,18 +127,18 @@ namespace RaspMat.Tests.Models
             string ConcatRows(params object[] strings) => string.Join(Environment.NewLine, strings);
             string ConcatColumns(params object[] strings) => string.Join("\t", strings);
 
-            Assert.AreEqual(ConcatRows(ConcatColumns(0, 0), ConcatColumns(0, 0)), zero.ToString());
-            Assert.AreEqual(ConcatRows(ConcatColumns(1, 0, 0), ConcatColumns(0, 1, 0), ConcatColumns(0, 0, 1)), identity.ToString());
+            Assert.That(ConcatRows(ConcatColumns(0, 0), ConcatColumns(0, 0)), Is.EqualTo(zero.ToString()));
+            Assert.That(ConcatRows(ConcatColumns(1, 0, 0), ConcatColumns(0, 1, 0), ConcatColumns(0, 0, 1)), Is.EqualTo(identity.ToString()));
         }
 
         [Test]
         public void MultiplicationTest()
         {
-            Assert.AreEqual(identity, identity * identity);
-            Assert.AreEqual(equalToIdentity, identity * equalToIdentity);
-            Assert.AreEqual(equalToIdentity, equalToIdentity * identity);
-            Assert.AreEqual(zero, zero * verticalOnes);
-            Assert.AreEqual(zero, verticalOnes * zero);
+            Assert.That(identity, Is.EqualTo(identity * identity));
+            Assert.That(equalToIdentity, Is.EqualTo(identity * equalToIdentity));
+            Assert.That(equalToIdentity, Is.EqualTo(equalToIdentity * identity));
+            Assert.That(zero, Is.EqualTo(zero * verticalOnes));
+            Assert.That(zero, Is.EqualTo(verticalOnes * zero));
         }
 
     }

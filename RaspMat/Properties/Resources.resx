@@ -289,6 +289,15 @@
     <value>NewMatDialog</value>
     <comment>Do not translate. Used internally as a name for a view.</comment>
   </data>
+  <data name="_REGEX_FRATION" xml:space="preserve">
+    <value>^[0-9-+]*$</value>
+  </data>
+  <data name="_REGEX_INTEGER" xml:space="preserve">
+    <value>^[0-9-+]*$</value>
+  </data>
+  <data name="_REGEX_POSITIVE_INTEGER" xml:space="preserve">
+    <value>^[0-9]*$</value>
+  </data>
   <data name="_ROWS" xml:space="preserve">
     <value>Rows</value>
     <comment>Do not translate. Used internally as a name for a parameter.</comment>

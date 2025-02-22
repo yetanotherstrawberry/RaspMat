@@ -1,6 +1,4 @@
-﻿using Prism.Events;
-using RaspMat.Models;
-using System;
+﻿using RaspMat.Models;
 using System.Collections.Generic;
 
 namespace RaspMat.Helpers
@@ -8,17 +6,35 @@ namespace RaspMat.Helpers
     internal static class Events
     {
 
-        public abstract class Event<TInput> : PubSubEvent<TInput>
+        public abstract class Event<TData>
         {
-            public new SubscriptionToken Subscribe(Action<TInput> action)
+            public TData Data { get; }
+
+            protected Event(TData data)
             {
-                return Subscribe(action, ThreadOption.UIThread, keepSubscriberReferenceAlive: false);
+                Data = data;
             }
         }
 
-        public class LoadMatrixEvent : Event<Matrix> { }
+        public sealed class LoadMatrixEvent : Event<Matrix>
+        {
+            public LoadMatrixEvent(Matrix data) : base(data) { }
+        }
 
-        public class LoadStepsEvent : Event<ICollection<AlgorithmStep<Matrix>>> { }
+        public sealed class LoadStepsEvent : Event<IList<AlgorithmStep<Matrix>>>
+        {
+            public LoadStepsEvent(IList<AlgorithmStep<Matrix>> data) : base(data) { }
+        }
+
+        public sealed class OperationPerformedEvent : Event<string>
+        {
+            public OperationPerformedEvent(string data) : base(data) { }
+        }
+
+        public sealed class NewMatrixEvent : Event<string>
+        {
+            public NewMatrixEvent(string data) : base(data) { }
+        }
 
     }
 }

@@ -65,7 +65,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
@@ -94,13 +94,18 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\AsyncDelegateCommand.cs" />
+    <Compile Include="Helpers\ICommandHelpers.cs" />
     <Compile Include="Helpers\DataTableHelpers.cs" />
     <Compile Include="Helpers\Events.cs" />
     <Compile Include="Helpers\JaggedArrayHelper.cs" />
+    <Compile Include="Models\NewMatrixDescription.cs" />
+    <Compile Include="Services\AsyncRelayCommandingService.cs" />
+    <Compile Include="Services\Interfaces\IEventService.cs" />
+    <Compile Include="Services\Interfaces\ICommandingService.cs" />
     <Compile Include="Services\Interfaces\IFileService.cs" />
     <Compile Include="Services\Interfaces\ISerializationService.cs" />
     <Compile Include="Models\AlgorithmStep.cs" />
+    <Compile Include="Services\Interfaces\IMathService.cs" />
     <Compile Include="Services\Interfaces\IStepViewService.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
@@ -108,14 +113,21 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Services\StepWPFWindowService.cs" />
+    <Compile Include="Services\WeakReferenceMessengerEventService.cs" />
     <Compile Include="Services\Win32WPFFileService.cs" />
     <Compile Include="Services\JsonSerializationService.cs" />
     <Compile Include="ViewModels\FractionUserControlViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\StepListWindowViewModel.cs" />
+    <Compile Include="ViewModels\GraphUserControlViewModel.cs" />
     <Compile Include="ViewModels\GaussianUserControlViewModel.cs" />
     <Compile Include="ViewModels\NewMatDialogViewModel.cs" />
-    <Compile Include="Views\CommonWindow.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="Views\GraphUserControl.xaml.cs">
+      <DependentUpon>GraphUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserControlBase.cs" />
+    <Compile Include="Views\WindowBase.cs" />
     <Compile Include="Views\FractionUserControl.xaml.cs">
       <DependentUpon>FractionUserControl.xaml</DependentUpon>
     </Compile>
@@ -139,7 +151,7 @@
     <Compile Include="Helpers\Algorithms.cs" />
     <Compile Include="Models\Fraction.cs" />
     <Compile Include="Models\Matrix.cs" />
-    <Compile Include="Helpers\MathParser.cs" />
+    <Compile Include="Services\DataTableMathService.cs" />
     <Compile Include="Views\GaussianUserControl.xaml.cs">
       <DependentUpon>GaussianUserControl.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -147,6 +159,10 @@
     <Page Include="Views\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GraphUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\NewMatDialog.xaml">
       <SubType>Designer</SubType>
@@ -183,20 +199,20 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm">
+      <Version>8.4.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection">
+      <Version>9.0.2</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
-      <Version>1.1.77</Version>
+      <Version>1.1.135</Version>
+    </PackageReference>
+    <PackageReference Include="Msagl.WpfGraphControl">
+      <Version>1.2.1</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
-    </PackageReference>
-    <PackageReference Include="Prism.Unity">
-      <Version>8.1.97</Version>
-    </PackageReference>
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
-      <Version>6.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.Threading.Tasks.Extensions">
-      <Version>4.5.4</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />

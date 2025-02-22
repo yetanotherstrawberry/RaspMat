@@ -1,11 +1,9 @@
-﻿using System.Windows.Controls;
-
-namespace RaspMat.Views
+﻿namespace RaspMat.Views
 {
     /// <summary>
     /// Interaction logic for <see cref="GaussianUserControl"/>.
     /// </summary>
-    public partial class GaussianUserControl : UserControl
+    internal partial class GaussianUserControl : UserControlBase
     {
 
         /// <summary>

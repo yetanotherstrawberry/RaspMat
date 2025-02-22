@@ -1,8 +1,10 @@
-﻿<UserControl x:Class="RaspMat.Views.FractionUserControl"
+﻿<local:UserControlBase x:Class="RaspMat.Views.FractionUserControl"
+             x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:RaspMat.Views"
              xmlns:vm="clr-namespace:RaspMat.ViewModels"
              mc:Ignorable="d"
              d:Background="White"
@@ -34,17 +36,17 @@
             </Style>
         </Grid.Resources>
         <StackPanel Grid.Column="0">
-            <TextBox Text="{Binding LeftFractionUpperInput}" />
+            <TextBox Text="{Binding LeftFractionUpperInput}" PreviewTextInput="TextBox_PreviewTextInput" />
             <Separator />
-            <TextBox Text="{Binding LeftFractionLowerInput}" />
+            <TextBox Text="{Binding LeftFractionLowerInput}" PreviewTextInput="TextBox_PreviewTextInput" />
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <ComboBox Name="OperationSelector" ItemsSource="{Binding Operations}" SelectedIndex="0" />
+            <ComboBox Name="OperationSelector" ItemsSource="{Binding Operations}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedIndex="0" />
         </StackPanel>
         <StackPanel Grid.Column="2">
-            <TextBox Text="{Binding RightFractionUpperInput}" />
+            <TextBox Text="{Binding RightFractionUpperInput}" PreviewTextInput="TextBox_PreviewTextInput" />
             <Separator />
-            <TextBox Text="{Binding RightFractionLowerInput}" />
+            <TextBox Text="{Binding RightFractionLowerInput}" PreviewTextInput="TextBox_PreviewTextInput" />
         </StackPanel>
         <StackPanel Grid.Column="3">
             <Button
@@ -63,4 +65,4 @@
             <ListBox ItemsSource="{Binding History}" d:ItemsSource="{d:SampleData ItemCount=25}" />
         </GroupBox>
     </Grid>
-</UserControl>
+</local:UserControlBase>

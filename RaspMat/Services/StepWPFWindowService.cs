@@ -1,7 +1,7 @@
-﻿using Prism.Mvvm;
+﻿using Microsoft.Extensions.DependencyInjection;
 using RaspMat.Services.Interfaces;
-using RaspMat.ViewModels;
 using RaspMat.Views;
+using System;
 using System.Windows;
 
 namespace RaspMat.Services
@@ -10,6 +10,7 @@ namespace RaspMat.Services
     {
 
         private Window _stepViewWindow;
+        private readonly IServiceProvider _serviceProvider;
 
         public void Toggle()
         {
@@ -17,11 +18,8 @@ namespace RaspMat.Services
             {
                 if (!_stepViewWindow?.IsLoaded ?? true)
                 {
-                    _stepViewWindow = new StepListWindow()
-                    {
-                        Owner = Application.Current.MainWindow,
-                    };
-                    ViewModelLocator.SetAutoWireViewModel(_stepViewWindow, true);
+                    _stepViewWindow = _serviceProvider.GetRequiredService<StepListWindow>();
+                    _stepViewWindow.Owner = Application.Current.MainWindow;
                 }
 
                 if (_stepViewWindow.IsVisible)
@@ -31,9 +29,9 @@ namespace RaspMat.Services
             });
         }
 
-        public StepWPFWindowService()
+        public StepWPFWindowService(IServiceProvider serviceProvider)
         {
-            ViewModelLocationProvider.Register<StepListWindow, StepListWindowViewModel>();
+            _serviceProvider = serviceProvider;
         }
 
     }

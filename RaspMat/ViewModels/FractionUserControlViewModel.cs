@@ -1,46 +1,45 @@
-﻿using Prism.Events;
-using Prism.Mvvm;
-using RaspMat.Helpers;
-using RaspMat.Models;
+﻿using RaspMat.Models;
 using RaspMat.Properties;
+using RaspMat.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq.Expressions;
+using System.Numerics;
 using System.Windows.Input;
+using static RaspMat.Helpers.Events;
 
 namespace RaspMat.ViewModels
 {
     /// <summary>
     /// ViewModel for the view performing operations on <see cref="Fraction"/>s.
     /// </summary>
-    internal class FractionUserControlViewModel : BindableBase
+    internal class FractionUserControlViewModel : ViewModelBase, IObserver<OperationPerformedEvent>
     {
 
-        private class OperationPerformedEvent : PubSubEvent<string> { }
+        private readonly IEventService _eventService;
+        private readonly ICommandingService _commandingService;
 
-        private readonly IEventAggregator _eventAggregator;
-
-        private enum OperationType
+        /// <summary>
+        /// Allowed operations on <see cref="LeftFraction"/> and <see cref="RightFraction"/>. Passed to <see cref="CalculateComm"/>.
+        /// </summary>
+        public enum OperationType
         {
-            Add,
+            Add = 1,
             Subtract,
             Multiply,
             Divide,
         }
 
-        private readonly IReadOnlyDictionary<string, OperationType> _operations = new Dictionary<string, OperationType>
-        {
-            { Resources.PLUS_SIGN, OperationType.Add },
-            { Resources.MINUS_SIGN, OperationType.Subtract },
-            { Resources.MULTIPLY_SIGN, OperationType.Multiply },
-            { Resources.DIVIDE_SIGN, OperationType.Divide },
-        };
-
         /// <summary>
-        /// Available operations.
+        /// Allowed <see cref="OperationType"/>s.
         /// </summary>
-        public IEnumerable<string> Operations => _operations.Keys;
+        public IReadOnlyDictionary<OperationType, string> Operations { get; } = new Dictionary<OperationType, string>
+        {
+            { OperationType.Add, Resources.PLUS_SIGN },
+            { OperationType.Subtract, Resources.MINUS_SIGN },
+            { OperationType.Multiply, Resources.MULTIPLY_SIGN },
+            { OperationType.Divide, Resources.DIVIDE_SIGN },
+        };
 
         /// <summary>
         /// History of operations.
@@ -50,7 +49,16 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Numerator of the left <see cref="Fraction"/> of the equation.
         /// </summary>
-        public string LeftFractionUpperInput { get; set; }
+        public string LeftFractionUpperInput
+        {
+            get => _leftFractionUpperInput;
+            set => SetProperty(ref _leftFractionUpperInput, value);
+        }
+
+        /// <summary>
+        /// Field for <see cref="LeftFractionUpperInput"/>.
+        /// </summary>
+        private string _leftFractionUpperInput = string.Empty;
 
         /// <summary>
         /// Denominator of the left <see cref="Fraction"/> of the equation.
@@ -60,12 +68,25 @@ namespace RaspMat.ViewModels
             get => _leftFractionLowerInput;
             set => SetProperty(ref _leftFractionLowerInput, value);
         }
+
+        /// <summary>
+        /// Field for <see cref="LeftFractionLowerInput"/>.
+        /// </summary>
         private string _leftFractionLowerInput = string.Empty;
 
         /// <summary>
         /// Numerator of the right <see cref="Fraction"/> of the equation.
         /// </summary>
-        public string RightFractionUpperInput { get; set; }
+        public string RightFractionUpperInput
+        {
+            get => _rightFractionUpperInput;
+            set => SetProperty(ref _rightFractionUpperInput, value);
+        }
+
+        /// <summary>
+        /// Field for <see cref="RightFractionUpperInput"/>.
+        /// </summary>
+        private string _rightFractionUpperInput = string.Empty;
 
         /// <summary>
         /// Denominator of the right <see cref="Fraction"/> of the equation.
@@ -75,10 +96,20 @@ namespace RaspMat.ViewModels
             get => _rightFractionLowerInput;
             set => SetProperty(ref _rightFractionLowerInput, value);
         }
+
+        /// <summary>
+        /// Field for <see cref="RightFractionLowerInput"/>.
+        /// </summary>
         private string _rightFractionLowerInput = string.Empty;
 
+        /// <summary>
+        /// Passes <see cref="LeftFractionUpperInput"/> and <see cref="LeftFractionLowerInput"/> to <see cref="Fraction.Parse(string, string)"/>.
+        /// </summary>
         private Fraction LeftFraction => Fraction.Parse(LeftFractionUpperInput, LeftFractionLowerInput);
 
+        /// <summary>
+        /// Passes <see cref="RightFractionUpperInput"/> and <see cref="RightFractionLowerInput"/> to <see cref="Fraction.Parse(string, string)"/>.
+        /// </summary>
         private Fraction RightFraction => Fraction.Parse(RightFractionUpperInput, RightFractionLowerInput);
 
         /// <summary>
@@ -89,10 +120,14 @@ namespace RaspMat.ViewModels
             get => _result;
             private set => SetProperty(ref _result, value);
         }
+
+        /// <summary>
+        /// Field for <see cref="Result"/>.
+        /// </summary>
         private Fraction _result;
 
         /// <summary>
-        /// Executes the requested operation. Requires <see cref="string"/> representation of it from <see cref="Operations"/> passed as a parameter.
+        /// Executes the requested operation. Requires <see cref="OperationType"/> passed as a parameter.
         /// </summary>
         public ICommand CalculateComm
         {
@@ -100,15 +135,13 @@ namespace RaspMat.ViewModels
             {
                 if (_calculateCommand is null)
                 {
-                    Expression<Func<bool>> isFreeExpr = () => IsFree;
-                    var isFreeCheck = isFreeExpr.Compile();
-
-                    _calculateCommand = new AsyncDelegateCommand<string>(operationType =>
+                    _calculateCommand = _commandingService.CreateFromAction<OperationType?>(() => IsFree = false, operationType =>
                     {
-                        if (string.IsNullOrWhiteSpace(LeftFractionLowerInput)) LeftFractionLowerInput = "1";
-                        if (string.IsNullOrWhiteSpace(RightFractionLowerInput)) RightFractionLowerInput = "1";
+                        var one = BigInteger.One.ToString();
+                        if (string.IsNullOrWhiteSpace(LeftFractionLowerInput)) LeftFractionLowerInput = one;
+                        if (string.IsNullOrWhiteSpace(RightFractionLowerInput)) RightFractionLowerInput = one;
 
-                        switch (_operations[operationType])
+                        switch (operationType)
                         {
                             case OperationType.Add:
                                 Result = LeftFraction + RightFraction;
@@ -125,13 +158,17 @@ namespace RaspMat.ViewModels
                             default:
                                 throw new ArgumentOutOfRangeException(nameof(operationType));
                         }
-                        _eventAggregator.GetEvent<OperationPerformedEvent>()
-                            .Publish(string.Join(Resources.EQUATION_SPACER, LeftFraction, operationType, RightFraction, Resources.EQUALITY_SIGN, Result));
-                    }, () => IsFree = false, () => IsFree = true, _ => isFreeCheck(), isFreeExpr);
+
+                        _eventService.Send(new OperationPerformedEvent(string.Join(Resources.EQUATION_SPACER, LeftFraction, Operations[operationType.Value], RightFraction, Resources.EQUALITY_SIGN, Result)));
+                    }, () => IsFree = true);
                 }
                 return _calculateCommand;
             }
         }
+
+        /// <summary>
+        /// Field for <see cref="CalculateComm"/>.
+        /// </summary>
         private ICommand _calculateCommand;
 
         /// <summary>
@@ -142,26 +179,20 @@ namespace RaspMat.ViewModels
             get => _isFree;
             set => SetProperty(ref _isFree, value);
         }
-        private bool _isFree = true;
-
-        private void UpdateHistory(string operationString)
-        {
-            History.Insert(0, operationString);
-        }
 
         /// <summary>
-        /// Creates a new <see cref="FractionUserControlViewModel"/> and subscribes <see cref="UpdateHistory(string)"/> to <see cref="OperationPerformedEvent"/>.
+        /// Field for <see cref="IsFree"/>.
         /// </summary>
-        /// <param name="eventAggregator">An instance of <see cref="IEventAggregator"/> used to register <see cref="OperationPerformedEvent"/>.</param>
-        public FractionUserControlViewModel(IEventAggregator eventAggregator)
-        {
-            _eventAggregator = eventAggregator;
-            _eventAggregator.GetEvent<OperationPerformedEvent>().Subscribe(UpdateHistory, ThreadOption.UIThread);
-        }
+        private bool _isFree = true;
 
-        ~FractionUserControlViewModel()
+        public void OnNext(OperationPerformedEvent value) => History.Insert(0, value.Data);
+
+        public FractionUserControlViewModel(IEventService eventService, ICommandingService commandingService)
         {
-            _eventAggregator.GetEvent<OperationPerformedEvent>().Unsubscribe(UpdateHistory);
+            _eventService = eventService;
+            _commandingService = commandingService;
+
+            _eventService.Subscribe(this);
         }
 
     }

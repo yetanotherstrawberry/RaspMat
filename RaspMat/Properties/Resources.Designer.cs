@@ -115,6 +115,33 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ^[0-9-+]*$.
+        /// </summary>
+        public static string _REGEX_FRATION {
+            get {
+                return ResourceManager.GetString("_REGEX_FRATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ^[0-9-+]*$.
+        /// </summary>
+        public static string _REGEX_INTEGER {
+            get {
+                return ResourceManager.GetString("_REGEX_INTEGER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ^[0-9]*$.
+        /// </summary>
+        public static string _REGEX_POSITIVE_INTEGER {
+            get {
+                return ResourceManager.GetString("_REGEX_POSITIVE_INTEGER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Rows.
         /// </summary>
         public static string _ROWS {

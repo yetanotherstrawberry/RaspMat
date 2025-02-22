@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
 
 namespace RaspMat.Helpers
 {
@@ -17,25 +18,20 @@ namespace RaspMat.Helpers
         /// <param name="columns">Number of columns in the <see cref="DataTable"/>. Will iterate the <paramref name="cellValue"/> from 0 to <paramref name="columns"/> exclusive.</param>
         /// <param name="cellValue">A <see cref="Func{TRow, TColumn, TValue}"/> that returns a value for every row and column. Values must implement <see cref="object.ToString"/>.</param>
         /// <returns>A <paramref name="rows"/> by <paramref name="columns"/> <see cref="DataTable"/> with values from <paramref name="cellValue"/>.</returns>
-        public static DataTable CreateStrDataTable<TValue>(int rows, int columns, Func<int, int, TValue> cellValue)
+        public static DataTable CreateStrDataTable<TValue>(this Func<int, int, TValue> cellValue, int rows, int columns)
         {
             var ret = new DataTable();
 
-            for (var column = 0; column < columns; column++)
+            ret.Columns.AddRange(Enumerable.Range(0, columns).Select(columnIndex => new DataColumn
             {
-                ret.Columns.Add(new DataColumn
-                {
-                    DataType = typeof(string),
-                    ColumnName = column.ToString(),
-                });
-            }
+                DataType = typeof(string),
+                ColumnName = columnIndex.ToString(),
+            }).ToArray());
 
             for (var row = 0; row < rows; row++)
             {
                 var dataRow = ret.NewRow();
-                for (var column = 0; column < columns; column++)
-                    dataRow[column] = cellValue(row, column).ToString();
-
+                dataRow.ItemArray = Enumerable.Range(0, columns).Select(columnIndex => cellValue(row, columnIndex).ToString()).Cast<object>().ToArray();
                 ret.Rows.Add(dataRow);
             }
 

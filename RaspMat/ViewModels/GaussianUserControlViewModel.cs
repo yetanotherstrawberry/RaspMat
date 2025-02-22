@@ -1,63 +1,54 @@
-﻿using Prism.Commands;
-using Prism.Events;
-using Prism.Mvvm;
-using Prism.Services.Dialogs;
-using RaspMat.Helpers;
+﻿using RaspMat.Helpers;
 using RaspMat.Models;
 using RaspMat.Properties;
 using RaspMat.Services.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Windows.Controls;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using static RaspMat.Helpers.Events;
+using static RaspMat.Helpers.ICommandHelpers;
 
 namespace RaspMat.ViewModels
 {
     /// <summary>
     /// ViewModel for the Gaussian elimination algorithm of a <see cref="Matrix"/>.
     /// </summary>
-    internal class GaussianUserControlViewModel : BindableBase
+    internal class GaussianUserControlViewModel : ViewModelBase, IObserver<LoadMatrixEvent>
     {
 
         private readonly Action _lockUI, _unlockUI;
-        private readonly Expression<Func<bool>> _checkIsFreeExpr;
-        private readonly Func<bool> _checkIsFree;
+        private readonly Predicate _checkIsFree;
         private readonly ISerializationService _serializationService;
-        private readonly IDialogService _dialogService;
         private readonly IStepViewService _stepViewService;
-        private readonly IEventAggregator _eventAggregator;
+        private readonly IEventService _eventService;
+        private readonly ICommandingService _commandingService;
 
-        private int DataGridRowToMatRow(DataRowView rowView)
+        private ICommand GenerateCommand(Action start = null, Func<Task> task = null)
         {
-            return MatrixDataTable.Rows.IndexOf(rowView.Row);
-        }
-
-        private ICommand GenerateCommand(Action action)
-        {
-            return new AsyncDelegateCommand(action, _lockUI, _unlockUI, _checkIsFree, _checkIsFreeExpr);
+            return CreateAsyncICommand(() =>
+            {
+                _lockUI?.Invoke();
+                start?.Invoke();
+            }, task, _unlockUI, () => _checkIsFree());
         }
 
         private ICommand GenerateCommand<TParameter>(Action<TParameter> action)
         {
-            return new AsyncDelegateCommand<TParameter>(action, _lockUI, _unlockUI, _ => _checkIsFree(), _checkIsFreeExpr);
+            return _commandingService.CreateFromAction(_lockUI, action, _unlockUI, _ => _checkIsFree());
         }
 
-        private void LoadSteps(object sender, PropertyChangedEventArgs eventArguments)
+        private ICommand GenerateCommand(Action action)
         {
-            if (string.Equals(eventArguments.PropertyName, nameof(Steps)))
+            return CreateAsyncICommand(() =>
             {
-                _eventAggregator.GetEvent<Events.LoadStepsEvent>().Publish(Steps);
-            }
-        }
-
-        private void LoadMatrix(Matrix matrix)
-        {
-            CurrentMatrix = matrix;
+                _lockUI?.Invoke();
+                action?.Invoke();
+            }, _unlockUI, () => _checkIsFree?.Invoke() ?? true);
         }
 
         /// <summary>
@@ -73,7 +64,7 @@ namespace RaspMat.ViewModels
                     {
                         if (SelectedRows.Count > 2)
                             throw new ArgumentOutOfRangeException(nameof(SelectedRows.Count), SelectedRows.Count, string.Format(Resources.ERR_ROWS, 2));
-                        LoadMatrix(Matrix.SwapMatrix(CurrentMatrix, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix);
+                        CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
                     });
                 }
                 return _matSwapRowsComm;
@@ -88,10 +79,7 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_matScaleComm is null)
-                {
-                    _matScaleComm = GenerateCommand<string>(scalar => CurrentMatrix *= Fraction.Parse(scalar));
-                }
+                if (_matScaleComm == null) _matScaleComm = GenerateCommand<string>(scalar => CurrentMatrix *= Fraction.Parse(scalar));
                 return _matScaleComm;
             }
         }
@@ -130,7 +118,7 @@ namespace RaspMat.ViewModels
             {
                 if (_matAddIComm is null)
                 {
-                    _matAddIComm = GenerateCommand<bool>(left => CurrentMatrix = Matrix.AddI(CurrentMatrix, left));
+                    _matAddIComm = GenerateCommand<bool?>(left => CurrentMatrix = Matrix.AddI(CurrentMatrix, left.Value));
                 }
                 return _matAddIComm;
             }
@@ -146,7 +134,7 @@ namespace RaspMat.ViewModels
             {
                 if (_matSliceComm is null)
                 {
-                    _matSliceComm = GenerateCommand<bool>(left => CurrentMatrix = Matrix.Slice(CurrentMatrix, left));
+                    _matSliceComm = GenerateCommand<bool?>(left => CurrentMatrix = Matrix.Slice(CurrentMatrix, left.Value));
                 }
                 return _matSliceComm;
             }
@@ -162,9 +150,9 @@ namespace RaspMat.ViewModels
             {
                 if (_matGaussComm is null)
                 {
-                    _matGaussComm = GenerateCommand<bool>(reduced =>
+                    _matGaussComm = GenerateCommand<bool?>(reduced =>
                     {
-                        var steps = CurrentMatrix.GaussianElimination(reduced);
+                        var steps = CurrentMatrix.GaussianElimination(reduced.Value);
 
                         if (steps.Count > 0)
                         {
@@ -205,33 +193,33 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_userInputCommDialog is null)
-                {
-                    var command = new DelegateCommand(() => _dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
-                    {
-                        if (_userInputCommHander is null)
-                        {
-                            _userInputCommHander = GenerateCommand<IDialogResult>(result =>
-                            {
-                                if (result.Result != ButtonResult.OK) return;
+                /* if (_userInputCommDialog is null)
+                 {
+                     var command = GenerateCommand(() => _dialogService.ShowDialog(Resources._NEW_MAT_DIALOG, res =>
+                     {
+                         if (_userInputCommHander is null)
+                         {
+                             _userInputCommHander = GenerateCommand<IDialogResult>(result =>
+                             {
+                                 if (result.Result != ButtonResult.OK) return;
 
-                                var filler = result.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
+                                 var filler = result.Parameters.GetValue<bool>(Resources._ADD_ZEROS) ? Resources._ZERO : Resources._CELL_DEFAULT;
 
-                                var ret = DataTableHelpers.CreateStrDataTable(
-                                    result.Parameters.GetValue<int>(Resources._ROWS),
-                                    result.Parameters.GetValue<int>(Resources._COLS),
-                                    (row, column) => filler);
+                                 var ret = DataTableHelpers.CreateStrDataTable(
+                                     result.Parameters.GetValue<int>(Resources._ROWS),
+                                     result.Parameters.GetValue<int>(Resources._COLS),
+                                     (row, column) => filler);
 
-                                MatrixDataTable = ret;
-                            });
-                        }
-                        if (!_userInputCommHander.CanExecute(res))
-                            throw new InvalidOperationException(nameof(ICommand.CanExecute));
-                        _userInputCommHander.Execute(res);
-                    }));
-                    command.ObservesCanExecute(_checkIsFreeExpr);
-                    _userInputCommDialog = command;
-                }
+                                 MatrixDataTable = ret;
+                             });
+                         }
+                         if (!_userInputCommHander.CanExecute(res))
+                             throw new InvalidOperationException(nameof(ICommand.CanExecute));
+                         _userInputCommHander.Execute(res);
+                     }));
+                     //command.ObservesCanExecute(_checkIsFreeExpr);
+                     _userInputCommDialog = command;
+                 }*/
                 return _userInputCommDialog;
             }
         }
@@ -239,32 +227,27 @@ namespace RaspMat.ViewModels
         private ICommand _userInputCommHander;
 
         /// <summary>
-        /// Stores indexes of rows selected by the user. Pass <see cref="SelectionChangedEventArgs"/> as a parameter.
+        /// Fired when user (de)selects a row. Pass <see cref="IList"/> of selected <see cref="DataRowView"/>s as a parameter.
         /// </summary>
         public ICommand GridSelectedRowComm
         {
             get
             {
-                if (_gridSelectedRowComm is null)
+                if (_gridSelectedRowComm == null)
                 {
-                    _gridSelectedRowComm = GenerateCommand<SelectionChangedEventArgs>(args =>
+                    _gridSelectedRowComm = GenerateCommand<IList>(rowViewList =>
                     {
-                        // Remove all unselected rows.
-                        foreach (DataRowView item in args.RemovedItems)
-                        {
-                            SelectedRows.Remove(DataGridRowToMatRow(item));
-                        }
-
-                        // Add all selected rows.
-                        foreach (DataRowView item in args.AddedItems)
-                        {
-                            SelectedRows.Add(DataGridRowToMatRow(item));
-                        }
+                        SelectedRows.Clear();
+                        SelectedRows.UnionWith(rowViewList.Cast<DataRowView>().Select(rowView => rowView.Row).Select(MatrixDataTable.Rows.IndexOf));
                     });
                 }
                 return _gridSelectedRowComm;
             }
         }
+
+        /// <summary>
+        /// Field for <see cref="GridSelectedRowComm"/>.
+        /// </summary>
         private ICommand _gridSelectedRowComm;
 
         /// <summary>
@@ -274,17 +257,15 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_serializeCommStream is null)
-                {
-                    _serializeCommStream = GenerateCommand(() =>
-                    {
-                        _serializationService.Serialize(CurrentMatrix).Wait();
-                    });
-                }
-                return _serializeCommStream;
+                if (_serializeComm == null) _serializeComm = GenerateCommand(() => _serializationService.Serialize(CurrentMatrix));
+                return _serializeComm;
             }
         }
-        private ICommand _serializeCommStream;
+
+        /// <summary>
+        /// Field for <see cref="SerializeComm"/>.
+        /// </summary>
+        private ICommand _serializeComm;
 
         /// <summary>
         /// Deserializes into <see cref="CurrentMatrix"/> using <see cref="ISerializationService.Deserialize{TDeserialized}(Stream)"/>.
@@ -295,12 +276,10 @@ namespace RaspMat.ViewModels
             {
                 if (_deserializeComm is null)
                 {
-                    _deserializeComm = GenerateCommand(() =>
+                    _deserializeComm = GenerateCommand(task: async () =>
                     {
-                        var task = _serializationService.Deserialize<Matrix>();
-                        task.Wait();
-                        if (task.Result is null) return;
-                        CurrentMatrix = task.Result;
+                        var mat = await _serializationService.Deserialize<Matrix>();
+                        if (mat != null) CurrentMatrix = mat;
                     });
                 }
                 return _deserializeComm;
@@ -315,10 +294,7 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_stepListViewComm is null)
-                {
-                    _stepListViewComm = GenerateCommand(_stepViewService.Toggle);
-                }
+                if (_stepListViewComm == null) _stepListViewComm = GenerateCommand(_stepViewService.Toggle);
                 return _stepListViewComm;
             }
         }
@@ -330,18 +306,22 @@ namespace RaspMat.ViewModels
         public DataTable MatrixDataTable
         {
             get => _matrixDataTable;
-            set
+            private set
             {
-                SetProperty(ref _matrixDataTable, value);
                 SelectedRows.Clear();
+                SetProperty(ref _matrixDataTable, value);
             }
         }
+
+        /// <summary>
+        /// Field for <see cref="MatrixDataTable"/>.
+        /// </summary>
         private DataTable _matrixDataTable = new Matrix(3, 4, (row, column) => row + column + 1).ToDataTable();
 
         /// <summary>
         /// Indexes of rows of the <see cref="MatrixDataTable"/> currently selected by the user.
         /// </summary>
-        private ICollection<int> SelectedRows { get; } = new List<int>();
+        private ISet<int> SelectedRows { get; } = new HashSet<int>();
 
         /// <summary>
         /// Currently displayed <see cref="MatrixDataTable"/> converted from or to <see cref="Matrix"/>.
@@ -360,39 +340,43 @@ namespace RaspMat.ViewModels
             get => _isFree;
             private set => SetProperty(ref _isFree, value);
         }
+
+        /// <summary>
+        /// Field for <see cref="IsFree"/>.
+        /// </summary>
         private bool _isFree = true;
 
         /// <summary>
-        /// Steps performed by algorithms. Notifies about the value change.
+        /// Steps performed by algorithms. Fires <see cref="LoadStepsEvent"/> on change.
         /// </summary>
         public IList<AlgorithmStep<Matrix>> Steps
         {
-            get => steps;
-            set => SetProperty(ref steps, value);
+            get => _steps;
+            private set
+            {
+                if (SetProperty(ref _steps, value)) _eventService.Send(new LoadStepsEvent(Steps));
+            }
         }
-        private IList<AlgorithmStep<Matrix>> steps = new List<AlgorithmStep<Matrix>>();
 
         /// <summary>
-        /// Creates a new <see cref="GaussianUserControlViewModel"/> for a <see cref="Matrix"/> and implements its commands.
+        /// Field for <see cref="Steps"/>.
         /// </summary>
-        /// <param name="dialogService">Instance of a <see cref="IDialogService"/> that will be used for user input.</param>
-        /// <param name="serializationService">Instance of a <see cref="ISerializationService"/> that will be used for <see cref="Matrix"/> serialization.</param>
-        /// <param name="eventAggregator">Event aggregator that will be used for inter-viewmodel communication.</param>
-        /// <param name="stepViewService">Implementation for showing a view with steps of an algorithm.</param>
-        public GaussianUserControlViewModel(IDialogService dialogService, ISerializationService serializationService, IStepViewService stepViewService, IEventAggregator eventAggregator)
+        private IList<AlgorithmStep<Matrix>> _steps = new List<AlgorithmStep<Matrix>>();
+
+        void IObserver<LoadMatrixEvent>.OnNext(LoadMatrixEvent value) => CurrentMatrix = value.Data;
+
+        public GaussianUserControlViewModel(ISerializationService serializationService, IStepViewService stepViewService, IEventService eventService, ICommandingService commandingService)
         {
-            _dialogService = dialogService;
+            _eventService = eventService;
+            _commandingService = commandingService;
             _serializationService = serializationService;
             _stepViewService = stepViewService;
-            _eventAggregator = eventAggregator;
 
             _lockUI = () => IsFree = false;
             _unlockUI = () => IsFree = true;
-            _checkIsFreeExpr = () => IsFree;
-            _checkIsFree = _checkIsFreeExpr.Compile();
+            _checkIsFree = () => IsFree;
 
-            _eventAggregator.GetEvent<Events.LoadMatrixEvent>().Subscribe(LoadMatrix);
-            PropertyChanged += LoadSteps;
+            _eventService.Subscribe(this);
         }
 
     }

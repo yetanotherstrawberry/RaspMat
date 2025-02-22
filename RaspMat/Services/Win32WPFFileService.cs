@@ -15,30 +15,34 @@ namespace RaspMat.Services
     internal class Win32WPFFileService : IFileService
     {
 
-        private readonly IDictionary<Type, FileDialog> _dialogs = new Dictionary<Type, FileDialog>();
+        /// <summary>
+        /// Stores created <see cref="CommonDialog"/>s based on their <see cref="Type"/>.
+        /// </summary>
+        private readonly IDictionary<Type, CommonDialog> _dialogs = new Dictionary<Type, CommonDialog>();
 
+        /// <summary>
+        /// Uses a <typeparamref name="TDialog"/> from <see cref="_dialogs"/> or creates a <see langword="new"/> one and stores it.
+        /// Shows the <typeparamref name="TDialog"/> to the user.
+        /// If the user selected a file a <typeparamref name="TDialog"/> is returned; <see langword="null"/> otherwise.
+        /// </summary>
+        /// <typeparam name="TDialog"><see cref="Type"/> of the dialog. Must be instantiable and inherit <see cref="FileDialog"/>.</typeparam>
+        /// <returns>A <typeparamref name="TDialog"/> or <see langword="null"/>.</returns>
         private async Task<TDialog> CreateDialog<TDialog>() where TDialog : FileDialog, new()
         {
             // Dialogs must be created and shown from the main (UI) thread.
             return await Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                TDialog dialog;
-                if (!_dialogs.ContainsKey(typeof(TDialog)))
+                if (!_dialogs.TryGetValue(typeof(TDialog), out var dialog))
                 {
-                    dialog = new TDialog()
+                    _dialogs.Add(typeof(TDialog), dialog = new TDialog()
                     {
                         Filter = Resources._FILE_FILTER,
-                    };
-                    _dialogs.Add(typeof(TDialog), dialog);
-                }
-                else
-                {
-                    dialog = (TDialog)_dialogs[typeof(TDialog)];
+                    });
                 }
 
                 if (dialog.ShowDialog(Application.Current.MainWindow) ?? false)
                 {
-                    return dialog;
+                    return (TDialog)dialog;
                 }
 
                 return null;
@@ -47,13 +51,13 @@ namespace RaspMat.Services
 
         public async Task<Stream> OpenFileAsync()
         {
-            var dialog = await CreateDialog<OpenFileDialog>().ConfigureAwait(false);
+            var dialog = await CreateDialog<OpenFileDialog>().ConfigureAwait(continueOnCapturedContext: false);
             return dialog?.OpenFile();
         }
 
         public async Task<Stream> NewFileAsync()
         {
-            var dialog = await CreateDialog<SaveFileDialog>().ConfigureAwait(false);
+            var dialog = await CreateDialog<SaveFileDialog>().ConfigureAwait(continueOnCapturedContext: false);
             return dialog?.OpenFile();
         }
 

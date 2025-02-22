@@ -1,11 +1,9 @@
-﻿using System.Windows;
-
-namespace RaspMat.Views
+﻿namespace RaspMat.Views
 {
     /// <summary>
     /// Interaction logic for <see cref="StepListWindow"/>.
     /// </summary>
-    public partial class StepListWindow : CommonWindow
+    internal partial class StepListWindow : WindowBase
     {
 
         /// <summary>
