@@ -331,6 +331,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fill:.
+        /// </summary>
+        public static string FILL {
+            get {
+                return ResourceManager.GetString("FILL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Gaussian elimination.
         /// </summary>
         public static string GAUSS_ELIM {

@@ -49,13 +49,14 @@ namespace RaspMat.Models
             FractionMatrix = JaggedArrayHelper.Create(rows, cols, values);
         }
 
+        /// <summary>
+        /// Constructor used by the serializer.
+        /// </summary>
+        /// <param name="fractionMatrix">A representation of a <see cref="Matrix"/>.</param>
         [JsonConstructor]
 #pragma warning disable IDE0051 // Remove unused private members
-        private Matrix(Fraction[][] fractionMatrix)
+        private Matrix(Fraction[][] fractionMatrix) => FractionMatrix = fractionMatrix;
 #pragma warning restore IDE0051 // Remove unused private members
-        {
-            FractionMatrix = fractionMatrix;
-        }
 
         public Matrix(int rows, int columns) : this(rows, columns, (row, column) => 0) { }
         #endregion Constructors

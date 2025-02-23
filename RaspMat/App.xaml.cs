@@ -17,6 +17,11 @@ namespace RaspMat
     {
 
         /// <summary>
+        /// <see cref="Dispatcher.Invoke(Action)"/> used to run <see cref="Action"/>s on the UI thread.
+        /// </summary>
+        private Action<Action> _invoker;
+
+        /// <summary>
         /// Service provider for dependency injection.
         /// </summary>
         private IServiceProvider Services => _services;
@@ -39,7 +44,7 @@ namespace RaspMat
         private void MsgBoxExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs disUnhExcArgs)
         {
             disUnhExcArgs.Handled = true; // Do not crash the application if possible.
-            Current.Dispatcher.Invoke(() =>
+            _invoker(() =>
             {
                 MessageBox.Show(((App)Current).MainWindow, disUnhExcArgs.Exception.Message, RaspMat.Properties.Resources.ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
             });
@@ -77,16 +82,20 @@ namespace RaspMat
         /// <param name="builder"><see cref="IServiceCollection"/> to register the services to.</param>
         private void AddServices(IServiceCollection builder)
         {
+            builder.AddTransient<ICommandingService, AsyncRelayCommandingService>(serviceProvider =>
+            {
+                return new AsyncRelayCommandingService(_invoker);
+            });
+
             builder.AddSingleton<IFileService, Win32WPFFileService>();
             builder.AddSingleton<ISerializationService, JsonSerializationService>();
             builder.AddSingleton<IEventService, WeakReferenceMessengerEventService>();
             builder.AddSingleton<IMathService, DataTableMathService>();
-            builder.AddSingleton<ICommandingService, AsyncRelayCommandingService>(serviceProvider =>
-            {
-                return new AsyncRelayCommandingService(Current.Dispatcher.Invoke);
-            });
 
-            builder.AddSingleton<IStepViewService, StepWPFWindowService>();
+            builder.AddSingleton<IViewService, WPFWindowService>(serviceProvider =>
+            {
+                return new WPFWindowService(serviceProvider, _invoker);
+            });
         }
 
         /// <summary>
@@ -115,6 +124,13 @@ namespace RaspMat
             RegisterViewModels(builder);
 
             _services = builder.BuildServiceProvider();
+
+            _invoker = (Action action) =>
+            {
+                if (action is null) return;
+                Current.Dispatcher.Invoke(action);
+            };
+
             (MainWindow = Services.GetRequiredService<MainWindow>()).Show();
         }
 

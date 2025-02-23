@@ -94,10 +94,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\ICommandHelpers.cs" />
     <Compile Include="Helpers\DataTableHelpers.cs" />
     <Compile Include="Helpers\Events.cs" />
     <Compile Include="Helpers\JaggedArrayHelper.cs" />
+    <Compile Include="ViewModels\Interfaces\IEventReceiver.cs" />
     <Compile Include="Models\NewMatrixDescription.cs" />
     <Compile Include="Services\AsyncRelayCommandingService.cs" />
     <Compile Include="Services\Interfaces\IEventService.cs" />
@@ -106,13 +106,13 @@
     <Compile Include="Services\Interfaces\ISerializationService.cs" />
     <Compile Include="Models\AlgorithmStep.cs" />
     <Compile Include="Services\Interfaces\IMathService.cs" />
-    <Compile Include="Services\Interfaces\IStepViewService.cs" />
+    <Compile Include="Services\Interfaces\IViewService.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Services\StepWPFWindowService.cs" />
+    <Compile Include="Services\WPFWindowService.cs" />
     <Compile Include="Services\WeakReferenceMessengerEventService.cs" />
     <Compile Include="Services\Win32WPFFileService.cs" />
     <Compile Include="Services\JsonSerializationService.cs" />

@@ -31,10 +31,5 @@ namespace RaspMat.Helpers
             public OperationPerformedEvent(string data) : base(data) { }
         }
 
-        public sealed class NewMatrixEvent : Event<string>
-        {
-            public NewMatrixEvent(string data) : base(data) { }
-        }
-
     }
 }

@@ -1,6 +1,7 @@
 ﻿using RaspMat.Models;
 using RaspMat.Properties;
 using RaspMat.Services.Interfaces;
+using RaspMat.ViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,11 +14,12 @@ namespace RaspMat.ViewModels
     /// <summary>
     /// ViewModel for the view performing operations on <see cref="Fraction"/>s.
     /// </summary>
-    internal class FractionUserControlViewModel : ViewModelBase, IObserver<OperationPerformedEvent>
+    internal class FractionUserControlViewModel : ViewModelBase, IEventReceiver<OperationPerformedEvent>
     {
 
         private readonly IEventService _eventService;
         private readonly ICommandingService _commandingService;
+        private readonly IViewService _viewService;
 
         /// <summary>
         /// Allowed operations on <see cref="LeftFraction"/> and <see cref="RightFraction"/>. Passed to <see cref="CalculateComm"/>.
@@ -177,7 +179,11 @@ namespace RaspMat.ViewModels
         public bool IsFree
         {
             get => _isFree;
-            set => SetProperty(ref _isFree, value);
+            set
+            {
+                SetProperty(ref _isFree, value);
+                _commandingService.NotifyCanExecuteChanged();
+            }
         }
 
         /// <summary>
@@ -185,14 +191,15 @@ namespace RaspMat.ViewModels
         /// </summary>
         private bool _isFree = true;
 
-        public void OnNext(OperationPerformedEvent value) => History.Insert(0, value.Data);
+        public void Receive(OperationPerformedEvent value) => _viewService.Execute(() => History.Insert(0, value.Data));
 
-        public FractionUserControlViewModel(IEventService eventService, ICommandingService commandingService)
+        public FractionUserControlViewModel(IEventService eventService, ICommandingService commandingService, IViewService viewService)
         {
             _eventService = eventService;
             _commandingService = commandingService;
+            _viewService = viewService;
 
-            _eventService.Subscribe(this);
+            _eventService.Subscribe<FractionUserControlViewModel, OperationPerformedEvent>(this);
         }
 
     }

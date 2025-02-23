@@ -1,7 +1,6 @@
-﻿using RaspMat.Helpers;
-using RaspMat.Models;
+﻿using RaspMat.Models;
 using RaspMat.Services.Interfaces;
-using System;
+using RaspMat.ViewModels.Interfaces;
 using System.Collections.Generic;
 using System.Windows.Input;
 using static RaspMat.Helpers.Events;
@@ -11,13 +10,11 @@ namespace RaspMat.ViewModels
     /// <summary>
     /// ViewModel for the list of <see cref="AlgorithmStep{T}"/> where <c>T</c> is <see cref="Matrix"/>.
     /// </summary>
-    internal class StepListWindowViewModel : ViewModelBase, IObserver<LoadStepsEvent>
+    internal class StepListWindowViewModel : ViewModelBase, IEventReceiver<LoadStepsEvent>
     {
 
-        /// <summary>
-        /// Service for messaging.
-        /// </summary>
         private readonly IEventService _eventService;
+        private readonly ICommandingService _commandingService;
 
         /// <summary>
         /// Steps of the algorithm shown to the user.
@@ -40,10 +37,7 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_loadMatrix == null)
-                {
-                    _loadMatrix = ICommandHelpers.CreateAsyncICommand<Matrix>(matrix => _eventService.Send(new LoadMatrixEvent(matrix)));
-                }
+                if (_loadMatrix is null) _loadMatrix = _commandingService.CreateFromAction<Matrix>(action: matrix => _eventService.Send(new LoadMatrixEvent(matrix)));
                 return _loadMatrix;
             }
         }
@@ -53,13 +47,14 @@ namespace RaspMat.ViewModels
         /// </summary>
         private ICommand _loadMatrix;
 
-        void IObserver<LoadStepsEvent>.OnNext(LoadStepsEvent value) => Steps = value.Data;
+        public void Receive(LoadStepsEvent value) => Steps = value.Data;
 
-        public StepListWindowViewModel(IEventService eventService)
+        public StepListWindowViewModel(IEventService eventService, ICommandingService commandingService)
         {
             _eventService = eventService;
+            _commandingService = commandingService;
 
-            _eventService.Subscribe(this);
+            _eventService.Subscribe<StepListWindowViewModel, LoadStepsEvent>(this);
         }
 
     }

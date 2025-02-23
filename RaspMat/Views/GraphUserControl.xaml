@@ -14,32 +14,6 @@
              d:DataContext="{d:DesignInstance vm:GraphUserControlViewModel, IsDesignTimeCreatable=False}"
              d:Background="White">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.Resources>
-            <Style TargetType="StackPanel">
-                <Setter Property="VerticalAlignment" Value="Center" />
-            </Style>
-            <Style TargetType="TextBox">
-                <Setter Property="Margin" Value="80,5,80,5" />
-            </Style>
-            <Style TargetType="Separator">
-                <Setter Property="Margin" Value="60,5,60,5" />
-            </Style>
-        </Grid.Resources>
-
-        <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
-            <ComboBox ItemsSource="{Binding Nodes}" DisplayMemberPath="Label.Text" />
-            <Button Click="Button_Click" Content="Add node"/>
-        </StackPanel>
-
-        <StackPanel x:Name="spanel" HorizontalAlignment="Stretch" 
-                    VerticalAlignment="Stretch" Grid.Column="1" />
 
     </Grid>
 </local:UserControlBase>

@@ -8,7 +8,7 @@
              xmlns:prop="clr-namespace:RaspMat.Properties"
              xmlns:local="clr-namespace:RaspMat.Views"
              mc:Ignorable="d"
-             Width="200"
+             Width="250"
              MinWidth="180"
              Height="150"
              MinHeight="140"
@@ -35,7 +35,10 @@
             </StackPanel>
         </Grid>
         <StackPanel Grid.Row="1" HorizontalAlignment="Center">
-            <CheckBox Content="{x:Static prop:Resources.IN_ADD_ZEROS}" IsChecked="{Binding AddZeros}" HorizontalAlignment="Center" Margin="5" />
+            <StackPanel Orientation="Horizontal">
+                <Label Content="{x:Static prop:Resources.FILL}" />
+                <TextBox Height="25" Text="{Binding Fill}" Margin="1" PreviewTextInput="TextBox_PreviewTextInput" Width="40" />
+            </StackPanel>
             <Button Command="{Binding CloseDialogCommand}" Content="{x:Static prop:Resources.OK}" Margin="5" />
         </StackPanel>
     </Grid>

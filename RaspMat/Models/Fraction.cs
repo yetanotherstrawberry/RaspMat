@@ -78,7 +78,7 @@ namespace RaspMat.Models
         public static Fraction Parse(string fraction)
         {
             var integers = Array.ConvertAll(
-                new string(fraction.ToCharArray().Where(ch => !char.IsWhiteSpace(ch)).ToArray()).Split(FRACTION_SEPARATOR),
+                new string(fraction.ToCharArray().Where(character => !char.IsWhiteSpace(character)).ToArray()).Split(FRACTION_SEPARATOR),
                 str => BigInteger.Parse(str.TrimStart('(').TrimEnd(')')));
 
             switch (integers.Length)
