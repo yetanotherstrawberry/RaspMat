@@ -1,6 +1,4 @@
-﻿using RaspMat.ViewModels.Interfaces;
-
-namespace RaspMat.Services.Interfaces
+﻿namespace RaspMat.Services.Interfaces
 {
     /// <summary>
     /// A service for handling messaging.

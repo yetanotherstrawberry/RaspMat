@@ -102,11 +102,11 @@ namespace RaspMat.Tests.Models
         [Test]
         public void AddISliceTest()
         {
-            var addedI = Matrix.AddI(identity, onLeft: true);
+            var addedI = Matrix.WithIdentity(identity, onLeft: true);
             Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: true)));
             Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: false)));
 
-            addedI = Matrix.AddI(identity, onLeft: false);
+            addedI = Matrix.WithIdentity(identity, onLeft: false);
             Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: true)));
             Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: false)));
 
@@ -117,7 +117,7 @@ namespace RaspMat.Tests.Models
                 1, 1, 1, 0, 0, 1,
             };
             var expected = new Matrix(3, 6, (row, column) => temp[row * 6 + column]);
-            addedI = Matrix.AddI(equalToIdentity, onLeft: false);
+            addedI = Matrix.WithIdentity(equalToIdentity, onLeft: false);
             Assert.That(expected, Is.EqualTo(addedI));
         }
 

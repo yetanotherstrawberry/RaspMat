@@ -1,4 +1,4 @@
-﻿namespace RaspMat.ViewModels.Interfaces
+﻿namespace RaspMat.Services.Interfaces
 {
     internal interface IEventReceiver<TEventType>
     {

@@ -1,7 +1,7 @@
 ﻿using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System.Windows.Input;
-using static RaspMat.Helpers.Events;
+using static RaspMat.Models.Events;
 
 namespace RaspMat.ViewModels
 {

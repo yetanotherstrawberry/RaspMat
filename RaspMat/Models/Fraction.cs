@@ -1,5 +1,4 @@
-﻿using RaspMat.Properties;
-using System;
+﻿using System;
 using System.Linq;
 using System.Numerics;
 
@@ -11,7 +10,7 @@ namespace RaspMat.Models
     internal readonly struct Fraction
     {
 
-        private const char FRACTION_SEPARATOR = '/';
+        public const char FRACTION_SEPARATOR = '/';
         private const string INTEGER_TOSTRING_FORMAT = "R"; // Allow more than 50 digits.
 
         /// <summary>
@@ -54,27 +53,11 @@ namespace RaspMat.Models
         }
 
         /// <summary>
-        /// Creates a new <see cref="Fraction"/> with <see cref="Fraction.Denominator"/> equal to 1.
-        /// </summary>
-        /// <param name="numerator">Numerator (upper part) of the fraction.</param>
-        public Fraction(BigInteger numerator) : this(numerator, BigInteger.One) { }
-
-        /// <summary>
-        /// Creates a new <see cref="Fraction"/> which is equal to 0.
-        /// </summary>
-        public static Fraction Zero { get; } = new Fraction(BigInteger.Zero);
-
-        /// <summary>
-        /// Creates a new <see cref="Fraction"/> which is equal to 1.
-        /// </summary>
-        public static Fraction One { get; } = new Fraction(BigInteger.One);
-
-        /// <summary>
         /// Trims all whitespace characters, removes parentheses and creates a new <see cref="Fraction"/> based on <paramref name="fraction"/>.
         /// </summary>
         /// <param name="fraction">Human-readible string representation of a <see cref="Fraction"/>, like "-1/2".</param>
         /// <returns><see cref="Fraction"/> created from the <paramref name="fraction"/>.</returns>
-        /// <exception cref="ArgumentException"><paramref name="fraction"/> has more than 2 or no parts when split by <see cref="FRACTION_SEPARATOR"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="fraction"/> has more than 2 or no parts when split by <see cref="FRACTION_SEPARATOR"/>.</exception>
         public static Fraction Parse(string fraction)
         {
             var integers = Array.ConvertAll(
@@ -83,14 +66,12 @@ namespace RaspMat.Models
 
             switch (integers.Length)
             {
-                case 0:
-                    throw new ArgumentException(Resources.ERR_NO_INTS, nameof(fraction));
                 case 1:
-                    return new Fraction(integers[0]);
+                    return new Fraction(integers[0], BigInteger.One);
                 case 2:
                     return new Fraction(integers[0], integers[1]);
                 default:
-                    throw new ArgumentException(Resources.ERR_TOO_MANY_INTS, nameof(fraction));
+                    throw new ArgumentOutOfRangeException(nameof(fraction));
             }
         }
 
@@ -132,20 +113,17 @@ namespace RaspMat.Models
         public static bool operator !=(Fraction a, Fraction b)
             => !(a == b);
 
-        public static bool operator ==(Fraction fraction, long integer)
+        public static bool operator ==(Fraction fraction, BigInteger integer)
             => fraction.Numerator == integer && fraction.Denominator == 1;
 
-        public static bool operator !=(Fraction fraction, long integer)
+        public static bool operator !=(Fraction fraction, BigInteger integer)
             => !(fraction == integer);
 
         public static implicit operator Fraction(BigInteger numerator)
-            => new Fraction(numerator);
+            => new Fraction(numerator, BigInteger.One);
 
         public static implicit operator Fraction(long numerator)
             => new BigInteger(numerator);
-
-        public static explicit operator Fraction(decimal numerator)
-            => (long)numerator;
 
         public override bool Equals(object obj)
             => obj is Fraction fraction && this == fraction;

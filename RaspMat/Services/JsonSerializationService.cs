@@ -14,7 +14,7 @@ namespace RaspMat.Services
         private readonly IFileService _fileService;
         private readonly JsonSerializer _serializer = JsonSerializer.CreateDefault();
 
-        public async Task<TDeserialized> Deserialize<TDeserialized>() where TDeserialized : class // Constraint forces value to be nullable.
+        public async Task<TDeserialized> Deserialize<TDeserialized>() where TDeserialized : class
         {
             var stream = await _fileService.OpenFileAsync().ConfigureAwait(false);
             if (stream is null) return null; // No file selected by the user.
@@ -23,7 +23,9 @@ namespace RaspMat.Services
             using (var reader = new StreamReader(stream))
             using (var jsonReader = new JsonTextReader(reader))
             {
-                return await Task.Run(() => _serializer.Deserialize<TDeserialized>(jsonReader)).ConfigureAwait(false);
+                //var ret = await Task.Run(() => ).ConfigureAwait(false);
+                var ret = _serializer.Deserialize<TDeserialized>(jsonReader);
+                return ret;
             }
         }
 

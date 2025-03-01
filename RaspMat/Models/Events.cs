@@ -1,7 +1,6 @@
-﻿using RaspMat.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace RaspMat.Helpers
+namespace RaspMat.Models
 {
     internal static class Events
     {
@@ -10,7 +9,7 @@ namespace RaspMat.Helpers
         {
             public TData Data { get; }
 
-            protected Event(TData data)
+            public Event(TData data)
             {
                 Data = data;
             }

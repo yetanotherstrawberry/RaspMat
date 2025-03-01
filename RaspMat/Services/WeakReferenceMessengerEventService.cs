@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using RaspMat.Services.Interfaces;
-using RaspMat.ViewModels.Interfaces;
 
 namespace RaspMat.Services
 {

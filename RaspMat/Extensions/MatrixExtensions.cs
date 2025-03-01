@@ -2,12 +2,12 @@
 using RaspMat.Properties;
 using System.Collections.Generic;
 
-namespace RaspMat.Helpers
+namespace RaspMat.Extensions
 {
     /// <summary>
     /// Static class for holding algorithms.
     /// </summary>
-    internal static class Algorithms
+    internal static class MatrixExtensions
     {
 
         /// <summary>
@@ -21,25 +21,28 @@ namespace RaspMat.Helpers
         /// <returns>Steps and matrices created during elimination: <see cref="IList{T}"/> where <c>T</c> is <see cref="IAlgorithmResult{T}"/> where <c>T</c> is <see cref="Matrix"/>.</returns>
         public static IList<AlgorithmStep<Matrix>> GaussianElimination(this Matrix matrix, bool reducedEchelon = true)
         {
-            AlgorithmStep<Matrix> GenerateStep(string text, Matrix stepMatrix, params object[] interpolation)
+            AlgorithmStep<Matrix> GenerateStep(Matrix stepMatrix, string text, params object[] interpolation)
             {
                 return new AlgorithmStep<Matrix>(string.Format(text, interpolation), stepMatrix);
             }
 
-            var ret = new List<AlgorithmStep<Matrix>>();
-            var row = 0;
-            var col = 0;
-
-            while (row < matrix.Rows && col < matrix.Columns)
+            var steps = new List<AlgorithmStep<Matrix>>()
             {
-                while (col < matrix.Columns && matrix[row, col] == 0)
+                new AlgorithmStep<Matrix>(string.Empty, matrix),
+            };
+            var row = 0;
+            var column = 0;
+
+            while (row < matrix.Rows && column < matrix.Columns)
+            {
+                while (column < matrix.Columns && matrix[row, column] == 0)
                 {
                     var onlyZeros = true;
 
                     var shift = row;
                     while (shift < matrix.Rows)
                     {
-                        if (matrix[shift, col] != 0)
+                        if (matrix[shift, column] != 0)
                         {
                             onlyZeros = false;
                             break;
@@ -47,40 +50,40 @@ namespace RaspMat.Helpers
                         shift++;
                     }
 
-                    if (onlyZeros) col++;
+                    if (onlyZeros) column++;
 
                     if (shift != row && row < matrix.Rows && shift < matrix.Rows)
                     {
-                        matrix = Matrix.SwapMatrix(matrix, row, shift) * matrix;
-                        ret.Add(GenerateStep(Resources.STEP_SWAP_ROWS, matrix, row + 1, shift + 1));
+                        matrix = Matrix.SwapMatrix(matrix.Rows, row, shift) * matrix;
+                        steps.Add(GenerateStep(matrix, Resources.STEP_SWAP_ROWS, row + 1, shift + 1));
                     }
                 }
 
-                if (col < matrix.Columns)
+                if (column < matrix.Columns)
                 {
-                    var reciprocal = matrix[row, col].Reciprocal();
+                    var reciprocal = matrix[row, column].Reciprocal();
                     if (reciprocal != 1)
                     {
                         matrix = Matrix.MultiplicationMatrix(matrix.Rows, row, reciprocal) * matrix;
-                        ret.Add(GenerateStep(Resources.STEP_MULTIPLY_ROW, matrix, row + 1, reciprocal));
+                        steps.Add(GenerateStep(matrix, Resources.STEP_MULTIPLY_ROW, row + 1, reciprocal));
                     }
 
-                    reciprocal = matrix[row, col].Reciprocal();
+                    reciprocal = matrix[row, column].Reciprocal();
 
                     for (var destination = row + 1; destination < matrix.Rows; destination++)
                     {
-                        var multiplier = matrix[destination, col] * -reciprocal;
+                        var multiplier = matrix[destination, column] * -reciprocal;
 
                         if (multiplier != 0)
                         {
                             matrix = Matrix.AddToRowMatrix(matrix, destination, row, multiplier) * matrix;
-                            ret.Add(GenerateStep(Resources.STEP_SUM_ROWS, matrix, row + 1, multiplier, destination + 1));
+                            steps.Add(GenerateStep(matrix, Resources.STEP_SUM_ROWS, row + 1, multiplier, destination + 1));
                         }
                     }
                 }
 
                 row++;
-                col++;
+                column++;
             }
 
             // Subtract from all rows above the current one its value multiplied by the ratio,
@@ -102,13 +105,13 @@ namespace RaspMat.Helpers
                         if (multiplier != 0)
                         {
                             matrix = Matrix.AddToRowMatrix(matrix, destination, currentRow, multiplier) * matrix;
-                            ret.Add(GenerateStep(Resources.STEP_SUM_ROWS, matrix, currentRow + 1, multiplier, destination + 1));
+                            steps.Add(GenerateStep(matrix, Resources.STEP_SUM_ROWS, currentRow + 1, multiplier, destination + 1));
                         }
                     }
                 }
             }
 
-            return ret;
+            return steps;
         }
         /*
         public static IList<AlgorithmStep<Matrix>> InverseMatrix(this Matrix matrix)

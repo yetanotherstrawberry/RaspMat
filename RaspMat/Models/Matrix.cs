@@ -4,49 +4,75 @@ using RaspMat.Properties;
 using System;
 using System.Data;
 using System.Linq;
-using System.Numerics;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RaspMat.Models
 {
-    internal class Matrix
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    internal class Matrix : ISerializable
     {
 
-        private const int MinCols = 1, MinRows = 1;
+        private const char COLUMN_SEPARATOR = '\t';
 
         #region Properties
+        /// <summary>
+        /// <see cref="Fraction"/>s of this <see cref="Matrix"/>.
+        /// </summary>
         [JsonProperty]
         private Fraction[][] FractionMatrix { get; }
 
-        [JsonIgnore]
+        /// <summary>
+        /// The total number of rows.
+        /// </summary>
         public int Rows => FractionMatrix.Length;
 
-        [JsonIgnore]
-        public int Columns => FractionMatrix.First().Length;
+        /// <summary>
+        /// The total number of columns.
+        /// </summary>
+        public int Columns => FractionMatrix[0].Length;
 
+        /// <summary>
+        /// Returns <see langword="true"/> is <see langword="this"/> <see cref="Matrix"/> is square.
+        /// </summary>
+        public bool IsSquare => Rows == Columns;
+
+        /// <summary>
+        /// Gets the specified rows.
+        /// </summary>
+        /// <param name="row">Zero-based index.</param>
+        /// <returns>An array of <see cref="Fraction"/>s.</returns>
         private Fraction[] this[int row]
         {
             get => FractionMatrix[row];
             set => FractionMatrix[row] = value;
         }
 
-        public Fraction this[int row, int col]
+        /// <summary>
+        /// Gets the specified cell.
+        /// </summary>
+        /// <param name="row">Zero-based index of the row.</param>
+        /// <param name="column">Zero-based index of the column.</param>
+        /// <returns>A <see cref="Fraction"/> that is at the given position.</returns>
+        public Fraction this[int row, int column]
         {
-            get => this[row][col];
-            private set => this[row][col] = value;
+            get => this[row][column];
+            private set => this[row][column] = value;
         }
         #endregion Properties
 
         #region Constructors
-        public Matrix(int rows, int cols, Func<int, int, Fraction> values)
+        public Matrix(int rows, int columns, Func<int, int, Fraction> values)
         {
-            if (rows < MinRows || cols < MinCols)
-                throw new ArgumentException(
-                    message: string.Format(Resources.ERR_TOO_SMALL_MAT, MinCols, MinRows),
-                    paramName: rows < MinRows ? nameof(rows) : nameof(cols));
+            FractionMatrix = new Fraction[rows][];
 
-            FractionMatrix = JaggedArrayHelper.Create(rows, cols, values);
+            Parallel.For(0, Rows, row =>
+            {
+                this[row] = new Fraction[columns];
+                Parallel.For(0, Columns, column => this[row][column] = values(row, column));
+            });
         }
 
         /// <summary>
@@ -54,35 +80,40 @@ namespace RaspMat.Models
         /// </summary>
         /// <param name="fractionMatrix">A representation of a <see cref="Matrix"/>.</param>
         [JsonConstructor]
-#pragma warning disable IDE0051 // Remove unused private members
-        private Matrix(Fraction[][] fractionMatrix) => FractionMatrix = fractionMatrix;
-#pragma warning restore IDE0051 // Remove unused private members
+        protected Matrix(Fraction[][] fractionMatrix)
+        {
+            FractionMatrix = fractionMatrix;
+        }
 
-        public Matrix(int rows, int columns) : this(rows, columns, (row, column) => 0) { }
+        public Matrix(int rows, int columns) : this(Enumerable.Range(0, rows).Select(row => new Fraction[columns]).ToArray()) { }
         #endregion Constructors
 
         #region StaticMethods
         public static Matrix Identity(int size)
         {
-            return RowEchelon(size, size);
+            var newMatrix = new Matrix(size, size);
+            for (var cell = 0; cell < size; cell++) newMatrix[cell, cell] = 1;
+            return newMatrix;
         }
 
-        public static Matrix RowEchelon(int rows, int columns)
+        /// <summary>
+        /// Creates a <see cref="Matrix"/> that can be used to swap rows or columns of another <see cref="Matrix"/> by multiplication.
+        /// </summary>
+        /// <param name="size">Size of a square multiplication <see cref="Matrix"/>.</param>
+        /// <param name="first">Zero-based index of the first row to swap.</param>
+        /// <param name="second">Zero-based index of the second row to swap.</param>
+        /// <returns>A <see langword="new"/> square <see cref="Matrix"/> of the specified <paramref name="size"/>.</returns>
+        public static Matrix SwapMatrix(int size, int first, int second)
         {
-            return new Matrix(rows, columns, (row, col) => row == col ? 1 : 0);
-        }
+            var newMatrix = Identity(size);
 
-        public static Matrix SwapMatrix(Matrix matrix, int a, int b)
-        {
-            var ret = Identity(matrix.Rows);
+            newMatrix[first, first] = 0;
+            newMatrix[second, second] = 0;
 
-            ret[a, a] = 0;
-            ret[b, b] = 0;
+            newMatrix[first, second] = 1;
+            newMatrix[second, first] = 1;
 
-            ret[a, b] = 1;
-            ret[b, a] = 1;
-
-            return ret;
+            return newMatrix;
         }
 
         public static Matrix AddToRowMatrix(Matrix matrix, int destination, int source, Fraction srcMultiplication)
@@ -96,33 +127,28 @@ namespace RaspMat.Models
 
         public static Matrix MultiplicationMatrix(int diagonal, int index, Fraction multiplier)
         {
-            var ret = Identity(diagonal);
-
-            ret[index, index] = multiplier;
-
-            return ret;
+            var newMatrix = Identity(diagonal);
+            newMatrix[index, index] = multiplier;
+            return newMatrix;
         }
 
-        public static Matrix AddI(Matrix matrix, bool onLeft)
+        public static Matrix WithIdentity(Matrix matrix, bool onLeft)
         {
             if (matrix.Rows != matrix.Columns)
                 throw new ArgumentException(message: Resources.ERR_MAT_NO_SQUARE, paramName: nameof(matrix));
 
-            var ret = new Matrix(matrix.Rows, matrix.Columns * 2);
+            var newMatrix = new Matrix(matrix.Rows, matrix.Columns * 2);
 
             // Copies the original matrix to the left side of the returned matrix if onRight is true.
             for (int row = 0; row < matrix.Rows; row++)
-                for (int column = 0, shift = ret.Rows; column < matrix.Columns; column++, shift++)
-                    ret[row, onLeft ? shift : column] = matrix[row, column];
+                for (int column = 0, shift = newMatrix.Rows; column < matrix.Columns; column++, shift++)
+                    newMatrix[row, onLeft ? shift : column] = matrix[row, column];
 
-            /*
-             * Assigns I to the matrix.
-             * shift is used in case we add I on the right side of the square matrix.
-             */
-            for (int row = 0, shift = matrix.Rows; row < ret.Rows; row++, shift++)
-                ret[row, onLeft ? row : shift] = 1;
+            // Assigns I to the matrix; shift is used in case I is to be added on the right side of a square matrix.
+            for (int row = 0, shift = matrix.Rows; row < newMatrix.Rows; row++, shift++)
+                newMatrix[row, onLeft ? row : shift] = 1;
 
-            return ret;
+            return newMatrix;
         }
 
         public static Matrix Slice(Matrix matrix, bool removeLeft)
@@ -137,17 +163,17 @@ namespace RaspMat.Models
 
         public static Matrix operator *(Fraction scale, Matrix matrix)
         {
-            var temp = new Matrix(matrix.Rows, matrix.Columns);
+            var newValue = new Matrix(matrix.Rows, matrix.Columns);
 
             Parallel.For(0, matrix.Rows, row =>
             {
-                Parallel.For(0, matrix.Columns, col =>
+                Parallel.For(0, matrix.Columns, column =>
                 {
-                    temp[row, col] = matrix[row, col] * scale;
+                    newValue[row, column] = matrix[row, column] * scale;
                 });
             });
 
-            return temp;
+            return newValue;
         }
 
         public static Matrix operator *(Matrix matrix, Fraction scale) => scale * matrix;
@@ -161,14 +187,9 @@ namespace RaspMat.Models
 
             Parallel.For(0, ret.Rows, row =>
             {
-                Parallel.For(0, ret.Columns, col =>
+                Parallel.For(0, ret.Columns, column =>
                 {
-                    var cellValue = Fraction.Zero;
-
-                    for (int cell = 0; cell < left.Columns; cell++)
-                        cellValue += left[row, cell] * right[cell, col];
-
-                    ret[row, col] = cellValue;
+                    ret[row, column] = Enumerable.Range(0, left.Columns).Select(cell => left[row, cell] * right[cell, column]).Aggregate((x, y) => x + y);
                 });
             });
 
@@ -177,7 +198,7 @@ namespace RaspMat.Models
 
         public static Matrix Transpose(Matrix matrix)
         {
-            return new Matrix(matrix.Columns, matrix.Rows, (row, col) => matrix[col, row]);
+            return new Matrix(matrix.Columns, matrix.Rows, (row, column) => matrix[column, row]);
         }
         #endregion StaticMethods
 
@@ -187,51 +208,74 @@ namespace RaspMat.Models
             return new Matrix(dataTable.Rows.Count, dataTable.Columns.Count, (row, column) => Fraction.Parse(dataTable.Rows[row][column].ToString()));
         }
 
-        public DataTable ToDataTable() => DataTableHelpers.CreateStrDataTable((row, col) => this[row, col], Rows, Columns);
+        /// <summary>
+        /// Creates a <see cref="DataTable"/> with its cells (<see langword="as"/> <see cref="string"/>) populated based on <see langword="this"/> <see cref="Matrix"/>.
+        /// </summary>
+        /// <returns>A <see langword="new"/> <see cref="DataTable"/>.</returns>
+        public DataTable ToDataTable() => DataTableHelpers.CreateStrDataTable((row, column) => this[row, column], Rows, Columns);
 
         public override string ToString()
         {
-            var retSB = new StringBuilder();
+            var stringBuilder = new StringBuilder(Rows * Columns * 4);
 
-            for (int i = 0; i < Rows; i++)
+            for (var row = 0; row < Rows; row++)
             {
-                for (int j = 0; j < Columns; j++)
+                for (var column = 0; column < Columns; column++)
                 {
-                    retSB.Append(this[i, j]);
-                    if (j < Columns - 1)
-                        retSB.Append("\t");
+                    stringBuilder.Append(this[row, column]);
+                    if (column < Columns - 1) stringBuilder.Append(COLUMN_SEPARATOR);
                 }
 
-                if (i < Rows - 1)
-                {
-                    retSB.AppendLine();
-                }
+                if (row < Rows - 1) stringBuilder.AppendLine();
             }
 
-            return retSB.ToString();
+            return stringBuilder.ToString();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object compared)
         {
-            if (!(obj is Matrix mat) || Columns != mat.Columns || Rows != mat.Rows) return false;
+            if (!(compared is Matrix matrix) || Columns != matrix.Columns || Rows != matrix.Rows) return false;
 
-            for (int row = 0; row < Rows; row++)
+            var differences = 0;
+
+            Parallel.For(0, Rows, (row, rowLoop) =>
             {
-                for (int col = 0; col < Columns; col++)
+                Parallel.For(0, Columns, (column, columnLoop) =>
                 {
-                    if (this[row, col] != mat[row, col]) return false;
-                }
-            }
+                    if (this[row, column] != matrix[row, column])
+                    {
+                        Interlocked.Increment(ref differences);
+                        rowLoop.Stop();
+                    }
 
-            return true;
+                    if (differences > 0) columnLoop.Stop();
+                });
+            });
+
+            return differences == 0;
         }
 
         public override int GetHashCode()
         {
-            return (int)(FractionMatrix
-                .Aggregate((rowA, rowB) => rowA.Concat(rowB).ToArray())
-                .SelectMany(fraction => new[] { fraction.Numerator, fraction.Denominator })
-                .Aggregate((a, b) => BigInteger.Add(a, b)) % int.MaxValue);
+            var iterateColumns = Columns > Rows;
+            var stop = iterateColumns ? Columns : Rows;
+            var total = 0;
+
+            for (var index = 0; index < stop; index++)
+            {
+                var cell = iterateColumns ? this[0, index] : this[index, 0];
+                var bigInt = cell.Numerator * cell.Denominator;
+                var totalAndBigInt = bigInt + total;
+                total = (int)(totalAndBigInt > int.MaxValue ? totalAndBigInt % int.MaxValue : totalAndBigInt);
+            }
+
+            return total;
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+
+            throw new NotImplementedException();
         }
         #endregion Methods
 

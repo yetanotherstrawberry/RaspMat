@@ -1,13 +1,12 @@
 ﻿using RaspMat.Models;
 using RaspMat.Properties;
 using RaspMat.Services.Interfaces;
-using RaspMat.ViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Numerics;
 using System.Windows.Input;
-using static RaspMat.Helpers.Events;
+using static RaspMat.Models.Events;
 
 namespace RaspMat.ViewModels
 {

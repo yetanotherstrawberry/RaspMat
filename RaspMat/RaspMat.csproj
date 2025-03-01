@@ -95,9 +95,8 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\DataTableHelpers.cs" />
-    <Compile Include="Helpers\Events.cs" />
-    <Compile Include="Helpers\JaggedArrayHelper.cs" />
-    <Compile Include="ViewModels\Interfaces\IEventReceiver.cs" />
+    <Compile Include="Models\Events.cs" />
+    <Compile Include="Services\Interfaces\IEventReceiver.cs" />
     <Compile Include="Models\NewMatrixDescription.cs" />
     <Compile Include="Services\AsyncRelayCommandingService.cs" />
     <Compile Include="Services\Interfaces\IEventService.cs" />
@@ -148,7 +147,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Helpers\Algorithms.cs" />
+    <Compile Include="Extensions\MatrixExtensions.cs" />
     <Compile Include="Models\Fraction.cs" />
     <Compile Include="Models\Matrix.cs" />
     <Compile Include="Services\DataTableMathService.cs" />
@@ -187,9 +186,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8.1">
       <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
+      <ProductName>Microsoft .NET Framework 4.8.1 %28x86 and x64%29</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

@@ -1,8 +1,8 @@
-﻿using RaspMat.Helpers;
+﻿using RaspMat.Extensions;
+using RaspMat.Helpers;
 using RaspMat.Models;
 using RaspMat.Properties;
 using RaspMat.Services.Interfaces;
-using RaspMat.ViewModels.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,14 +11,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using static RaspMat.Helpers.Events;
+using static RaspMat.Models.Events;
 
 namespace RaspMat.ViewModels
 {
     /// <summary>
     /// ViewModel for the Gaussian elimination algorithm of a <see cref="Matrix"/>.
     /// </summary>
-    internal class GaussianUserControlViewModel : ViewModelBase, IEventReceiver<LoadMatrixEvent>
+    internal class GaussianUserControlViewModel : ViewModelBase, IEventReceiver<LoadMatrixEvent>, IDisposable
     {
 
         private readonly Action _lockUI, _unlockUI;
@@ -72,7 +72,7 @@ namespace RaspMat.ViewModels
                     {
                         if (SelectedRows.Count > 2)
                             throw new ArgumentOutOfRangeException(nameof(SelectedRows.Count), SelectedRows.Count, string.Format(Resources.ERR_ROWS, 2));
-                        CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
+                        CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix.Rows, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
                     });
                 }
                 return _matSwapRowsComm;
@@ -136,7 +136,7 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_matAddIComm is null) _matAddIComm = GenerateCommand<bool?>(left => CurrentMatrix = Matrix.AddI(CurrentMatrix, left.Value));
+                if (_matAddIComm is null) _matAddIComm = GenerateCommand<bool?>(left => CurrentMatrix = Matrix.WithIdentity(CurrentMatrix, left.Value));
                 return _matAddIComm;
             }
         }
@@ -333,7 +333,12 @@ namespace RaspMat.ViewModels
         private Matrix CurrentMatrix
         {
             get => Matrix.Parse(MatrixDataTable);
-            set => MatrixDataTable = value.ToDataTable();
+            set
+            {
+                var matrix = MatrixDataTable;
+                MatrixDataTable = value.ToDataTable();
+                matrix.Dispose();
+            }
         }
 
         /// <summary>
@@ -376,7 +381,12 @@ namespace RaspMat.ViewModels
             CurrentMatrix = value.Data;
         }
 
-        public GaussianUserControlViewModel(ISerializationService serializationService, IViewService stepViewService, IEventService eventService, ICommandingService commandingService)
+        public void Dispose()
+        {
+            MatrixDataTable.Dispose();
+        }
+
+        public GaussianUserControlViewModel(ISerializationService serializationService, IViewService viewService, IEventService eventService, ICommandingService commandingService)
         {
             _checkIsFree = () => IsFree;
             _lockUI = () => IsFree = false;
@@ -385,7 +395,7 @@ namespace RaspMat.ViewModels
             _eventService = eventService;
             _commandingService = commandingService;
             _serializationService = serializationService;
-            _viewService = stepViewService;
+            _viewService = viewService;
 
             _eventService.Subscribe<GaussianUserControlViewModel, LoadMatrixEvent>(this);
         }

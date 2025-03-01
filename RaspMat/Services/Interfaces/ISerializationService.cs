@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace RaspMat.Services.Interfaces
 {
     /// <summary>
-    /// Interface for service (de)serializing instances.
+    /// Interface for service (de)serializing <see cref="object"/>s.
     /// </summary>
     internal interface ISerializationService
     {
@@ -16,7 +16,7 @@ namespace RaspMat.Services.Interfaces
         /// <typeparam name="TObject"><see cref="Type"/> of <paramref name="instance"/>.</typeparam>
         /// <param name="instance">An instance to be serialized.</param
         /// <param name="stream"><see cref="Stream"/> to serialize to.</param>
-        Task Serialize<TObject>(TObject instance) where TObject : class;
+        Task Serialize<TObject>(TObject instance) where TObject : class; // Constraint forces value to be nullable.
 
         /// <summary>
         /// Requests deserialization and returns an instance of <typeparamref name="TDeserialized"/>.
@@ -28,7 +28,7 @@ namespace RaspMat.Services.Interfaces
         /// <see cref="IDeserializationResult{TDeserialized}.Result"/> indicates whether deserialization was successful.
         /// If it is <see langword="false"/>, <see cref="IDeserializationResult{TDeserialized}.Result"/> will be equal to default.
         /// </returns>
-        Task<TDeserialized> Deserialize<TDeserialized>() where TDeserialized : class;
+        Task<TDeserialized> Deserialize<TDeserialized>() where TDeserialized : class; // Constraint forces value to be nullable.
 
     }
 }
