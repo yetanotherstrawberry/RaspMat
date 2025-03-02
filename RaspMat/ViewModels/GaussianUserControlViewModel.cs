@@ -1,7 +1,5 @@
 ﻿using RaspMat.Extensions;
-using RaspMat.Helpers;
 using RaspMat.Models;
-using RaspMat.Properties;
 using RaspMat.Services.Interfaces;
 using System;
 using System.Collections;
@@ -70,8 +68,7 @@ namespace RaspMat.ViewModels
                 {
                     _matSwapRowsComm = GenerateCommand(() =>
                     {
-                        if (SelectedRows.Count > 2)
-                            throw new ArgumentOutOfRangeException(nameof(SelectedRows.Count), SelectedRows.Count, string.Format(Resources.ERR_ROWS, 2));
+                        if (SelectedRows.Count > 2) throw new ArgumentOutOfRangeException(nameof(SelectedRows.Count));
                         CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix.Rows, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
                     });
                 }
@@ -136,7 +133,7 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_matAddIComm is null) _matAddIComm = GenerateCommand<bool?>(left => CurrentMatrix = Matrix.WithIdentity(CurrentMatrix, left.Value));
+                if (_matAddIComm is null) _matAddIComm = GenerateCommand<bool?>(left => CurrentMatrix = CurrentMatrix.WithIdentity(left.Value));
                 return _matAddIComm;
             }
         }
@@ -153,7 +150,7 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_matSliceComm is null) _matSliceComm = GenerateCommand<bool?>(left => CurrentMatrix = Matrix.Slice(CurrentMatrix, left.Value));
+                if (_matSliceComm is null) _matSliceComm = GenerateCommand<bool?>(left => CurrentMatrix = CurrentMatrix.Slice(left.Value));
                 return _matSliceComm;
             }
         }
@@ -199,7 +196,7 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_matTransposeComm is null) _matTransposeComm = GenerateCommand(() => CurrentMatrix = Matrix.Transpose(CurrentMatrix));
+                if (_matTransposeComm is null) _matTransposeComm = GenerateCommand(() => CurrentMatrix = CurrentMatrix.Transpose());
                 return _matTransposeComm;
             }
         }
@@ -294,7 +291,7 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_stepListViewComm is null) _stepListViewComm = GenerateCommand(_viewService.ToggleStepWindow);
+                if (_stepListViewComm is null) _stepListViewComm = GenerateCommand(_viewService.ToggleStepsView);
                 return _stepListViewComm;
             }
         }

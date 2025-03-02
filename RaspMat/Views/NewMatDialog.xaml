@@ -9,9 +9,8 @@
              xmlns:local="clr-namespace:RaspMat.Views"
              mc:Ignorable="d"
              Width="250"
-             MinWidth="180"
              Height="150"
-             MinHeight="140"
+             ResizeMode="NoResize"
              d:DataContext="{d:DesignInstance vm:NewMatDialogViewModel, IsDesignTimeCreatable=False}"
              d:Background="White"
              Title="{x:Static prop:Resources.ENTER_MATRIX}">

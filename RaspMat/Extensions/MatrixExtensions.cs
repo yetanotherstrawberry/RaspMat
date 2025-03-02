@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace RaspMat.Extensions
 {
     /// <summary>
-    /// Static class for holding algorithms.
+    /// Extensions for the <see cref="Matrix"/> <see langword="class"/>.
     /// </summary>
     internal static class MatrixExtensions
     {

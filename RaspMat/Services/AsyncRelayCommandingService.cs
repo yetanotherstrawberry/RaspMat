@@ -47,7 +47,6 @@ namespace RaspMat.Services
                 try
                 {
                     _dispatcherInvoker(before);
-                    //await Task.Yield();
                     await task();
                 }
                 finally

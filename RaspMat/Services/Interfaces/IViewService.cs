@@ -12,7 +12,7 @@ namespace RaspMat.Services.Interfaces
         /// <summary>
         /// Shows or closes a view with steps performed by an algorithm.
         /// </summary>
-        void ToggleStepWindow();
+        void ToggleStepsView();
 
         /// <summary>
         /// Shows or closes a view that creates a new <see cref="Matrix"/>.

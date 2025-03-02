@@ -16,6 +16,8 @@ namespace RaspMat.ViewModels
     internal class FractionUserControlViewModel : ViewModelBase, IEventReceiver<OperationPerformedEvent>
     {
 
+        private const string EQUITY_SIGN = "=", EQUATION_SEPARATOR = " ";
+
         private readonly IEventService _eventService;
         private readonly ICommandingService _commandingService;
         private readonly IViewService _viewService;
@@ -160,7 +162,7 @@ namespace RaspMat.ViewModels
                                 throw new ArgumentOutOfRangeException(nameof(operationType));
                         }
 
-                        _eventService.Send(new OperationPerformedEvent(string.Join(Resources.EQUATION_SPACER, LeftFraction, Operations[operationType.Value], RightFraction, Resources.EQUALITY_SIGN, Result)));
+                        _eventService.Send(new OperationPerformedEvent(string.Join(EQUATION_SEPARATOR, LeftFraction, Operations[operationType.Value], RightFraction, EQUITY_SIGN, Result)));
                     }, () => IsFree = true);
                 }
                 return _calculateCommand;
@@ -190,7 +192,10 @@ namespace RaspMat.ViewModels
         /// </summary>
         private bool _isFree = true;
 
-        public void Receive(OperationPerformedEvent value) => _viewService.Execute(() => History.Insert(0, value.Data));
+        public void Receive(OperationPerformedEvent value)
+        {
+            _viewService.Execute(() => History.Insert(0, value.Data));
+        }
 
         public FractionUserControlViewModel(IEventService eventService, ICommandingService commandingService, IViewService viewService)
         {

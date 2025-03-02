@@ -10,12 +10,27 @@ namespace RaspMat.Services
     internal class WPFWindowService : IViewService
     {
 
-        private IDictionary<Type, Window> Windows { get; } = new Dictionary<Type, Window>();
-
         private readonly IServiceProvider _serviceProvider;
         private readonly Action<Action> _dispatcherInvoke;
 
-        private void SpawnWindow<TWindow>() where TWindow : Window
+        /// <summary>
+        /// <see cref="Window"/>s created by <see langword="this"/> instance.
+        /// </summary>
+        private IDictionary<Type, Window> Windows { get; } = new Dictionary<Type, Window>();
+
+        /// <summary>
+        /// <see cref="Window"/>s that are to be created as blocking dialogs.
+        /// </summary>
+        private ISet<Type> ModalViews { get; } = new HashSet<Type>()
+        {
+            typeof(NewMatDialog),
+        };
+
+        /// <summary>
+        /// Closes or opens a <see cref="Window"/>.
+        /// </summary>
+        /// <typeparam name="TWindow">The <see cref="Window"/> to toggle.</typeparam>
+        private void ToggleView<TWindow>() where TWindow : Window
         {
             _dispatcherInvoke(() =>
             {
@@ -27,15 +42,20 @@ namespace RaspMat.Services
                 }
 
                 if (_tempWindow.IsVisible)
+                {
                     _tempWindow.Close();
+                }
                 else
-                    _tempWindow.Show();
+                {
+                    if (ModalViews.Contains(typeof(TWindow))) _tempWindow.ShowDialog();
+                    else _tempWindow.Show();
+                }
             });
         }
 
-        public void ToggleStepWindow() => SpawnWindow<StepListWindow>();
+        public void ToggleStepsView() => ToggleView<StepListWindow>();
 
-        public void ToggleNewMatDialog() => SpawnWindow<NewMatDialog>();
+        public void ToggleNewMatDialog() => ToggleView<NewMatDialog>();
 
         public void Execute(Action action) => _dispatcherInvoke(action);
 
