@@ -1,4 +1,7 @@
-﻿namespace RaspMat.Views
+﻿using System;
+using System.Windows;
+
+namespace RaspMat.Views
 {
     /// <summary>
     /// Interaction logic for <see cref="MainWindow"/>.

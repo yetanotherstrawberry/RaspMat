@@ -91,11 +91,7 @@ namespace RaspMat
             builder.AddSingleton<ISerializationService, JsonSerializationService>();
             builder.AddSingleton<IEventService, WeakReferenceMessengerEventService>();
             builder.AddSingleton<IMathService, DataTableMathService>();
-
-            builder.AddSingleton<IViewService, WPFWindowService>(serviceProvider =>
-            {
-                return new WPFWindowService(serviceProvider, _invoker);
-            });
+            builder.AddSingleton<IViewService, WPFWindowService>();
         }
 
         /// <summary>

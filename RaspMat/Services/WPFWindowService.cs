@@ -11,7 +11,6 @@ namespace RaspMat.Services
     {
 
         private readonly IServiceProvider _serviceProvider;
-        private readonly Action<Action> _dispatcherInvoke;
 
         /// <summary>
         /// <see cref="Window"/>s created by <see langword="this"/> instance.
@@ -32,13 +31,14 @@ namespace RaspMat.Services
         /// <typeparam name="TWindow">The <see cref="Window"/> to toggle.</typeparam>
         private void ToggleView<TWindow>() where TWindow : Window
         {
-            _dispatcherInvoke(() =>
+            Application.Current.Dispatcher.Invoke(() =>
             {
+                if (Application.Current.MainWindow.GetType().Equals(typeof(TWindow))) throw new InvalidOperationException();
+
                 if (!Windows.TryGetValue(typeof(TWindow), out var _tempWindow) || !_tempWindow.IsLoaded)
                 {
                     Windows.Remove(typeof(TWindow));
                     Windows.Add(typeof(TWindow), _tempWindow = _serviceProvider.GetRequiredService<TWindow>());
-                    _tempWindow.Owner = Application.Current.MainWindow;
                 }
 
                 if (_tempWindow.IsVisible)
@@ -47,7 +47,11 @@ namespace RaspMat.Services
                 }
                 else
                 {
-                    if (ModalViews.Contains(typeof(TWindow))) _tempWindow.ShowDialog();
+                    if (ModalViews.Contains(typeof(TWindow)))
+                    {
+                        _tempWindow.Owner = Application.Current.MainWindow;
+                        _tempWindow.ShowDialog();
+                    }
                     else _tempWindow.Show();
                 }
             });
@@ -57,12 +61,11 @@ namespace RaspMat.Services
 
         public void ToggleNewMatDialog() => ToggleView<NewMatDialog>();
 
-        public void Execute(Action action) => _dispatcherInvoke(action);
+        public void Execute(Action action) => Application.Current.Dispatcher.Invoke(action);
 
-        public WPFWindowService(IServiceProvider serviceProvider, Action<Action> dispatcherInvoke)
+        public WPFWindowService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _dispatcherInvoke = dispatcherInvoke;
         }
 
     }
