@@ -23,9 +23,7 @@ namespace RaspMat.Services
             using (var reader = new StreamReader(stream))
             using (var jsonReader = new JsonTextReader(reader))
             {
-                //var ret = await Task.Run(() => ).ConfigureAwait(false);
-                var ret = _serializer.Deserialize<TDeserialized>(jsonReader);
-                return ret;
+                return await Task.Run(() => _serializer.Deserialize<TDeserialized>(jsonReader)).ConfigureAwait(false);
             }
         }
 

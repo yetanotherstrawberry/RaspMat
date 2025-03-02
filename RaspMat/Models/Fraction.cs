@@ -10,7 +10,14 @@ namespace RaspMat.Models
     internal readonly struct Fraction
     {
 
+        /// <summary>
+        /// Separator used between <see cref="Numerator"/> and <see cref="Denominator"/>.
+        /// </summary>
         public const char FRACTION_SEPARATOR = '/';
+
+        /// <summary>
+        /// Format used by <see cref="BigInteger.ToString(string)"/>.
+        /// </summary>
         private const string INTEGER_TOSTRING_FORMAT = "R"; // Allow more than 50 digits.
 
         /// <summary>
@@ -60,9 +67,7 @@ namespace RaspMat.Models
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="fraction"/> has more than 2 or no parts when split by <see cref="FRACTION_SEPARATOR"/>.</exception>
         public static Fraction Parse(string fraction)
         {
-            var integers = Array.ConvertAll(
-                new string(fraction.ToCharArray().Where(character => !char.IsWhiteSpace(character)).ToArray()).Split(FRACTION_SEPARATOR),
-                str => BigInteger.Parse(str.TrimStart('(').TrimEnd(')')));
+            var integers = Array.ConvertAll(string.Concat(fraction.ToCharArray().Where(character => !char.IsWhiteSpace(character))).Split(FRACTION_SEPARATOR), str => BigInteger.Parse(str.TrimStart('(').TrimEnd(')')));
 
             switch (integers.Length)
             {
@@ -107,8 +112,8 @@ namespace RaspMat.Models
         public static Fraction operator /(Fraction a, Fraction b)
             => a * b.Reciprocal();
 
-        public static bool operator ==(Fraction a, Fraction b)
-            => a.Numerator == b.Numerator && a.Denominator == b.Denominator;
+        public static bool operator ==(Fraction left, Fraction right)
+            => left.Numerator == right.Numerator && left.Denominator == right.Denominator;
 
         public static bool operator !=(Fraction a, Fraction b)
             => !(a == b);
@@ -125,16 +130,15 @@ namespace RaspMat.Models
         public static implicit operator Fraction(long numerator)
             => new BigInteger(numerator);
 
-        public override bool Equals(object obj)
-            => obj is Fraction fraction && this == fraction;
+        public override bool Equals(object comapred)
+            => comapred is Fraction fraction && this == fraction;
 
-        public override int GetHashCode()
-            => (int)((Numerator % (int.MaxValue / 2)) + (Denominator % (int.MaxValue / 2 + 1)));
+        public override int GetHashCode() => BigInteger.Add(BigInteger.Pow(Numerator, 2), Denominator).GetHashCode();
 
         public override string ToString()
         {
             var numerator = Numerator.ToString(INTEGER_TOSTRING_FORMAT);
-            return Denominator == 1 ? numerator : string.Join(FRACTION_SEPARATOR.ToString(), numerator, Denominator.ToString(INTEGER_TOSTRING_FORMAT));
+            return Denominator.IsOne ? numerator : string.Join(FRACTION_SEPARATOR.ToString(), numerator, Denominator.ToString(INTEGER_TOSTRING_FORMAT));
         }
 
     }
