@@ -10,6 +10,9 @@ namespace RaspMat.Services
     internal class WPFWindowService : IViewService
     {
 
+        /// <summary>
+        /// The <see cref="IServiceProvider"/> used to create <see cref="Window"/>s.
+        /// </summary>
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
@@ -33,7 +36,7 @@ namespace RaspMat.Services
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                if (Application.Current.MainWindow.GetType().Equals(typeof(TWindow))) throw new InvalidOperationException();
+                if (Application.Current.MainWindow.GetType().Equals(typeof(TWindow))) throw new InvalidOperationException(nameof(Application.Current.MainWindow));
 
                 if (!Windows.TryGetValue(typeof(TWindow), out var _tempWindow) || !_tempWindow.IsLoaded)
                 {
@@ -63,9 +66,14 @@ namespace RaspMat.Services
 
         public void Execute(Action action) => Application.Current.Dispatcher.Invoke(action);
 
+        /// <summary>
+        /// Creates a new instance of <see cref="IViewService"/> that uses the provided <see cref="IServiceProvider"/> to create <see cref="Window"/>s.
+        /// </summary>
+        /// <param name="serviceProvider"><see cref="IServiceProvider"/> used to create <see cref="Window"/>s.</param>
+        /// <exception cref="ArgumentNullException">The <paramref name="serviceProvider"/> <see langword="is"/> <see langword="null"/>.</exception>
         public WPFWindowService(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
     }

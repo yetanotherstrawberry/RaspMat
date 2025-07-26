@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RaspMat.Services.Interfaces;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace RaspMat.Services
         private readonly IFileService _fileService;
         private readonly JsonSerializer _serializer = JsonSerializer.CreateDefault();
 
-        public async Task<TDeserialized> Deserialize<TDeserialized>() where TDeserialized : class
+        public async Task<TDeserialized> DeserializeAsync<TDeserialized>() where TDeserialized : class
         {
             var stream = await _fileService.OpenFileAsync().ConfigureAwait(false);
             if (stream is null) return null; // No file selected by the user.
@@ -27,7 +28,7 @@ namespace RaspMat.Services
             }
         }
 
-        public async Task Serialize<TDeserialized>(TDeserialized serialized) where TDeserialized : class
+        public async Task SerializeAsync<TDeserialized>(TDeserialized serialized) where TDeserialized : class
         {
             var stream = await _fileService.NewFileAsync().ConfigureAwait(false);
             if (stream is null) return; // No file selected - cancel silently.
@@ -45,7 +46,7 @@ namespace RaspMat.Services
         /// <param name="fileService">A service used for streaming the (de)serialized data.</param>
         public JsonSerializationService(IFileService fileService)
         {
-            _fileService = fileService;
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         }
 
     }

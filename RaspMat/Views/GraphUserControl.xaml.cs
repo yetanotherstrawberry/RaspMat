@@ -1,9 +1,4 @@
-﻿using Microsoft.Msagl.Drawing;
-using Microsoft.Msagl.WpfGraphControl;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace RaspMat.Views
+﻿namespace RaspMat.Views
 {
     /// <summary>
     /// Interaction logic for GraphUserControl.xaml

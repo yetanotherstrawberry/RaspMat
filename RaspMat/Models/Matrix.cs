@@ -15,6 +15,9 @@ namespace RaspMat.Models
     internal class Matrix : ISerializable
     {
 
+        /// <summary>
+        /// The character used to separate columns.
+        /// </summary>
         private const char COLUMN_SEPARATOR = '\t';
 
         #region Properties
@@ -82,7 +85,7 @@ namespace RaspMat.Models
             FractionMatrix = fractionMatrix ?? throw new ArgumentNullException(nameof(fractionMatrix));
         }
 
-        protected Matrix(SerializationInfo info, StreamingContext context) : this(info.GetValue(nameof(FractionMatrix), typeof(Fraction[][])) as Fraction[][]) { }
+        protected internal Matrix(SerializationInfo info, StreamingContext context) : this(info.GetValue(nameof(FractionMatrix), typeof(Fraction[][])) as Fraction[][]) { }
 
         public Matrix(int rows, int columns) : this(Enumerable.Range(0, rows).Select(row => new Fraction[columns]).ToArray()) { }
 

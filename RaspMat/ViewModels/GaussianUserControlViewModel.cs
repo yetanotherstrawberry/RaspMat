@@ -254,7 +254,7 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_serializeComm is null) _serializeComm = GenerateCommand(() => _serializationService.Serialize(CurrentMatrix));
+                if (_serializeComm is null) _serializeComm = GenerateCommand(() => _serializationService.SerializeAsync(CurrentMatrix));
                 return _serializeComm;
             }
         }
@@ -275,7 +275,7 @@ namespace RaspMat.ViewModels
                 {
                     _deserializeComm = GenerateCommand(task: async () =>
                     {
-                        var mat = await _serializationService.Deserialize<Matrix>();
+                        var mat = await _serializationService.DeserializeAsync<Matrix>();
                         if (mat != null) CurrentMatrix = mat;
                     });
                 }
