@@ -5,11 +5,25 @@ using static RaspMat.Models.Events;
 
 namespace RaspMat.ViewModels
 {
+    /// <summary>
+    /// ViewModel for creating a <see cref="Matrix"/>.
+    /// </summary>
     internal class NewMatDialogViewModel : ViewModelBase
     {
 
+        /// <summary>
+        /// Used for communication with the UI.
+        /// </summary>
         private readonly IViewService _viewService;
+
+        /// <summary>
+        /// Used for communication between ViewModels.
+        /// </summary>
         private readonly IEventService _eventService;
+
+        /// <summary>
+        /// Used for creating the <see cref="ICommand"/>s.
+        /// </summary>
         private readonly ICommandingService _commandingService;
 
         /// <summary>
@@ -21,14 +35,13 @@ namespace RaspMat.ViewModels
             {
                 if (_closeDialogCommand is null)
                 {
-                    _closeDialogCommand = _commandingService.CreateFromAction(action: () =>
+                    _closeDialogCommand = _commandingService.CreateFromAction(() => IsFree = false, () =>
                     {
-                        var rows = int.Parse(Rows);
-                        var columns = int.Parse(Columns);
                         var fill = Fraction.Parse(Fill);
-                        _eventService.Send(new LoadMatrixEvent(new Matrix(rows, columns, (row, column) => fill)));
+                        _eventService.Send(new LoadMatrixEvent(new Matrix(int.Parse(Rows), int.Parse(Columns), (row, column) => fill)));
                         _viewService.ToggleNewMatDialog();
-                    });
+
+                    }, () => IsFree = true);
                 }
                 return _closeDialogCommand;
             }

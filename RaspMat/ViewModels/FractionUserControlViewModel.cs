@@ -1,4 +1,5 @@
-﻿using RaspMat.Models;
+﻿using RaspMat.Extensions;
+using RaspMat.Models;
 using RaspMat.Properties;
 using RaspMat.Services.Interfaces;
 using System;
@@ -174,24 +175,7 @@ namespace RaspMat.ViewModels
         /// </summary>
         private ICommand _calculateCommand;
 
-        /// <summary>
-        /// Indicates whether there is an ongoing (<see langword="false"/>) operation.
-        /// </summary>
-        public bool IsFree
-        {
-            get => _isFree;
-            set
-            {
-                SetProperty(ref _isFree, value);
-                _commandingService.NotifyCanExecuteChanged();
-            }
-        }
-
-        /// <summary>
-        /// Field for <see cref="IsFree"/>.
-        /// </summary>
-        private bool _isFree = true;
-
+        /// <inheritdoc/>
         public void Receive(OperationPerformedEvent value)
         {
             _viewService.Execute(() => History.Insert(0, value.Data));
@@ -199,9 +183,9 @@ namespace RaspMat.ViewModels
 
         public FractionUserControlViewModel(IEventService eventService, ICommandingService commandingService, IViewService viewService)
         {
-            _eventService = eventService;
-            _commandingService = commandingService;
-            _viewService = viewService;
+            _eventService = eventService.ThrowIfNull();
+            _commandingService = commandingService.ThrowIfNull();
+            _viewService = viewService.ThrowIfNull();
 
             _eventService.Subscribe<FractionUserControlViewModel, OperationPerformedEvent>(this);
         }

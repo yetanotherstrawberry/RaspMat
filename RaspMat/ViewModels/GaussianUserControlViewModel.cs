@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -19,11 +18,34 @@ namespace RaspMat.ViewModels
     internal class GaussianUserControlViewModel : ViewModelBase, IEventReceiver<LoadMatrixEvent>, IDisposable
     {
 
+        /// <summary>
+        /// Used for managing the UI.
+        /// </summary>
         private readonly Action _lockUI, _unlockUI;
+
+        /// <summary>
+        /// Checks whether the UI should be enabled.
+        /// </summary>
         private readonly Func<bool> _checkIsFree;
+
+        /// <summary>
+        /// Used for (de)serialization of a <see cref="Matrix"/>.
+        /// </summary>
         private readonly ISerializationService _serializationService;
+
+        /// <summary>
+        /// Used for managing Views.
+        /// </summary>
         private readonly IViewService _viewService;
+
+        /// <summary>
+        /// Used for communication with other ViewModels.
+        /// </summary>
         private readonly IEventService _eventService;
+
+        /// <summary>
+        /// Used for creation of <see cref="ICommand"/>s.
+        /// </summary>
         private readonly ICommandingService _commandingService;
 
         /// <summary>
@@ -69,7 +91,7 @@ namespace RaspMat.ViewModels
                     _matSwapRowsComm = GenerateCommand(() =>
                     {
                         if (SelectedRows.Count > 2) throw new ArgumentOutOfRangeException(nameof(SelectedRows.Count));
-                        CurrentMatrix = Matrix.SwapMatrix(CurrentMatrix.Rows, SelectedRows.First(), SelectedRows.Last()) * CurrentMatrix;
+                        CurrentMatrix = CurrentMatrix.SwapRows(SelectedRows.First(), SelectedRows.Last());
                     });
                 }
                 return _matSwapRowsComm;
@@ -273,7 +295,7 @@ namespace RaspMat.ViewModels
             {
                 if (_deserializeComm is null)
                 {
-                    _deserializeComm = GenerateCommand(task: async () =>
+                    _deserializeComm = GenerateCommand(async () =>
                     {
                         var mat = await _serializationService.DeserializeAsync<Matrix>();
                         if (mat != null) CurrentMatrix = mat;
@@ -282,6 +304,10 @@ namespace RaspMat.ViewModels
                 return _deserializeComm;
             }
         }
+
+        /// <summary>
+        /// Field for <see cref="DeserializeComm"/>.
+        /// </summary>
         private ICommand _deserializeComm;
 
         /// <summary>
@@ -339,24 +365,6 @@ namespace RaspMat.ViewModels
         }
 
         /// <summary>
-        /// Indicates whether UI should be blocked (<see langword="false"/>) because of an ongoing operation.
-        /// </summary>
-        public bool IsFree
-        {
-            get => _isFree;
-            private set
-            {
-                SetProperty(ref _isFree, value);
-                _commandingService.NotifyCanExecuteChanged();
-            }
-        }
-
-        /// <summary>
-        /// Field for <see cref="IsFree"/>.
-        /// </summary>
-        private bool _isFree = true;
-
-        /// <summary>
         /// Steps performed by algorithms. Fires <see cref="LoadStepsEvent"/> on change.
         /// </summary>
         public IList<AlgorithmStep<Matrix>> Steps
@@ -373,11 +381,13 @@ namespace RaspMat.ViewModels
         /// </summary>
         private IList<AlgorithmStep<Matrix>> _steps = new List<AlgorithmStep<Matrix>>();
 
+        /// <inheritdoc/>
         public void Receive(LoadMatrixEvent value)
         {
             CurrentMatrix = value.Data;
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             MatrixDataTable.Dispose();
@@ -389,10 +399,10 @@ namespace RaspMat.ViewModels
             _lockUI = () => IsFree = false;
             _unlockUI = () => IsFree = true;
 
-            _eventService = eventService;
-            _commandingService = commandingService;
-            _serializationService = serializationService;
-            _viewService = viewService;
+            _eventService = eventService.ThrowIfNull();
+            _commandingService = commandingService.ThrowIfNull();
+            _serializationService = serializationService.ThrowIfNull();
+            _viewService = viewService.ThrowIfNull();
 
             _eventService.Subscribe<GaussianUserControlViewModel, LoadMatrixEvent>(this);
         }

@@ -1,4 +1,5 @@
-﻿using RaspMat.Models;
+﻿using RaspMat.Extensions;
+using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System.Collections.Generic;
 using System.Windows.Input;
@@ -12,7 +13,14 @@ namespace RaspMat.ViewModels
     internal class StepListWindowViewModel : ViewModelBase, IEventReceiver<LoadStepsEvent>
     {
 
+        /// <summary>
+        /// Used for communication with other ViewModels.
+        /// </summary>
         private readonly IEventService _eventService;
+
+        /// <summary>
+        /// Used for the creation of <see cref="ICommand"/>s.
+        /// </summary>
         private readonly ICommandingService _commandingService;
 
         /// <summary>
@@ -46,12 +54,13 @@ namespace RaspMat.ViewModels
         /// </summary>
         private ICommand _loadMatrix;
 
+        /// <inheritdoc/>
         public void Receive(LoadStepsEvent value) => Steps = value.Data;
 
         public StepListWindowViewModel(IEventService eventService, ICommandingService commandingService)
         {
-            _eventService = eventService;
-            _commandingService = commandingService;
+            _eventService = eventService.ThrowIfNull();
+            _commandingService = commandingService.ThrowIfNull();
 
             _eventService.Subscribe<StepListWindowViewModel, LoadStepsEvent>(this);
         }

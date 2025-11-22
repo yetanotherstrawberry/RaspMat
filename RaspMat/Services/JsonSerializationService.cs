@@ -12,9 +12,17 @@ namespace RaspMat.Services
     internal class JsonSerializationService : ISerializationService
     {
 
+        /// <summary>
+        /// Used to access the files.
+        /// </summary>
         private readonly IFileService _fileService;
+
+        /// <summary>
+        /// Used for (de)serialization.
+        /// </summary>
         private readonly JsonSerializer _serializer = JsonSerializer.CreateDefault();
 
+        /// <inheritdoc/>
         public async Task<TDeserialized> DeserializeAsync<TDeserialized>() where TDeserialized : class
         {
             var stream = await _fileService.OpenFileAsync().ConfigureAwait(false);
@@ -28,6 +36,7 @@ namespace RaspMat.Services
             }
         }
 
+        /// <inheritdoc/>
         public async Task SerializeAsync<TDeserialized>(TDeserialized serialized) where TDeserialized : class
         {
             var stream = await _fileService.NewFileAsync().ConfigureAwait(false);

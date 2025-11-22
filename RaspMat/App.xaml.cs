@@ -17,6 +17,11 @@ namespace RaspMat
     {
 
         /// <summary>
+        /// Returns <see cref="App"/> that has been set to be the <see cref="Application.Current"/> one.
+        /// </summary>
+        private static App Self => Current as App;
+
+        /// <summary>
         /// <see cref="Dispatcher.Invoke(Action)"/> used to run <see cref="Action"/>s on the UI thread.
         /// </summary>
         private Action<Action> _invoker;
@@ -43,11 +48,11 @@ namespace RaspMat
         /// <param name="disUnhExcArgs">An instance which will have its <see cref="DispatcherUnhandledExceptionEventArgs.Handled"/> set by this method.</param>
         private void MsgBoxExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs disUnhExcArgs)
         {
-            disUnhExcArgs.Handled = true; // Do not crash the application if possible.
             _invoker(() =>
             {
-                MessageBox.Show(((App)Current).MainWindow, disUnhExcArgs.Exception.Message, RaspMat.Properties.Resources.ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Self?.MainWindow, disUnhExcArgs.Exception.Message, RaspMat.Properties.Resources.ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
             });
+            disUnhExcArgs.Handled = true; // Do not crash if possible.
         }
 
         /// <summary>
@@ -58,8 +63,7 @@ namespace RaspMat
         /// <returns>Instance of ViewModel casted to <see cref="object"/> or <see langword="null"/>.</returns>
         internal static object GetViewModel(Type viewType)
         {
-            var app = (App)Current;
-            return app.ViewModelLocator.TryGetValue(viewType, out var viewModelType) ? app.Services.GetRequiredService(viewModelType) : null;
+            return Self.ViewModelLocator.TryGetValue(viewType, out var viewModelType) ? Self.Services.GetRequiredService(viewModelType) : null;
         }
 
         /// <summary>
@@ -91,7 +95,7 @@ namespace RaspMat
             builder.AddSingleton<ISerializationService, JsonSerializationService>();
             builder.AddSingleton<IEventService, WeakReferenceMessengerEventService>();
             builder.AddSingleton<IMathService, DataTableMathService>();
-            builder.AddSingleton<IViewService, WPFWindowService>();
+            builder.AddSingleton<IViewService, WpfViewService>();
         }
 
         /// <summary>
@@ -109,6 +113,7 @@ namespace RaspMat
             RegisterViewModel<GraphUserControl, GraphUserControlViewModel>(builder);
         }
 
+        /// <inheritdoc/>
         protected override void OnStartup(StartupEventArgs startupEventArgs)
         {
             DispatcherUnhandledException += MsgBoxExceptionHandler;
@@ -119,17 +124,19 @@ namespace RaspMat
             AddServices(builder);
             RegisterViewModels(builder);
 
-            _services = builder.BuildServiceProvider();
-
-            _invoker = (Action action) =>
+            _invoker = action =>
             {
                 if (action is null) return;
-                Current.Dispatcher.Invoke(action);
+                Self.Dispatcher.Invoke(action);
             };
 
-            (MainWindow = Services.GetRequiredService<MainWindow>()).Show();
+            _services = builder.BuildServiceProvider();
+
+            MainWindow = Services.GetRequiredService<MainWindow>();
+            MainWindow.Show();
         }
 
+        /// <inheritdoc/>
         protected override void OnExit(ExitEventArgs exitArgs)
         {
             base.OnExit(exitArgs);

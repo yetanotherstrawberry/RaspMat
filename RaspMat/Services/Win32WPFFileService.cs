@@ -49,12 +49,14 @@ namespace RaspMat.Services
             });
         }
 
+        /// <inheritdoc/>
         public async Task<Stream> OpenFileAsync()
         {
             var dialog = await CreateDialog<OpenFileDialog>().ConfigureAwait(continueOnCapturedContext: false);
             return dialog?.OpenFile();
         }
 
+        /// <inheritdoc/>
         public async Task<Stream> NewFileAsync()
         {
             var dialog = await CreateDialog<SaveFileDialog>().ConfigureAwait(continueOnCapturedContext: false);

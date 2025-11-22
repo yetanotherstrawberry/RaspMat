@@ -1,5 +1,6 @@
 ﻿using RaspMat.Models;
 using RaspMat.Properties;
+using System;
 using System.Collections.Generic;
 
 namespace RaspMat.Extensions
@@ -25,36 +26,34 @@ namespace RaspMat.Extensions
             {
                 return new AlgorithmStep<Matrix>(string.Format(text, interpolation), stepMatrix);
             }
-
+            
             var steps = new List<AlgorithmStep<Matrix>>()
             {
-                new AlgorithmStep<Matrix>(string.Empty, matrix),
+                GenerateStep(matrix, string.Empty),
             };
             var row = 0;
             var column = 0;
 
             while (row < matrix.Rows && column < matrix.Columns)
             {
-                while (column < matrix.Columns && matrix[row, column] == 0)
+                while (column < matrix.Columns && matrix[row, column].IsZero)
                 {
                     var onlyZeros = true;
-
                     var shift = row;
                     while (shift < matrix.Rows)
                     {
-                        if (matrix[shift, column] != 0)
+                        if (!matrix[shift, column].IsZero)
                         {
                             onlyZeros = false;
                             break;
                         }
                         shift++;
                     }
-
                     if (onlyZeros) column++;
 
                     if (shift != row && row < matrix.Rows && shift < matrix.Rows)
                     {
-                        matrix = Matrix.SwapMatrix(matrix.Rows, row, shift) * matrix;
+                        matrix = matrix.SwapRows(row, shift);
                         steps.Add(GenerateStep(matrix, Resources.STEP_SWAP_ROWS, row + 1, shift + 1));
                     }
                 }
@@ -62,7 +61,7 @@ namespace RaspMat.Extensions
                 if (column < matrix.Columns)
                 {
                     var reciprocal = matrix[row, column].Reciprocal();
-                    if (reciprocal != 1)
+                    if (!reciprocal.IsOne)
                     {
                         matrix = Matrix.MultiplicationMatrix(matrix.Rows, row, reciprocal) * matrix;
                         steps.Add(GenerateStep(matrix, Resources.STEP_MULTIPLY_ROW, row + 1, reciprocal));
@@ -74,9 +73,9 @@ namespace RaspMat.Extensions
                     {
                         var multiplier = matrix[destination, column] * -reciprocal;
 
-                        if (multiplier != 0)
+                        if (!multiplier.IsZero)
                         {
-                            matrix = Matrix.AddToRowMatrix(matrix, destination, row, multiplier) * matrix;
+                            matrix = matrix.AddRows(row, destination, multiplier);
                             steps.Add(GenerateStep(matrix, Resources.STEP_SUM_ROWS, row + 1, multiplier, destination + 1));
                         }
                     }
@@ -86,25 +85,25 @@ namespace RaspMat.Extensions
                 column++;
             }
 
-            // Subtract from all rows above the current one its value multiplied by the ratio,
-            // so that all rows above have 0 in the column of the leading 1 of the current row.
+            /*
+             * Subtract from all rows above the current one its value multiplied by the ratio,
+             * so that all rows above have 0 in the column of the leading 1 of the current row.
+             */
             if (reducedEchelon)
             {
                 for (var currentRow = matrix.Rows - 1; currentRow > 0; currentRow--)
                 {
-                    var nonZeroCol = 0;
-
-                    while (nonZeroCol < matrix.Columns && matrix[currentRow, nonZeroCol] == 0) nonZeroCol++;
-
-                    if (nonZeroCol == matrix.Columns) continue;
+                    var nonZeroColumn = 0;
+                    while (nonZeroColumn < matrix.Columns && matrix[currentRow, nonZeroColumn].IsZero) nonZeroColumn++;
+                    if (nonZeroColumn == matrix.Columns) continue;
 
                     for (var destination = currentRow - 1; destination >= 0; destination--)
                     {
-                        var multiplier = matrix[destination, nonZeroCol] / -matrix[currentRow, nonZeroCol];
+                        var multiplier = matrix[destination, nonZeroColumn] / -matrix[currentRow, nonZeroColumn];
 
-                        if (multiplier != 0)
+                        if (!multiplier.IsZero)
                         {
-                            matrix = Matrix.AddToRowMatrix(matrix, destination, currentRow, multiplier) * matrix;
+                            matrix = matrix.AddRows(currentRow, destination, multiplier);
                             steps.Add(GenerateStep(matrix, Resources.STEP_SUM_ROWS, currentRow + 1, multiplier, destination + 1));
                         }
                     }
@@ -113,18 +112,9 @@ namespace RaspMat.Extensions
 
             return steps;
         }
-        /*
-        public static IList<AlgorithmStep<Matrix>> InverseMatrix(this Matrix matrix)
-        {
-            var ret = new List<AlgorithmStep<Matrix>>();
-            var mat = Matrix.AddI(matrix, onLeft: false);
-            mat.GaussianElimination(reducedEchelon: true);
-            mat = Matrix.Slice(mat, removeLeft: true);
-
-            return ret;
-        }
-
         
+
+        /*
         private static string[] StrToStrVecs(string vec, char vectorsSplitter = ';')
             => Array.ConvertAll(vec.Split(vectorsSplitter), str => str.TrimStart('(').TrimEnd(')'));
 
@@ -196,7 +186,7 @@ namespace RaspMat.Extensions
             //if (czyPokaz)
             //Interaction.MsgBox("Wszystkie macierze zostały rozwiązane.\nUzyskane wyniki należy wstawić do kolumn nowej macierzy, która będzie macierzą przejścia z bazy B1 do B2.", MsgBoxStyle.OkOnly, "Macierz utworzona - koniec pracy");
             return Matrix.Transpose(new Matrix(ret.ToArray()));
+        }*/
+
         }
-        */
     }
-}

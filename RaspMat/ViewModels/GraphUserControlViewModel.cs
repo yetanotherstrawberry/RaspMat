@@ -1,12 +1,14 @@
-﻿using RaspMat.Models;
+﻿
+using Microsoft.Msagl.Drawing;
 using RaspMat.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 
 namespace RaspMat.ViewModels
 {
-    internal class GraphUserControlViewModel : ViewModelBase, IDisposable
+    internal class GraphUserControlViewModel : ViewModelBase
     {
 
         /// <summary>
@@ -22,36 +24,28 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Field for <see cref="Graph"/>.
         /// </summary>
-        private DirectedGraph _graph;
+        private Graph _graph;
 
         /// <summary>
         /// The <see cref="DirectedGraph"/> that is currently being edited.
         /// </summary>
-        public DirectedGraph Graph
+        public Graph Graph
         {
             get => _graph;
             private set => SetProperty(ref _graph, value);
         }
 
-        /// <summary>
-        /// Nodes of the <see cref="Graph"/> that are currently being edited.
-        /// </summary>
-        public IEnumerable<Vertex> Vertices => Graph.Vertices;
-
         public GraphUserControlViewModel(ICommandingService commandingService, IViewService viewService)
         {
             _viewService = viewService;
             _commandingService = commandingService;
-            Graph = new DirectedGraph();
-            Graph.VertexAdded += VerticesChanged;
-            Graph.VertexRemoved += VerticesChanged;
+            var graph = new Graph();
+            graph.AddNode("a");
+            graph.AddNode("b");
+            graph.AddNode("c");
+            graph.AddEdge("a", "TEST", "b");
+            Graph = graph;
         }
-
-        /// <summary>
-        /// Handler for the change of <see cref="DirectedGraph.Vertices"/>.
-        /// </summary>
-        /// <param name="vertex">The instance that was either added or removed.</param>
-        private void VerticesChanged(Vertex vertex) => OnPropertyChanged(nameof(Vertices));
 
         /// <summary>
         /// Field for <see cref="AddVertexCommand"/>.
@@ -69,7 +63,7 @@ namespace RaspMat.ViewModels
                 {
                     _addVertexCommand = _commandingService.CreateFromAction<string>(action: vertexName =>
                     {
-                        _viewService.Execute(() => Graph.AddVertex(vertexName));
+                        _viewService.Execute(() => Graph.AddEdge("c", "test2", "a"));
                     });
                 }
                 return _addVertexCommand;
@@ -90,9 +84,9 @@ namespace RaspMat.ViewModels
             {
                 if (_removeVertexCommand is null)
                 {
-                    _removeVertexCommand = _commandingService.CreateFromAction<Vertex>(action: vertex =>
+                    _removeVertexCommand = _commandingService.CreateFromAction<object>(action: vertex =>
                     {
-                        _viewService.Execute(() => Graph.RemoveVertex(vertex ?? throw new ArgumentNullException(nameof(vertex))));
+                        //_viewService.Execute(() => Graph.RemoveVertex(vertex ?? throw new ArgumentNullException(nameof(vertex))));
                     });
                 }
                 return _removeVertexCommand;
@@ -115,7 +109,7 @@ namespace RaspMat.ViewModels
                 {
                     _addEdgeCommand = _commandingService.CreateFromAction(action: () =>
                     {
-                        _viewService.Execute(() => Graph.AddEdge(LeftVertex, RightVertex));
+                        //_viewService.Execute(() => Graph.AddEdge(LeftVertex, RightVertex));
                     });
                 }
                 return _addEdgeCommand;
@@ -138,45 +132,11 @@ namespace RaspMat.ViewModels
                 {
                     _removeEdgeCommand = _commandingService.CreateFromAction(action: () =>
                     {
-                        _viewService.Execute(() => Graph.RemoveEdge(LeftVertex, RightVertex));
+                        //_viewService.Execute(() => Graph.RemoveEdge(LeftVertex, RightVertex));
                     });
                 }
                 return _removeEdgeCommand;
             }
-        }
-
-        /// <summary>
-        /// Field for <see cref="LeftVertex"/>.
-        /// </summary>
-        private Vertex _leftVertex;
-
-        /// <summary>
-        /// The <see cref="DirectedEdge.Source"/> <see cref="Vertex"/> currently selected by the user.
-        /// </summary>
-        public Vertex LeftVertex
-        {
-            get => _leftVertex;
-            set => SetProperty(ref _leftVertex, value);
-        }
-
-        /// <summary>
-        /// Field for <see cref="RightVertex"/>.
-        /// </summary>
-        private Vertex _rightVertex;
-
-        /// <summary>
-        /// The <see cref="DirectedEdge.Target"/> <see cref="Vertex"/> currently selected by the user.
-        /// </summary>
-        public Vertex RightVertex
-        {
-            get => _rightVertex;
-            set => SetProperty(ref _rightVertex, value);
-        }
-
-        public void Dispose()
-        {
-            Graph.VertexAdded -= VerticesChanged;
-            Graph.VertexRemoved -= VerticesChanged;
         }
 
     }

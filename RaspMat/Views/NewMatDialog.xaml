@@ -8,12 +8,13 @@
              xmlns:prop="clr-namespace:RaspMat.Properties"
              xmlns:local="clr-namespace:RaspMat.Views"
              mc:Ignorable="d"
-             Width="250"
-             Height="150"
+             Width="400"
+             Height="170"
              ResizeMode="NoResize"
              d:DataContext="{d:DesignInstance vm:NewMatDialogViewModel, IsDesignTimeCreatable=False}"
              d:Background="White"
-             Title="{x:Static prop:Resources.ENTER_MATRIX}">
+             Title="{x:Static prop:Resources.ENTER_MATRIX}"
+             IsEnabled="{Binding IsFree}">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -36,7 +37,7 @@
         <StackPanel Grid.Row="1" HorizontalAlignment="Center">
             <StackPanel Orientation="Horizontal">
                 <Label Content="{x:Static prop:Resources.FILL}" />
-                <TextBox Height="25" Text="{Binding Fill}" Margin="1" PreviewTextInput="TextBox_PreviewTextInput" Width="40" />
+                <TextBox Height="25" Text="{Binding Fill}" Margin="1" PreviewTextInput="TextBox_PreviewTextInput" Width="80" />
             </StackPanel>
             <Button Command="{Binding CloseDialogCommand}" Content="{x:Static prop:Resources.OK}" Margin="5" />
         </StackPanel>

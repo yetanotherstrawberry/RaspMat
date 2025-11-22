@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RaspMat.Extensions;
+using System;
 using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -12,21 +13,25 @@ namespace RaspMat.Models
     /// A representation of <see cref="Fraction"/>s.
     /// </summary>
     [Serializable]
-    internal class Matrix : ISerializable
+    internal class Matrix : ISerializable, ICloneable
     {
 
-        /// <summary>
-        /// The character used to separate columns.
-        /// </summary>
-        private const char COLUMN_SEPARATOR = '\t';
+        #region Constants
 
+        /// <summary>
+        /// Column separator.
+        /// </summary>
+        private const string COLUMN_SEPARATOR = "\t";
+
+        #endregion
         #region Properties
+
         /// <summary>
         /// <see cref="Fraction"/>s of this <see cref="Matrix"/>.
         /// </summary>
         private Fraction[][] FractionMatrix { get; }
 
-        /// <summary>            
+        /// <summary>
         /// The total number of rows.
         /// </summary>
         public int Rows => FractionMatrix.Length;
@@ -37,7 +42,7 @@ namespace RaspMat.Models
         public int Columns => FractionMatrix.FirstOrDefault()?.Length ?? 0;
 
         /// <summary>
-        /// Returns <see langword="true"/> is <see langword="this"/> <see cref="Matrix"/> is square.
+        /// Returns <see langword="true"/> if <see langword="this"/> <see cref="Matrix"/> is square.
         /// </summary>
         public bool IsSquare => Rows == Columns;
 
@@ -69,7 +74,7 @@ namespace RaspMat.Models
 
         public Matrix(int rows, int columns, Func<int, int, Fraction> values)
         {
-            if ((rows == 0 || columns == 0) && rows != columns) throw new ArgumentOutOfRangeException(nameof(columns));
+            if (rows == 0 || columns == 0) throw new ArgumentOutOfRangeException(nameof(columns));
 
             FractionMatrix = new Fraction[rows][];
 
@@ -80,12 +85,12 @@ namespace RaspMat.Models
             });
         }
 
-        protected Matrix(Fraction[][] fractionMatrix)
+        private Matrix(Fraction[][] fractionMatrix)
         {
-            FractionMatrix = fractionMatrix ?? throw new ArgumentNullException(nameof(fractionMatrix));
+            FractionMatrix = fractionMatrix.ThrowIfNull();
         }
 
-        protected internal Matrix(SerializationInfo info, StreamingContext context) : this(info.GetValue(nameof(FractionMatrix), typeof(Fraction[][])) as Fraction[][]) { }
+        protected internal Matrix(SerializationInfo info, StreamingContext context) : this((Fraction[][])info.GetValue(nameof(FractionMatrix), typeof(Fraction[][]))) { }
 
         public Matrix(int rows, int columns) : this(Enumerable.Range(0, rows).Select(row => new Fraction[columns]).ToArray()) { }
 
@@ -99,38 +104,7 @@ namespace RaspMat.Models
         /// <returns>A <see langword="new"/> <see cref="Matrix"/>.</returns>
         public static Matrix Identity(int size)
         {
-            var newMatrix = new Matrix(size, size);
-            for (var cell = 0; cell < size; cell++) newMatrix[cell, cell] = 1;
-            return newMatrix;
-        }
-
-        /// <summary>
-        /// Creates a <see cref="Matrix"/> that can be used to swap rows or columns of another <see cref="Matrix"/> by multiplication.
-        /// </summary>
-        /// <param name="size">Size of a square multiplication <see cref="Matrix"/>.</param>
-        /// <param name="first">Zero-based index of the first row to swap.</param>
-        /// <param name="second">Zero-based index of the second row to swap.</param>
-        /// <returns>A <see langword="new"/> square <see cref="Matrix"/> of the specified <paramref name="size"/>.</returns>
-        public static Matrix SwapMatrix(int size, int first, int second)
-        {
-            var newMatrix = Identity(size);
-
-            newMatrix[first, first] = 0;
-            newMatrix[second, second] = 0;
-
-            newMatrix[first, second] = 1;
-            newMatrix[second, first] = 1;
-
-            return newMatrix;
-        }
-
-        public static Matrix AddToRowMatrix(Matrix matrix, int destination, int source, Fraction srcMultiplication)
-        {
-            var ret = Identity(matrix.Rows);
-
-            ret[destination, source] = srcMultiplication;
-
-            return ret;
+            return new Matrix(size, size, (row, column) => row == column ? 1 : 0);
         }
 
         /// <summary>
@@ -149,36 +123,19 @@ namespace RaspMat.Models
 
         public static Matrix operator *(Fraction scalar, Matrix matrix)
         {
-            var newValue = new Matrix(matrix.Rows, matrix.Columns);
-
-            Parallel.For(0, matrix.Rows, row =>
-            {
-                Parallel.For(0, matrix.Columns, column =>
-                {
-                    newValue[row, column] = matrix[row, column] * scalar;
-                });
-            });
-
-            return newValue;
+            return new Matrix(matrix.Rows, matrix.Columns, (row, column) => matrix[row, column] * scalar);
         }
 
-        public static Matrix operator *(Matrix matrix, Fraction scale) => scale * matrix;
+        public static Matrix operator *(Matrix matrix, Fraction scalar) => scalar * matrix;
 
         public static Matrix operator *(Matrix left, Matrix right)
         {
             if (left.Columns != right.Rows) throw new InvalidOperationException(nameof(left.Columns));
 
-            var ret = new Matrix(left.Rows, right.Columns);
-
-            Parallel.For(0, ret.Rows, row =>
+            return new Matrix(left.Rows, right.Columns, (row, column) =>
             {
-                Parallel.For(0, ret.Columns, column =>
-                {
-                    ret[row, column] = Enumerable.Range(0, left.Columns).Select(cell => left[row, cell] * right[cell, column]).Aggregate((x, y) => x + y);
-                });
+                return Enumerable.Range(0, left.Columns).Select(cell => left[row, cell] * right[cell, column]).Aggregate((x, y) => x + y);
             });
-
-            return ret;
         }
 
         /// <summary>
@@ -203,7 +160,6 @@ namespace RaspMat.Models
         public Matrix Slice(bool removeLeft)
         {
             if (Columns % 2 != 0) throw new InvalidOperationException(nameof(Columns));
-
             var halfIndex = Columns / 2;
             return new Matrix(Rows, halfIndex, (row, column) => removeLeft ? this[row, column + halfIndex] : this[row, column]);
         }
@@ -218,6 +174,52 @@ namespace RaspMat.Models
         }
 
         /// <summary>
+        /// Creates a <see cref="Matrix"/> that will have two rows swapped with each other.
+        /// </summary>
+        /// <param name="first">Index of the row to swap with <paramref name="second"/>.</param>
+        /// <param name="second">Index of the row to swap with <paramref name="first"/>.</param>
+        /// <returns>A <see langword="new"/> <see cref="Matrix"/>.</returns>
+        public Matrix SwapRows(int first, int second)
+        {
+            return new Matrix(Rows, Columns, (row, column) =>
+            {
+                if (row == first) return this[second, column];
+                else return row == second ? this[first, column] : this[row, column];
+            });
+        }
+
+        /// <summary>
+        /// Adds one row to another.
+        /// </summary>
+        /// <param name="source">The row to take the values from. Will remain unchanged.</param>
+        /// <param name="destination">The row to add the values to.</param>
+        /// <param name="multiplier">Multiplier to </param>
+        /// <returns></returns>
+        public Matrix AddRows(int source, int destination, Fraction multiplier)
+        {
+            return new Matrix(Rows, Columns, (row, column) =>
+            {
+                if (row == destination) return multiplier * this[source, column] + this[row, column];
+                else return this[row, column];
+            });
+        }
+
+        /// <summary>
+        /// Creates a <see cref="Matrix"/> that will have two columns swapped with each other.
+        /// </summary>
+        /// <param name="first">Index of the column to swap with <paramref name="second"/></param>
+        /// <param name="second">Index of the column to swap with <paramref name="first"/>.</param>
+        /// <returns>A <see langword="new"/> <see cref="Matrix"/>.</returns>
+        public Matrix SwapColumns(int first, int second)
+        {
+            return new Matrix(Rows, Columns, (row, column) =>
+            {
+                if (column == first) return this[row, second];
+                else return column == second ? this[row, first] : this[row, column];
+            });
+        }
+
+        /// <summary>
         /// Creates a <see cref="Matrix"/> that has identity <see cref="Matrix"/> added to it.
         /// </summary>
         /// <param name="onLeft">Indicates whether the identity should (<see langword="true"/>) be added to the left side of the <see cref="Matrix"/>.</param>
@@ -227,18 +229,19 @@ namespace RaspMat.Models
         {
             if (!IsSquare) throw new ArgumentException(nameof(IsSquare));
 
-            var newMatrix = new Matrix(Rows, Columns * 2);
-
-            // Copies the original matrix to the left side of the returned matrix if onRight is true.
-            for (int row = 0; row < Rows; row++)
-                for (int column = 0, shift = newMatrix.Rows; column < Columns; column++, shift++)
-                    newMatrix[row, onLeft ? shift : column] = this[row, column];
-
-            // Assigns I to the matrix; shift is used in case I is to be added on the right side of a square matrix.
-            for (int row = 0, shift = Rows; row < newMatrix.Rows; row++, shift++)
-                newMatrix[row, onLeft ? row : shift] = 1;
-
-            return newMatrix;
+            return new Matrix(Rows, Columns * 2, (row, column) =>
+            {
+                if (onLeft)
+                {
+                    if (column < Columns) return row == column ? 1 : 0;
+                    else return this[row, column - Columns];
+                }
+                else
+                {
+                    if (column < Columns) return this[row, column];
+                    else return row == column - Columns ? 1 : 0;
+                }
+            });
         }
 
         /// <summary>
@@ -253,9 +256,10 @@ namespace RaspMat.Models
             return dataTable;
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
-            var stringBuilder = new StringBuilder(Rows * Columns * 4);
+            var stringBuilder = new StringBuilder(Rows * 2 + Columns * 2 - 2);
 
             for (var row = 0; row < Rows; row++)
             {
@@ -271,6 +275,7 @@ namespace RaspMat.Models
             return stringBuilder.ToString();
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object compared)
         {
             if (!(compared is Matrix matrix) || Columns != matrix.Columns || Rows != matrix.Rows) return false;
@@ -279,39 +284,48 @@ namespace RaspMat.Models
 
             Parallel.For(0, Rows, (row, rowLoop) =>
             {
+                if (differences > 0) rowLoop.Stop();
                 Parallel.For(0, Columns, (column, columnLoop) =>
                 {
-                    if (this[row, column] != matrix[row, column])
+                    if (differences > 0) columnLoop.Stop();
+                    else if (this[row, column] != matrix[row, column])
                     {
                         Interlocked.Increment(ref differences);
-                        rowLoop.Stop();
                     }
-
-                    if (differences > 0) columnLoop.Stop();
                 });
             });
 
             return differences == 0;
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             var iterateColumns = Columns > Rows;
             var stop = iterateColumns ? Columns : Rows;
-            var total = 0L;
+            var total = 0;
 
             for (var index = 0; index < stop; index++)
             {
-                var cell = iterateColumns ? this[0, index] : this[index, 0];
-                total = (cell.GetHashCode() + total) % int.MaxValue;
+                unchecked
+                {
+                    total += (iterateColumns ? this[0, index] : this[index, 0]).GetHashCode();
+                }
             }
 
-            return (int)total;
+            return total;
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        /// <inheritdoc/>
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue(nameof(FractionMatrix), FractionMatrix, FractionMatrix.GetType());
+        }
+
+        /// <inheritdoc/>
+        public object Clone()
+        {
+            return new Matrix(Rows, Columns, (row, column) => this[row, column]);
         }
 
         #endregion Methods

@@ -3,6 +3,9 @@ using System.Windows.Controls;
 
 namespace RaspMat.Views
 {
+    /// <summary>
+    /// The <see langword="base"/> <see langword="class"/> for all <see cref="UserControl"/>s.
+    /// </summary>
     internal abstract class UserControlBase : UserControl
     {
 

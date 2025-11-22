@@ -38,6 +38,7 @@ namespace RaspMat.Services
             _dispatcherInvoker = dispatcherInvoker ?? (action => action?.Invoke());
         }
 
+        /// <inheritdoc/>
         public ICommand CreateFromTask(Action before = null, Func<Task> task = null, Action finished = null, Func<bool> canExecute = null)
         {
             if (task is null) task = () => Task.CompletedTask;
@@ -60,6 +61,7 @@ namespace RaspMat.Services
             return ret;
         }
 
+        /// <inheritdoc/>
         public ICommand CreateFromAction(Action before = null, Action action = null, Action finished = null, Func<bool> canExecute = null)
         {
             async Task Execute()
@@ -71,6 +73,7 @@ namespace RaspMat.Services
             return CreateFromTask(before, Execute, finished, canExecute);
         }
 
+        /// <inheritdoc/>
         public ICommand CreateFromAction<TParameter>(Action before = null, Action<TParameter> action = null, Action finished = null, Predicate<TParameter> canExecute = null)
         {
             if (default(TParameter) != null) // AsyncRelayCommand requires parameter to be null-able.
@@ -97,13 +100,14 @@ namespace RaspMat.Services
             return ret;
         }
 
+        /// <inheritdoc/>
         public void NotifyCanExecuteChanged()
         {
             var toRemove = new HashSet<WeakReference<IRelayCommand>>();
             foreach (var commandRef in Commands)
             {
                 if (commandRef.TryGetTarget(out var relayCommand)) relayCommand.NotifyCanExecuteChanged();
-                else toRemove.Add(commandRef);
+                else Commands.Remove(commandRef);
             }
             Commands.ExceptWith(toRemove);
         }

@@ -15,6 +15,7 @@ namespace RaspMat.Services
         /// </summary>
         private readonly DataTable _dataTab = new DataTable();
 
+        /// <inheritdoc/>
         public TResult Compute<TResult>(string equation)
         {
             if (string.IsNullOrWhiteSpace(equation)) throw new ArgumentNullException(nameof(equation));
@@ -22,6 +23,7 @@ namespace RaspMat.Services
             return DBNull.Value.Equals(ret) ? throw new ArithmeticException(nameof(equation)) : (TResult)ret;
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             _dataTab.Dispose();

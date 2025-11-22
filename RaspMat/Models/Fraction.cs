@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using RaspMat.Extensions;
+using System;
 using System.Numerics;
 
 namespace RaspMat.Models
@@ -13,7 +13,7 @@ namespace RaspMat.Models
         /// <summary>
         /// Separator used between <see cref="Numerator"/> and <see cref="Denominator"/>.
         /// </summary>
-        public const char FRACTION_SEPARATOR = '/';
+        public const string FRACTION_SEPARATOR = "/";
 
         /// <summary>
         /// Format used by <see cref="BigInteger.ToString(string)"/>.
@@ -21,12 +21,12 @@ namespace RaspMat.Models
         private const string INTEGER_TOSTRING_FORMAT = "R"; // Allow more than 50 digits.
 
         /// <summary>
-        /// Numerator (upper part) of this <see cref="Fraction"/>.
+        /// Numerator (upper part) of the <see cref="Fraction"/>.
         /// </summary>
         public BigInteger Numerator { get; }
 
         /// <summary>
-        /// Denominator (lower part) of this <see cref="Fraction"/>. Will never equal to zero.
+        /// Denominator (lower part) of the <see cref="Fraction"/>. Will never be zero.
         /// </summary>
         public BigInteger Denominator => _denominator.IsZero ? BigInteger.One : _denominator; // 0 is possible if default (parameterless) constructor was used.
 
@@ -36,16 +36,26 @@ namespace RaspMat.Models
         private readonly BigInteger _denominator;
 
         /// <summary>
+        /// Indicates (<see langword="true"/>) a one.
+        /// </summary>
+        public bool IsOne => Numerator.IsOne && Denominator.IsOne;
+
+        /// <summary>
+        /// Indicates (<see langword="true"/>) a zero.
+        /// </summary>
+        public bool IsZero => Numerator.IsZero;
+
+        /// <summary>
         /// Creates a new <see cref="Fraction"/>. If the <paramref name="denominator"/> is negative, it and <paramref name="numerator"/> will be multiplied by -1.
         /// </summary>
         /// <param name="numerator">Numerator (upper part) of the fraction.</param>
         /// <param name="denominator">Denominator (lower part) of the fraction. Cannot be 0.</param>
-        /// <exception cref="DivideByZeroException">0 equals <paramref name="denominator"/>.</exception>
+        /// <exception cref="DivideByZeroException">Zero <paramref name="denominator"/>.</exception>
         public Fraction(BigInteger numerator, BigInteger denominator)
         {
             if (denominator.IsZero) throw new DivideByZeroException(nameof(denominator));
 
-            if (denominator.Sign == -1)
+            if (denominator.Sign < 0)
             {
                 denominator = -denominator;
                 numerator = -numerator;
@@ -60,14 +70,16 @@ namespace RaspMat.Models
         }
 
         /// <summary>
-        /// Trims all whitespace characters, removes parentheses and creates a new <see cref="Fraction"/> based on <paramref name="fraction"/>.
+        /// Trims all whitespace characters, removes parentheses and creates a new <see cref="Fraction"/> based on <paramref name="input"/>.
         /// </summary>
-        /// <param name="fraction">Human-readible string representation of a <see cref="Fraction"/>, like "-1/2".</param>
-        /// <returns><see cref="Fraction"/> created from the <paramref name="fraction"/>.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="fraction"/> has more than 2 or no parts when split by <see cref="FRACTION_SEPARATOR"/>.</exception>
-        public static Fraction Parse(string fraction)
+        /// <param name="input">Human-readible string representation of a <see cref="Fraction"/>, like "-1/2".</param>
+        /// <returns><see cref="Fraction"/> created from the <paramref name="input"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="input"/> has more than 2 or no parts when split by <see cref="FRACTION_SEPARATOR"/>.</exception>
+        public static Fraction Parse(string input)
         {
-            var integers = Array.ConvertAll(string.Concat(fraction.ToCharArray().Where(character => !char.IsWhiteSpace(character))).Split(FRACTION_SEPARATOR), str => BigInteger.Parse(str.TrimStart('(').TrimEnd(')')));
+            var integers = Array.ConvertAll(input.RemoveWhitespaces().Split(new[] {
+                FRACTION_SEPARATOR,
+            }, StringSplitOptions.RemoveEmptyEntries), split => BigInteger.Parse(split.TrimStart('(').TrimEnd(')')));
 
             switch (integers.Length)
             {
@@ -76,7 +88,7 @@ namespace RaspMat.Models
                 case 2:
                     return new Fraction(integers[0], integers[1]);
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(fraction));
+                    throw new ArgumentException(nameof(input));
             }
         }
 
@@ -86,12 +98,15 @@ namespace RaspMat.Models
         /// <param name="numerator">Numerator (upper part) to be parsed.</param>
         /// <param name="denominator">Denominator (lower part) to be parsed. If <see cref="string.IsNullOrWhiteSpace(string)"/>, it will be parsed as 1.</param>
         /// <returns>New <see cref="Fraction"/> based on the input.</returns>
-        public static Fraction Parse(string numerator, string denominator) => Parse(string.Join(FRACTION_SEPARATOR.ToString(), numerator, denominator));
+        public static Fraction Parse(string numerator, string denominator = null)
+        {
+            return new Fraction(BigInteger.Parse(numerator), string.IsNullOrWhiteSpace(denominator) ? BigInteger.One : BigInteger.Parse(denominator));
+        }
 
         /// <summary>
-        /// Returnes a new <see cref="Fraction"/> such that it is equal to 1 when multiplied by the <see cref="Fraction"/> it was created from.
+        /// Returnes a reciprocal of the <see cref="Fraction"/>.
         /// </summary>
-        /// <returns>New <see cref="Fraction"/> with swapped <see cref="Numerator"/> and <see cref="Denominator"/>.</returns>
+        /// <returns>A <see langword="new"/> <see cref="Fraction"/>.</returns>
         public Fraction Reciprocal() => new Fraction(Denominator, Numerator);
 
         public static Fraction operator +(Fraction a, Fraction b)
@@ -130,15 +145,22 @@ namespace RaspMat.Models
         public static implicit operator Fraction(long numerator)
             => new BigInteger(numerator);
 
+        /// <inheritdoc/>
         public override bool Equals(object comapred)
             => comapred is Fraction fraction && this == fraction;
 
-        public override int GetHashCode() => BigInteger.Add(BigInteger.Pow(Numerator, 2), Denominator).GetHashCode();
+        /// <inheritdoc/>
+        public override int GetHashCode()
+            => BigInteger.Add(BigInteger.Pow(Numerator, 2), Denominator).GetHashCode();
 
+        /// <summary>
+        /// Returns a <see cref="string"/> representation of <see langword="this"/> <see cref="Fraction"/>, like "-1/2" or "1".
+        /// </summary>
+        /// <returns>A <see langword="new"/> <see cref="string"/>.</returns>
         public override string ToString()
         {
             var numerator = Numerator.ToString(INTEGER_TOSTRING_FORMAT);
-            return Denominator.IsOne ? numerator : string.Join(FRACTION_SEPARATOR.ToString(), numerator, Denominator.ToString(INTEGER_TOSTRING_FORMAT));
+            return Denominator.IsOne ? numerator : string.Join(FRACTION_SEPARATOR, numerator, Denominator.ToString(INTEGER_TOSTRING_FORMAT));
         }
 
     }
