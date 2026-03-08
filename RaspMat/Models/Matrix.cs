@@ -1,5 +1,6 @@
 ﻿using RaspMat.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -16,12 +17,27 @@ namespace RaspMat.Models
     internal class Matrix : ISerializable, ICloneable
     {
 
-        #region Constants
+        #region ConstantsAndStaticFields
 
         /// <summary>
         /// Column separator.
         /// </summary>
         private const string COLUMN_SEPARATOR = "\t";
+
+        /// <summary>
+        /// Allowed separators between rows when parsing a <see langword="string"/>.
+        /// </summary>
+        private readonly static string[] _rowSeparators = new[] {
+            Environment.NewLine,
+        };
+
+        /// <summary>
+        /// Allowed separators between columns when parsing a <see langword="string"/>.
+        /// </summary>
+        private readonly static string[] _columnSeparators = new[] {
+            COLUMN_SEPARATOR,
+            " ",
+        };
 
         #endregion
         #region Properties
@@ -148,6 +164,16 @@ namespace RaspMat.Models
             return new Matrix(dataTable.Rows.Count, dataTable.Columns.Count, (row, column) => Fraction.Parse(dataTable.Rows[row][column].ToString()));
         }
 
+        /// <summary>
+        /// Creates a <see cref="Matrix"/> that has its cells populated with data from the <paramref name="input"/>.
+        /// </summary>
+        /// <param name="input">Provides data for the <see cref="Matrix"/>.</param>
+        /// <returns>A <see langword="new"/> <see cref="Matrix"/> based on the <paramref name="input"/>.</returns>
+        public static Matrix Parse(string input)
+        {
+            return new Matrix(input.Split(_rowSeparators, StringSplitOptions.RemoveEmptyEntries).Select(row => row.Split(_columnSeparators, StringSplitOptions.RemoveEmptyEntries).Select(cell => Fraction.Parse(cell)).ToArray()).ToArray());
+        }
+
         #endregion StaticMethods
         #region Methods
 
@@ -197,11 +223,7 @@ namespace RaspMat.Models
         /// <returns></returns>
         public Matrix AddRows(int source, int destination, Fraction multiplier)
         {
-            return new Matrix(Rows, Columns, (row, column) =>
-            {
-                if (row == destination) return multiplier * this[source, column] + this[row, column];
-                else return this[row, column];
-            });
+            return new Matrix(Rows, Columns, (row, column) => row == destination ? multiplier * this[source, column] + this[row, column] : this[row, column]);
         }
 
         /// <summary>
@@ -284,10 +306,10 @@ namespace RaspMat.Models
 
             Parallel.For(0, Rows, (row, rowLoop) =>
             {
-                if (differences > 0) rowLoop.Stop();
+                if (differences != 0) rowLoop.Stop();
                 Parallel.For(0, Columns, (column, columnLoop) =>
                 {
-                    if (differences > 0) columnLoop.Stop();
+                    if (differences != 0) columnLoop.Stop();
                     else if (this[row, column] != matrix[row, column])
                     {
                         Interlocked.Increment(ref differences);
@@ -307,9 +329,10 @@ namespace RaspMat.Models
 
             for (var index = 0; index < stop; index++)
             {
+                var hash = (iterateColumns ? this[0, index] : this[index, 0]).GetHashCode();
                 unchecked
                 {
-                    total += (iterateColumns ? this[0, index] : this[index, 0]).GetHashCode();
+                    total += hash;
                 }
             }
 
@@ -323,9 +346,15 @@ namespace RaspMat.Models
         }
 
         /// <inheritdoc/>
-        public object Clone()
+        public virtual object Clone() => new Matrix(Rows, Columns, (row, column) => this[row, column]);
+
+        /// <summary>
+        /// Will <see langword="return"/> the <see cref="FractionMatrix"/> of <see langword="this"/> <see cref="Matrix"/> <see langword="as"/> <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerable{T}"/>.</returns>
+        public virtual IEnumerable<IEnumerable<Fraction>> AsEnumerable()
         {
-            return new Matrix(Rows, Columns, (row, column) => this[row, column]);
+            return FractionMatrix.Select(row => row.AsEnumerable());
         }
 
         #endregion Methods

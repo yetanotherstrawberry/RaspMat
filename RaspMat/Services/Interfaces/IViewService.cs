@@ -16,9 +16,19 @@ namespace RaspMat.Services.Interfaces
         void ToggleStepsView();
 
         /// <summary>
+        /// Shows or closes the main view.
+        /// </summary>
+        void ToggleMainWindow();
+
+        /// <summary>
         /// Shows or closes a view that creates a new <see cref="Matrix"/>.
         /// </summary>
-        void ToggleNewMatDialog();
+        void ToggleNewMatrixDialog();
+
+        /// <summary>
+        /// Shows or closes a view that parses text into a <see cref="Matrix"/>.
+        /// </summary>
+        void ToggleMatrixInputDialog();
 
         /// <summary>
         /// Executes the <paramref name="action"/>, so that it can access the view.
@@ -32,7 +42,7 @@ namespace RaspMat.Services.Interfaces
         /// <typeparam name="TResult">The data to <see langword="return"/>.</typeparam>
         /// <param name="callback">Work to do.</param>
         /// <returns>A <see langword="new"/> <see cref="Task"/> that can be used to access the <paramref name="callback"/>.</returns>
-        Task ExecuteAsync<TResult>(Func<TResult> callback);
+        Task<TResult> ExecuteAsync<TResult>(Func<TResult> callback);
 
     }
 }

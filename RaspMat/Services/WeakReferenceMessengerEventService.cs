@@ -17,7 +17,7 @@ namespace RaspMat.Services
         /// <inheritdoc/>
         public void Subscribe<TObserver, TEventType>(TObserver observer) where TObserver : class, IEventReceiver<TEventType> where TEventType : class
         {
-            _messenger.Register(observer, new MessageHandler<TObserver, TEventType>((receiver, message) => observer.Receive(message)));
+            _messenger.Register(observer, new MessageHandler<TObserver, TEventType>((receiver, message) => receiver.Receive(message)));
         }
 
         /// <inheritdoc/>

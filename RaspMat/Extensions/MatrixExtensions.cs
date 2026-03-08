@@ -19,7 +19,7 @@ namespace RaspMat.Extensions
         /// </summary>
         /// <param name="matrix"><see cref="Matrix"/> to reduce. Will not be modified.</param>
         /// <param name="reducedEchelon">Whether the resulting <see cref="Matrix"/> should be reduced row echelon (<see langword="true"/>) or row echelon (<see langword="false"/>).</param>
-        /// <returns>Steps and matrices created during elimination: <see cref="IList{T}"/> where <c>T</c> is <see cref="IAlgorithmResult{T}"/> where <c>T</c> is <see cref="Matrix"/>.</returns>
+        /// <returns>An <see cref="IList{T}"/> of <see cref="AlgorithmStep{T}"/> of <see cref="Matrix"/>.</returns>
         public static IList<AlgorithmStep<Matrix>> GaussianElimination(this Matrix matrix, bool reducedEchelon = true)
         {
             AlgorithmStep<Matrix> GenerateStep(Matrix stepMatrix, string text, params object[] interpolation)
@@ -68,7 +68,6 @@ namespace RaspMat.Extensions
                     }
 
                     reciprocal = matrix[row, column].Reciprocal();
-
                     for (var destination = row + 1; destination < matrix.Rows; destination++)
                     {
                         var multiplier = matrix[destination, column] * -reciprocal;

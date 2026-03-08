@@ -19,7 +19,7 @@ namespace RaspMat.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -61,24 +61,6 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AddZeros.
-        /// </summary>
-        public static string _ADD_ZEROS {
-            get {
-                return ResourceManager.GetString("_ADD_ZEROS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        public static string _CELL_DEFAULT {
-            get {
-                return ResourceManager.GetString("_CELL_DEFAULT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Cols.
         /// </summary>
         public static string _COLS {
@@ -102,60 +84,6 @@ namespace RaspMat.Properties {
         public static string _FILE_FILTER {
             get {
                 return ResourceManager.GetString("_FILE_FILTER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to NewMatDialog.
-        /// </summary>
-        public static string _NEW_MAT_DIALOG {
-            get {
-                return ResourceManager.GetString("_NEW_MAT_DIALOG", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ^[0-9-+]*$.
-        /// </summary>
-        public static string _REGEX_FRATION {
-            get {
-                return ResourceManager.GetString("_REGEX_FRATION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ^[0-9-+]*$.
-        /// </summary>
-        public static string _REGEX_INTEGER {
-            get {
-                return ResourceManager.GetString("_REGEX_INTEGER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ^[0-9]*$.
-        /// </summary>
-        public static string _REGEX_POSITIVE_INTEGER {
-            get {
-                return ResourceManager.GetString("_REGEX_POSITIVE_INTEGER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Rows.
-        /// </summary>
-        public static string _ROWS {
-            get {
-                return ResourceManager.GetString("_ROWS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 0.
-        /// </summary>
-        public static string _ZERO {
-            get {
-                return ResourceManager.GetString("_ZERO", resourceCulture);
             }
         }
         
@@ -471,6 +399,15 @@ namespace RaspMat.Properties {
         public static string PLUS_SIGN {
             get {
                 return ResourceManager.GetString("PLUS_SIGN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Raw input.
+        /// </summary>
+        public static string RAW_MATRIX_INPUT {
+            get {
+                return ResourceManager.GetString("RAW_MATRIX_INPUT", resourceCulture);
             }
         }
         

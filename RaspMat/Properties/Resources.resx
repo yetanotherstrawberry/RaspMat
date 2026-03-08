@@ -268,13 +268,8 @@
   <data name="TRANSPOSE" xml:space="preserve">
     <value>Transpose</value>
   </data>
-  <data name="_ADD_ZEROS" xml:space="preserve">
-    <value>AddZeros</value>
-    <comment>Do not translate. Used internally as a name for a parameter.</comment>
-  </data>
-  <data name="_CELL_DEFAULT" xml:space="preserve">
-    <value />
-    <comment>Do not translate. Default value for a DataGrid cell of a Matrix. Can be empty.</comment>
+  <data name="RAW_MATRIX_INPUT" xml:space="preserve">
+    <value>Raw input</value>
   </data>
   <data name="_COLS" xml:space="preserve">
     <value>Cols</value>
@@ -287,26 +282,5 @@
   <data name="_FILE_FILTER" xml:space="preserve">
     <value>JSON|*.json|*|*.*</value>
     <comment>Used internally as a filter for file dialogs.</comment>
-  </data>
-  <data name="_NEW_MAT_DIALOG" xml:space="preserve">
-    <value>NewMatDialog</value>
-    <comment>Do not translate. Used internally as a name for a view.</comment>
-  </data>
-  <data name="_REGEX_FRATION" xml:space="preserve">
-    <value>^[0-9-+]*$</value>
-  </data>
-  <data name="_REGEX_INTEGER" xml:space="preserve">
-    <value>^[0-9-+]*$</value>
-  </data>
-  <data name="_REGEX_POSITIVE_INTEGER" xml:space="preserve">
-    <value>^[0-9]*$</value>
-  </data>
-  <data name="_ROWS" xml:space="preserve">
-    <value>Rows</value>
-    <comment>Do not translate. Used internally as a name for a parameter.</comment>
-  </data>
-  <data name="_ZERO" xml:space="preserve">
-    <value>0</value>
-    <comment>Do not translate. String representation of 0.</comment>
   </data>
 </root>

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 
 [assembly: AssemblyTitle("RaspMat")]
-[assembly: AssemblyDescription("User interface for performing algebra calculations.")]
+[assembly: AssemblyDescription("User interface for algebra.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("RaspMat")]

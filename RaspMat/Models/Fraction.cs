@@ -1,6 +1,7 @@
 ﻿using RaspMat.Extensions;
 using System;
 using System.Numerics;
+using System.Runtime.Serialization;
 
 namespace RaspMat.Models
 {
@@ -38,12 +39,20 @@ namespace RaspMat.Models
         /// <summary>
         /// Indicates (<see langword="true"/>) a one.
         /// </summary>
+        [IgnoreDataMember]
         public bool IsOne => Numerator.IsOne && Denominator.IsOne;
 
         /// <summary>
         /// Indicates (<see langword="true"/>) a zero.
         /// </summary>
+        [IgnoreDataMember]
         public bool IsZero => Numerator.IsZero;
+
+        /// <summary>
+        /// Indicates (<see langword="true"/>) a negative value.
+        /// </summary>
+        [IgnoreDataMember]
+        public bool IsNegative => Numerator.Sign < 0;
 
         /// <summary>
         /// Creates a new <see cref="Fraction"/>. If the <paramref name="denominator"/> is negative, it and <paramref name="numerator"/> will be multiplied by -1.
@@ -98,7 +107,7 @@ namespace RaspMat.Models
         /// <param name="numerator">Numerator (upper part) to be parsed.</param>
         /// <param name="denominator">Denominator (lower part) to be parsed. If <see cref="string.IsNullOrWhiteSpace(string)"/>, it will be parsed as 1.</param>
         /// <returns>New <see cref="Fraction"/> based on the input.</returns>
-        public static Fraction Parse(string numerator, string denominator = null)
+        public static Fraction Parse(string numerator = "1", string denominator = null)
         {
             return new Fraction(BigInteger.Parse(numerator), string.IsNullOrWhiteSpace(denominator) ? BigInteger.One : BigInteger.Parse(denominator));
         }
@@ -108,6 +117,24 @@ namespace RaspMat.Models
         /// </summary>
         /// <returns>A <see langword="new"/> <see cref="Fraction"/>.</returns>
         public Fraction Reciprocal() => new Fraction(Denominator, Numerator);
+
+        /// <inheritdoc/>
+        public override bool Equals(object comapred)
+            => comapred is Fraction fraction && this == fraction;
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+            => BigInteger.Add(BigInteger.Pow(Numerator, 2), Denominator).GetHashCode();
+
+        /// <summary>
+        /// Returns a <see cref="string"/> representation of <see langword="this"/> <see cref="Fraction"/>, like "-1/2" or "1".
+        /// </summary>
+        /// <returns>A <see langword="new"/> <see cref="string"/>.</returns>
+        public override string ToString()
+        {
+            var numerator = Numerator.ToString(INTEGER_TOSTRING_FORMAT);
+            return Denominator.IsOne ? numerator : string.Join(FRACTION_SEPARATOR, numerator, Denominator.ToString(INTEGER_TOSTRING_FORMAT));
+        }
 
         public static Fraction operator +(Fraction a, Fraction b)
         {
@@ -144,24 +171,6 @@ namespace RaspMat.Models
 
         public static implicit operator Fraction(long numerator)
             => new BigInteger(numerator);
-
-        /// <inheritdoc/>
-        public override bool Equals(object comapred)
-            => comapred is Fraction fraction && this == fraction;
-
-        /// <inheritdoc/>
-        public override int GetHashCode()
-            => BigInteger.Add(BigInteger.Pow(Numerator, 2), Denominator).GetHashCode();
-
-        /// <summary>
-        /// Returns a <see cref="string"/> representation of <see langword="this"/> <see cref="Fraction"/>, like "-1/2" or "1".
-        /// </summary>
-        /// <returns>A <see langword="new"/> <see cref="string"/>.</returns>
-        public override string ToString()
-        {
-            var numerator = Numerator.ToString(INTEGER_TOSTRING_FORMAT);
-            return Denominator.IsOne ? numerator : string.Join(FRACTION_SEPARATOR, numerator, Denominator.ToString(INTEGER_TOSTRING_FORMAT));
-        }
 
     }
 }

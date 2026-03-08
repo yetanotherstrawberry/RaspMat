@@ -6,13 +6,13 @@ namespace RaspMat.Views
     /// <summary>
     /// Interaction logic for NewMatDialog.xaml
     /// </summary>
-    internal partial class NewMatDialog : WindowBase
+    internal partial class NewMatrixDialog : DialogWindowBase
     {
 
         /// <summary>
         /// Initializes XAML.
         /// </summary>
-        public NewMatDialog()
+        public NewMatrixDialog()
         {
             InitializeComponent();
         }

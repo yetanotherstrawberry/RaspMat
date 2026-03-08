@@ -1,4 +1,5 @@
-﻿using RaspMat.Models;
+﻿using RaspMat.Extensions;
+using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System.Windows.Input;
 using static RaspMat.Models.Events;
@@ -8,7 +9,7 @@ namespace RaspMat.ViewModels
     /// <summary>
     /// ViewModel for creating a <see cref="Matrix"/>.
     /// </summary>
-    internal class NewMatDialogViewModel : ViewModelBase
+    internal class NewMatrixDialogViewModel : ViewModelBase
     {
 
         /// <summary>
@@ -39,8 +40,7 @@ namespace RaspMat.ViewModels
                     {
                         var fill = Fraction.Parse(Fill);
                         _eventService.Send(new LoadMatrixEvent(new Matrix(int.Parse(Rows), int.Parse(Columns), (row, column) => fill)));
-                        _viewService.ToggleNewMatDialog();
-
+                        _viewService.ToggleNewMatrixDialog();
                     }, () => IsFree = true);
                 }
                 return _closeDialogCommand;
@@ -94,11 +94,11 @@ namespace RaspMat.ViewModels
         /// </summary>
         private string _fill = string.Empty;
 
-        public NewMatDialogViewModel(ICommandingService commandingService, IEventService eventService, IViewService viewService)
+        public NewMatrixDialogViewModel(ICommandingService commandingService, IEventService eventService, IViewService viewService)
         {
-            _eventService = eventService;
-            _commandingService = commandingService;
-            _viewService = viewService;
+            _eventService = eventService.ThrowIfNull();
+            _commandingService = commandingService.ThrowIfNull();
+            _viewService = viewService.ThrowIfNull();
         }
 
     }

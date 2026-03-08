@@ -3,7 +3,7 @@
 namespace RaspMat.Models
 {
     /// <summary>
-    /// Container class for <see cref="Events"/>.
+    /// Container <see langword="class"/> for <see cref="Events"/>.
     /// </summary>
     internal static class Events
     {
@@ -14,7 +14,6 @@ namespace RaspMat.Models
         /// <typeparam name="TData"></typeparam>
         public abstract class Event<TData>
         {
-
             /// <summary>
             /// Parameter of the <see cref="Event{TData}"/>.
             /// </summary>

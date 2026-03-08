@@ -21,6 +21,11 @@ namespace RaspMat.Services
         private readonly IDictionary<Type, CommonDialog> _dialogs = new Dictionary<Type, CommonDialog>();
 
         /// <summary>
+        /// Used for UI access.
+        /// </summary>
+        private readonly IViewService _viewService;
+
+        /// <summary>
         /// Uses a <typeparamref name="TDialog"/> from <see cref="_dialogs"/> or creates a <see langword="new"/> one and stores it.
         /// Shows the <typeparamref name="TDialog"/> to the user.
         /// If the user selected a file a <typeparamref name="TDialog"/> is returned; <see langword="null"/> otherwise.
@@ -30,7 +35,7 @@ namespace RaspMat.Services
         private async Task<TDialog> CreateDialog<TDialog>() where TDialog : FileDialog, new()
         {
             // Dialogs must be created and shown from the main (UI) thread.
-            return await Application.Current.Dispatcher.InvokeAsync(() =>
+            return await _viewService.ExecuteAsync(() =>
             {
                 if (!_dialogs.TryGetValue(typeof(TDialog), out var dialog))
                 {
@@ -61,6 +66,11 @@ namespace RaspMat.Services
         {
             var dialog = await CreateDialog<SaveFileDialog>().ConfigureAwait(continueOnCapturedContext: false);
             return dialog?.OpenFile();
+        }
+
+        public Win32WPFFileService(IViewService viewService)
+        {
+            _viewService = viewService;
         }
 
     }

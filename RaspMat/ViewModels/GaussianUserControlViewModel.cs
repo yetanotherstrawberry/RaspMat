@@ -34,7 +34,7 @@ namespace RaspMat.ViewModels
         private readonly ISerializationService _serializationService;
 
         /// <summary>
-        /// Used for managing Views.
+        /// Used for managing the UI views.
         /// </summary>
         private readonly IViewService _viewService;
 
@@ -235,7 +235,7 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_userInputCommDialog is null) _userInputCommDialog = _commandingService.CreateFromAction(action: _viewService.ToggleNewMatDialog);
+                if (_userInputCommDialog is null) _userInputCommDialog = _commandingService.CreateFromAction(action: _viewService.ToggleNewMatrixDialog);
                 return _userInputCommDialog;
             }
         }
@@ -297,11 +297,34 @@ namespace RaspMat.ViewModels
                 {
                     _deserializeComm = GenerateCommand(async () =>
                     {
-                        var mat = await _serializationService.DeserializeAsync<Matrix>();
-                        if (mat != null) CurrentMatrix = mat;
+                        var matrix = await _serializationService.DeserializeAsync<Matrix>();
+                        if (matrix != null) CurrentMatrix = matrix;
                     });
                 }
                 return _deserializeComm;
+            }
+        }
+
+        /// <summary>
+        /// Field for <see cref="DeserializeComm"/>.
+        /// </summary>
+        private ICommand _rawInputComm;
+
+        /// <summary>
+        /// Accepts <see cref="string"/> and parses it to the <see cref="CurrentMatrix"/>.
+        /// </summary>
+        public ICommand RawInputComm
+        {
+            get
+            {
+                if (_rawInputComm is null)
+                {
+                    _rawInputComm = GenerateCommand(() =>
+                    {
+                        _viewService.ToggleMatrixInputDialog();
+                    });
+                }
+                return _rawInputComm;
             }
         }
 
@@ -393,6 +416,13 @@ namespace RaspMat.ViewModels
             MatrixDataTable.Dispose();
         }
 
+        /// <summary>
+        /// Creates a <see langword="new"/> <see cref="GaussianUserControlViewModel"/>.
+        /// </summary>
+        /// <param name="serializationService">Used for (de)serialization.</param>
+        /// <param name="viewService">Used for managing the UI.</param>
+        /// <param name="eventService">Used for communication with the UI.</param>
+        /// <param name="commandingService">Used for generation of <see cref="ICommand"/>s.</param>
         public GaussianUserControlViewModel(ISerializationService serializationService, IViewService viewService, IEventService eventService, ICommandingService commandingService)
         {
             _checkIsFree = () => IsFree;

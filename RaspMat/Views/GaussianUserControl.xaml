@@ -161,6 +161,7 @@
                     <Button Content="{x:Static prop:Resources.ENTER_MATRIX}" Command="{Binding UserInputComm}" />
                     <Button Content="{x:Static prop:Resources.SAVE_MAT}" Command="{Binding SerializeComm}" />
                     <Button Content="{x:Static prop:Resources.LOAD_MAT}" Command="{Binding DeserializeComm}" />
+                    <Button Content="{x:Static prop:Resources.RAW_MATRIX_INPUT}" Command="{Binding RawInputComm}" />
                 </StackPanel>
             </GroupBox>
         </Grid>

@@ -4,9 +4,15 @@ using System.Windows.Input;
 
 namespace RaspMat.Views
 {
+    /// <summary>
+    /// The <see langword="base"/> <see langword="class"/> for <see cref="Window"/>s.
+    /// </summary>
     internal abstract class WindowBase : Window
     {
 
+        /// <summary>
+        /// Sets the ViewModel.
+        /// </summary>
         public WindowBase()
         {
             if (!DesignerProperties.GetIsInDesignMode(this))
@@ -16,15 +22,22 @@ namespace RaspMat.Views
             }
         }
 
+        /// <inheritdoc/>
         protected override void OnKeyDown(KeyEventArgs keyArgs)
         {
             base.OnKeyDown(keyArgs);
 
-            switch (keyArgs.Key)
+            if (!keyArgs.Handled)
             {
-                case Key.Escape:
-                    Close();
-                    break;
+                switch (keyArgs.Key)
+                {
+                    case Key.Escape:
+                        Close();
+                        break;
+                    default:
+                        return;
+                }
+                keyArgs.Handled = true;
             }
         }
 

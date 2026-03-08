@@ -13,7 +13,7 @@ namespace RaspMat
     /// <summary>
     /// Main class of this <see cref="Application"/>.
     /// </summary>
-    public partial class App : Application
+    public partial class App : Application, IDisposable
     {
 
         /// <summary>
@@ -29,12 +29,12 @@ namespace RaspMat
         /// <summary>
         /// Service provider for dependency injection.
         /// </summary>
-        private IServiceProvider Services => _services;
+        private IServiceProvider Services => _serviceProvider;
 
         /// <summary>
         /// Field for <see cref="Services"/>.
         /// </summary>
-        private ServiceProvider _services;
+        private ServiceProvider _serviceProvider;
 
         /// <summary>
         /// Returns <see cref="Type"/> of the ViewModel based on the <see cref="Type"/> of the <see cref="KeyValuePair{TKey, TValue}.Key"/> of the view.
@@ -63,7 +63,18 @@ namespace RaspMat
         /// <returns>Instance of ViewModel casted to <see cref="object"/> or <see langword="null"/>.</returns>
         internal static object GetViewModel(Type viewType)
         {
-            return Self.ViewModelLocator.TryGetValue(viewType, out var viewModelType) ? Self.Services.GetRequiredService(viewModelType) : null;
+            return Self?.ViewModelLocator.TryGetValue(viewType, out var viewModelType) ?? false ? Self.Services.GetRequiredService(viewModelType) : null;
+        }
+
+        /// <summary>
+        /// Creates the <typeparamref name="TService"/> or <see langword="return"/>s an existing one.
+        /// Will <see langword="return"/> <see langword="null"/> if the <typeparamref name="TService"/> has not been registered or <see cref="App"/> has not been initialized.
+        /// </summary>
+        /// <typeparam name="TService">The requested service.</typeparam>
+        /// <returns>An instance of <typeparamref name="TService"/> or <see langword="null"/>.</returns>
+        internal static TService GetService<TService>() where TService : class
+        {
+            return Self?.Services.GetService<TService>();
         }
 
         /// <summary>
@@ -106,7 +117,8 @@ namespace RaspMat
         {
             RegisterViewModel<MainWindow, MainWindowViewModel>(builder);
             RegisterViewModel<StepListWindow, StepListWindowViewModel>(builder);
-            RegisterViewModel<NewMatDialog, NewMatDialogViewModel>(builder);
+            RegisterViewModel<NewMatrixDialog, NewMatrixDialogViewModel>(builder);
+            RegisterViewModel<InputMatrixDialog, InputMatrixDialogViewModel>(builder);
 
             RegisterViewModel<FractionUserControl, FractionUserControlViewModel>(builder);
             RegisterViewModel<GaussianUserControl, GaussianUserControlViewModel>(builder);
@@ -116,6 +128,12 @@ namespace RaspMat
         /// <inheritdoc/>
         protected override void OnStartup(StartupEventArgs startupEventArgs)
         {
+            _invoker = action =>
+            {
+                if (action is null) return;
+                Dispatcher.Invoke(action);
+            };
+
             DispatcherUnhandledException += MsgBoxExceptionHandler;
 
             base.OnStartup(startupEventArgs);
@@ -124,26 +142,23 @@ namespace RaspMat
             AddServices(builder);
             RegisterViewModels(builder);
 
-            _invoker = action =>
-            {
-                if (action is null) return;
-                Self.Dispatcher.Invoke(action);
-            };
+            _serviceProvider = builder.BuildServiceProvider();
 
-            _services = builder.BuildServiceProvider();
-
-            MainWindow = Services.GetRequiredService<MainWindow>();
-            MainWindow.Show();
+            Services.GetRequiredService<IViewService>().ToggleMainWindow();
         }
 
         /// <inheritdoc/>
         protected override void OnExit(ExitEventArgs exitArgs)
         {
             base.OnExit(exitArgs);
-
-            _services.Dispose();
-
+            Dispose();
             DispatcherUnhandledException -= MsgBoxExceptionHandler;
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            _serviceProvider.Dispose();
         }
 
     }
