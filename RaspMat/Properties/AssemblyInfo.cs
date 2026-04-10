@@ -9,7 +9,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("RaspMat")]
-[assembly: AssemblyCopyright("Copyright © yetanotherstrawberry 2020-2025")]
+[assembly: AssemblyCopyright("Copyright © yetanotherstrawberry 2020-2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

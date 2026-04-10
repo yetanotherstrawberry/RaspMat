@@ -2,7 +2,6 @@
 using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,12 +25,18 @@ namespace RaspMat.Views
         private readonly ISerializationService _serializationService;
 
         /// <summary>
+        /// Used for communication with other componenets.
+        /// </summary>
+        private readonly IEventService _eventService;
+
+        /// <summary>
         /// Initializes XAML and registers services.
         /// </summary>
         public GraphUserControl()
         {
             _viewService = App.GetService<IViewService>().ThrowIfNull();
             _serializationService = App.GetService<ISerializationService>().ThrowIfNull();
+            _eventService = App.GetService<IEventService>().ThrowIfNull();
 
             InitializeComponent();
         }
@@ -77,37 +82,13 @@ namespace RaspMat.Views
             HandleEdge((source, target) => GraphControl.AddEdge(source, target, probability.ToString()));
         }
 
-        /// <summary>
-        /// Calculates probabilites for a given node.
-        /// </summary>
-        /// <param name="sender">The <see cref="object"/> the requested the operation.</param>
-        /// <param name="eventArgs">Additional arguments.</param>
         private void CalculateNode(object sender, RoutedEventArgs eventArgs)
         {
-            var rootNode = VertexCalculate.Text;
-            var matrix = GraphControl.ToMatrix(rootNode, out var indexes);
-            var matStr = matrix.ToString();
-            matrix = matrix.GaussianElimination().Last().Result;
-            var matStr2 = matrix.ToString();
-            var rootIndex = indexes[rootNode];
-            var vertices = GraphControl.GetVertices();
-            var edges = new Dictionary<string, IDictionary<string, string>>()
-            {
-                { rootNode, new Dictionary<string, string>(vertices.Count) },
-            };
-
-            foreach (var vertex in vertices)
-            {
-                var probability = matrix[rootIndex, indexes[vertex.Key]];
-                if (!probability.IsZero)
-                {
-                    edges[rootNode].Add(vertex.Key, probability.ToString());
-                }
-            }
-
-            GraphControl.SetVerticesAndEdges(vertices, edges);
+            var matrix = GraphControl.ToProbabilityChain();
+            //_eventService.Send(new Events.LoadMatrixEvent(matrix.GaussianElimination().Last().Result));
+            _eventService.Send(new Events.LoadMatrixEvent(matrix));
         }
-        
+
         /// <summary>
         /// Locks the UI, executes asynchronously the <paramref name="action"/> and unlocks the UI regardless whether the <see cref="Task"/> completed successfully or failed.
         /// </summary>
@@ -117,7 +98,7 @@ namespace RaspMat.Views
             try
             {
                 _viewService.Execute(() => IsEnabled = false);
-                await action();
+                await Task.Run(action);
             }
             finally
             {
@@ -134,8 +115,7 @@ namespace RaspMat.Views
         {
             ExecuteAsync(async () =>
             {
-                var rootNode = GraphControl.GetVertices().First();
-                await _serializationService.SerializeAsync(new ProbabilityChain(GraphControl.ToMatrix(rootNode.Key, out var indexes), indexes.Keys));
+                await _serializationService.SerializeAsync(GraphControl.ToProbabilityChain());
             });
         }
 

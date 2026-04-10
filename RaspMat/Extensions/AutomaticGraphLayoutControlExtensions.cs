@@ -1,4 +1,5 @@
 ﻿using Microsoft.Msagl.Drawing;
+using Microsoft.Msagl.GraphmapsWithMesh;
 using Microsoft.Msagl.WpfGraphControl;
 using RaspMat.Models;
 using System;
@@ -26,8 +27,7 @@ namespace RaspMat.Extensions
         {
             if (element.Graph is null) element.SetGraph();
             var edges = element.GetEdges();
-            var success = edges.TryGetValue(source, out var sourceEdges) && sourceEdges.Remove(target);
-            if (!success) throw new KeyNotFoundException();
+            if (!edges.TryGetValue(source, out var sourceEdges) || !sourceEdges.Remove(target)) throw new KeyNotFoundException();
             return element.SetVerticesAndEdges(element.GetVertices(), edges);
         }
 
@@ -157,41 +157,44 @@ namespace RaspMat.Extensions
         /// <param name="element">The element with <see cref="AutomaticGraphLayoutControl.Graph"/> to modify.</param>
         /// <param name="indexes">Maps nodes to indexes of the <see cref="Matrix"/>.</param>
         /// <returns>A <see langword="new"/> <see cref="Matrix"/>.</returns>
-        public static Matrix ToMatrix(this AutomaticGraphLayoutControl element, string root, out IDictionary<string, int> indexes)
+        public static ProbabilityChain ToProbabilityChain(this AutomaticGraphLayoutControl element)
         {
             var vertices = element.GetVertices().OrderBy(vertex => vertex.Key).ToArray();
             var edges = element.GetEdges();
-            indexes = vertices.Select((vertex, index) => new KeyValuePair<string, int>(vertex.Key, index)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            var rootIndex = indexes[root];
-
-            return new Matrix(vertices.Length, vertices.Length + 1, (row, column) =>
+            var identity = Matrix.Identity(vertices.Length);
+            var probabilityMatrix = new Matrix(vertices.Length, vertices.Length, (row, column) =>
             {
-                if (column >= vertices.Length) return 1;
-                if (row == rootIndex && column == rootIndex) return 1;
-                if (edges.TryGetValue(vertices[row].Key, out var targetEdges))
+                var vertex = vertices[row];
+                var targets = edges.TryGetValue(vertex.Key, out var dictionary) ? dictionary : new Dictionary<string, string>(0);
+                var sum = targets.Sum(kvp => Fraction.Parse(kvp.Value));
+                if (sum.IsZero) throw new DivideByZeroException(vertex.Key);
+                if (!sum.IsOne) throw new ConstraintException(vertex.Key);
+                if (targets.TryGetValue(vertices[column].Key, out var edge))
                 {
-                    if (targetEdges.TryGetValue(vertices[column].Key, out var targetEdge))
-                    {
-                        return string.IsNullOrEmpty(targetEdge) ? 1 : Fraction.Parse(targetEdge);
-                    }
+                    var fraction = Fraction.Parse(edge);
+                    return row == column ? 1 - fraction : -fraction;
                 }
                 return 0;
             });
-        }
-        /*
-        public static ProbabilityChain ToProbabilityChain(this AutomaticGraphLayoutControl element, string mainVertex)
-        {
-            var edges = element.GetEdges();
-            var vertices = element.GetVertices();
-            var fractions = vertices.Select(vertex =>
+            var transposed = probabilityMatrix.Transpose();
+            return new ProbabilityChain(/*new Matrix(probabilityMatrix.Rows, probabilityMatrix.Columns + 1, (row, column) =>
             {
-                var targets = edges.TryGetValue(vertex.Key, out var dictionary) ? dictionary : new Dictionary<string, string>(0);
-                var sum = targets.Sum(kvp => Fraction.Parse(kvp.Value));
-                if (!sum.IsOne && !sum.IsZero) throw new ArithmeticException(nameof(sum));
-
-            });
+                if (row == probabilityMatrix.Rows - 1)
+                {
+                    if (column < probabilityMatrix.Columns) return 1;
+                    else return 0;
+                }
+                else if (column < probabilityMatrix.Columns)
+                {
+                    return identity[row, column] - transposed[row, column];
+                }
+                else
+                {
+                    return 0;
+                }
+            })*/probabilityMatrix, vertices.Select(kvp => kvp.Key));
         }
-        */
+
         /// <summary>
         /// Modifies the probabilites of edges.
         /// </summary>
