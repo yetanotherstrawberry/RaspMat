@@ -23,7 +23,7 @@
         void Unsubscribe<TObserver, TEventType>(TObserver observer) where TObserver : class, IEventReceiver<TEventType> where TEventType : class;
 
         /// <summary>
-        /// Sends a message to the subscribers. Use <see cref="Subscribe{TEventType}(IObserver{TEventType})"/> to subscribe.
+        /// Sends a message to the subscribers. Use <see cref="Subscribe{TObserver, TEventType}(TObserver)"/> to subscribe.
         /// </summary>
         /// <typeparam name="TEventType"></typeparam>
         /// <param name="message">An instance of <typeparamref name="TEventType"/> to send.</param>

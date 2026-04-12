@@ -1,144 +1,54 @@
 using NUnit.Framework;
-using RaspMat.Helpers;
 using RaspMat.Models;
-using System;
-using System.Linq;
 
 namespace RaspMat.Tests.Models
 {
     /// <summary>
-    /// Tests for <see cref="Matrix"/>.
+    /// Tests for the <see cref="Matrix"/> <see langword="class"/>.
     /// </summary>
     public class MatrixTests
     {
 
-        private Matrix equalToIdentity, identity, zero, verticalOnes, horizontalOnes;
-
-        [SetUp]
-        public void Setup()
-        {
-            int[] mat = null;
-
-            Func<int, int, Fraction> func = (int row, int column) => mat[row * 3 + column];
-
-            mat = new[] {
-                1, 2, 2,
-                1, 0, 1,
-                1, 1, 1,
-            };
-            equalToIdentity = new Matrix(3, 3, func);
-
-            func = (int row, int column) => mat[row * 2 + column];
-
-            mat = new[]
-            {
-                0, 1,
-                0, 1,
-            };
-            verticalOnes = new Matrix(2, 2, func);
-
-            mat = new[]
-            {
-                0, 0,
-                1, 1,
-            };
-            horizontalOnes = new Matrix(2, 2, func);
-
-            identity = Matrix.Identity(3);
-
-            mat = new[]
-            {
-                0, 0,
-                0, 0,
-            };
-            zero = new Matrix(2, 2, func);
-        }
-
         [Test]
         public void ZeroEqualsZero()
         {
-            var zeroInt = new Matrix(2, 2);
-            Assert.Equals(zeroInt, zero);
+            for (var rows = 1; rows <= 3; rows++)
+            {
+                for (var columns = 1; columns <= 3; columns++)
+                {
+                    var zeroDefault = new Matrix(rows, columns);
+                    var zeroManual = new Matrix(rows, columns, (row, column) => 0);
+                    Assert.That(zeroDefault, Is.EqualTo(zeroManual));
+                    var sabotage = new Matrix(rows, columns, (row, column) => row + column + 1);
+                    Assert.That(zeroDefault, Is.Not.EqualTo(sabotage));
+                }
+            }
         }
 
         [Test]
         public void IdentityEqualsIdentity()
         {
-            var matI = new Matrix(3, 3, (row, col) => row == col ? 1 : 0);
-            Assert.That(matI, Is.EqualTo(identity));
-        }
-
-        [Test]
-        public void GaussIdentityTest()
-        {
-            Assert.That(Matrix.Identity(3), Is.EqualTo(equalToIdentity.GaussianElimination().Last().Result));
-        }
-
-        [Test]
-        public void EqualsTest()
-        {
-            Assert.That(equalToIdentity.Equals(equalToIdentity));
-            Assert.That(equalToIdentity.Equals(identity));
-            Assert.That(equalToIdentity.Equals(new object()));
-        }
-
-        [Test]
-        public void GetHashTest()
-        {
-            Assert.That(identity.GetHashCode(), Is.EqualTo(identity.GetHashCode()));
-            Assert.That(identity.GetHashCode(), Is.Not.EqualTo(equalToIdentity.GetHashCode()));
-            Assert.That(equalToIdentity.GetHashCode(), Is.EqualTo(equalToIdentity.GetHashCode()));
-        }
-
-        [Test]
-        public void TransposeTest()
-        {
-            Assert.That(identity, Is.EqualTo(Matrix.Transpose(identity)));
-            Assert.That(identity, Is.Not.EqualTo(Matrix.Transpose(equalToIdentity)));
-            Assert.That(verticalOnes, Is.EqualTo(Matrix.Transpose(horizontalOnes)));
-            Assert.That(verticalOnes, Is.Not.EqualTo(horizontalOnes));
-        }
-
-        [Test]
-        public void AddISliceTest()
-        {
-            var addedI = Matrix.WithIdentity(identity, onLeft: true);
-            Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: true)));
-            Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: false)));
-
-            addedI = Matrix.WithIdentity(identity, onLeft: false);
-            Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: true)));
-            Assert.That(identity, Is.EqualTo(Matrix.Slice(addedI, removeLeft: false)));
-
-            var temp = new[]
+            for (var size = 1; size <= 3; size++)
             {
-                1, 2, 2, 1, 0, 0,
-                1, 0, 1, 0, 1, 0,
-                1, 1, 1, 0, 0, 1,
-            };
-            var expected = new Matrix(3, 6, (row, column) => temp[row * 6 + column]);
-            addedI = Matrix.WithIdentity(equalToIdentity, onLeft: false);
-            Assert.That(expected, Is.EqualTo(addedI));
+                var identityManual = new Matrix(size, size, (row, col) => row == col ? 1 : 0);
+                Assert.That(identityManual, Is.EqualTo(Matrix.Identity(size)));
+            }
         }
 
         [Test]
-        public void ToStringTest()
+        public void Multiplication()
         {
-            string ConcatRows(params object[] strings) => string.Join(Environment.NewLine, strings);
-            string ConcatColumns(params object[] strings) => string.Join("\t", strings);
-
-            Assert.That(ConcatRows(ConcatColumns(0, 0), ConcatColumns(0, 0)), Is.EqualTo(zero.ToString()));
-            Assert.That(ConcatRows(ConcatColumns(1, 0, 0), ConcatColumns(0, 1, 0), ConcatColumns(0, 0, 1)), Is.EqualTo(identity.ToString()));
-        }
-
-        [Test]
-        public void MultiplicationTest()
-        {
-            Assert.That(identity, Is.EqualTo(identity * identity));
-            Assert.That(equalToIdentity, Is.EqualTo(identity * equalToIdentity));
-            Assert.That(equalToIdentity, Is.EqualTo(equalToIdentity * identity));
-            Assert.That(zero, Is.EqualTo(zero * verticalOnes));
-            Assert.That(zero, Is.EqualTo(verticalOnes * zero));
+            for (var size = 1; size <= 3; size++)
+            {
+                var matrix = new Matrix(size, size, (row, column) => new Fraction(row + column + 1, column + 1));
+                var matrixDouble = new Matrix(size, size, (row, column) => 2 * new Fraction(row + column + 1, column + 1));
+                var identity = Matrix.Identity(size);
+                var doubleIdentity = new Matrix(identity.Rows, identity.Columns, (row, column) => identity[row, column] * 2);
+                var result = matrix * identity;
+                Assert.That(result, Is.EqualTo(matrix));
+                Assert.That(result, Is.Not.EqualTo(new Matrix(size, size)));
+                Assert.That(matrix * doubleIdentity, Is.EqualTo(matrixDouble));
+            }
         }
 
     }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Msagl.Drawing;
-using Microsoft.Msagl.GraphmapsWithMesh;
 using Microsoft.Msagl.WpfGraphControl;
 using RaspMat.Models;
 using System;
@@ -139,6 +138,49 @@ namespace RaspMat.Extensions
         }
 
         /// <summary>
+        /// Gets the <see cref="ProbabilityMatrix"/> of the <see cref="AutomaticGraphLayoutControl.Graph"/>.
+        /// </summary>
+        /// <param name="element">The graph layout control containing the vertices and edges to convert to a probability matrix.</param>
+        /// <param name="eliminationSteps">Gaussian elimination steps.</param>
+        /// <returns>A <see langword="new"/> <see cref="ProbabilityMatrix"/>.</returns>
+        /// <exception cref="RankException">No transient nodes.</exception>
+        public static ProbabilityMatrix ToProbabilityMatrix(this AutomaticGraphLayoutControl element, out IList<AlgorithmStep<Matrix>> eliminationSteps)
+        {
+            var edges = element.GetEdges();
+            var allNodes = element.GetVertices().OrderBy(vertex => vertex.Key).ToArray();
+            var allVertices = allNodes.Select(vertex => vertex.Key).ToArray();
+
+            var transientNodes = allVertices.Where(edges.ContainsKey).ToArray();
+            var exitNodes = allVertices.Where(vertex => !edges.ContainsKey(vertex)).ToArray();
+
+            if (!transientNodes.Any())
+            {
+                throw new RankException();
+            }
+
+            var matrix = new Matrix(transientNodes.Length, transientNodes.Length + exitNodes.Length, (row, column) =>
+            {
+                var source = transientNodes[row];
+                var targets = edges[source];
+
+                if (column < transientNodes.Length)
+                {
+                    var target = transientNodes[column];
+                    var probability = targets.TryGetValue(target, out var edgeLabel) ? Fraction.Parse(edgeLabel) : 0;
+                    return row == column ? 1 - probability : -probability;
+                }
+                else
+                {
+                    var exitNode = exitNodes[column - transientNodes.Length];
+                    return targets.TryGetValue(exitNode, out var edgeLabel) ? Fraction.Parse(edgeLabel) : 0;
+                }
+            });
+
+            eliminationSteps = matrix.GaussianElimination();
+            return new ProbabilityMatrix(eliminationSteps.Last().Result, transientNodes, exitNodes);
+        }
+
+        /// <summary>
         /// Sets the <see cref="Graph"/> to <paramref name="graph"/> or to a <see langword="new"/> <see cref="Graph"/> is <see langword="null"/> is passed.
         /// </summary>
         /// <param name="element">The element with <see cref="AutomaticGraphLayoutControl.Graph"/> to modify.</param>
@@ -149,91 +191,6 @@ namespace RaspMat.Extensions
             var oldGraph = element.Graph;
             element.Graph = graph ?? new Graph();
             return oldGraph;
-        }
-
-        /// <summary>
-        /// Creates a probability <see cref="Matrix"/>. Rows represent source nodes, columns represent target nodes, cells represent probabilities.
-        /// </summary>
-        /// <param name="element">The element with <see cref="AutomaticGraphLayoutControl.Graph"/> to modify.</param>
-        /// <param name="indexes">Maps nodes to indexes of the <see cref="Matrix"/>.</param>
-        /// <returns>A <see langword="new"/> <see cref="Matrix"/>.</returns>
-        public static ProbabilityChain ToProbabilityChain(this AutomaticGraphLayoutControl element)
-        {
-            var vertices = element.GetVertices().OrderBy(vertex => vertex.Key).ToArray();
-            var edges = element.GetEdges();
-            var identity = Matrix.Identity(vertices.Length);
-            var probabilityMatrix = new Matrix(vertices.Length, vertices.Length, (row, column) =>
-            {
-                var vertex = vertices[row];
-                var targets = edges.TryGetValue(vertex.Key, out var dictionary) ? dictionary : new Dictionary<string, string>(0);
-                var sum = targets.Sum(kvp => Fraction.Parse(kvp.Value));
-                if (sum.IsZero) throw new DivideByZeroException(vertex.Key);
-                if (!sum.IsOne) throw new ConstraintException(vertex.Key);
-                if (targets.TryGetValue(vertices[column].Key, out var edge))
-                {
-                    var fraction = Fraction.Parse(edge);
-                    return row == column ? 1 - fraction : -fraction;
-                }
-                return 0;
-            });
-            var transposed = probabilityMatrix.Transpose();
-            return new ProbabilityChain(/*new Matrix(probabilityMatrix.Rows, probabilityMatrix.Columns + 1, (row, column) =>
-            {
-                if (row == probabilityMatrix.Rows - 1)
-                {
-                    if (column < probabilityMatrix.Columns) return 1;
-                    else return 0;
-                }
-                else if (column < probabilityMatrix.Columns)
-                {
-                    return identity[row, column] - transposed[row, column];
-                }
-                else
-                {
-                    return 0;
-                }
-            })*/probabilityMatrix, vertices.Select(kvp => kvp.Key));
-        }
-
-        /// <summary>
-        /// Modifies the probabilites of edges.
-        /// </summary>
-        /// <param name="element">The element with <see cref="AutomaticGraphLayoutControl.Graph"/> to modify.</param>
-        /// <param name="matrix">The pobability <see cref="Matrix"/>. Rows correspond to source vertices.</param>
-        /// <returns>The <see cref="Graph"/> before modifications.</returns>
-        /// <exception cref="ArgumentException">Invalid <paramref name="matrix"/> size.</exception>
-        public static Graph SetProbabilities(this AutomaticGraphLayoutControl element, Matrix matrix)
-        {
-            var vertices = element.GetVertices();
-            var sortedVertices = vertices.OrderBy(vertex => vertex.Key).ToArray();
-            var edges = element.GetEdges();
-            if (!matrix.IsSquare || matrix.Rows != vertices.Count)
-            {
-                throw new ArgumentException(nameof(matrix));
-            }
-            for (var row = 0; row < matrix.Rows; row++)
-            {
-                for (var column = 0; column < matrix.Columns; column++)
-                {
-                    var probability = matrix[row, column];
-                    var source = sortedVertices[row].Key;
-                    var target = sortedVertices[column].Key;
-                    var targetEdges = edges[source];
-                    if (probability.IsZero)
-                    {
-                        if (!targetEdges.Remove(target))
-                        {
-                            throw new KeyNotFoundException(target);
-                        }
-                    }
-                    else
-                    {
-                        if (probability.IsNegative) throw new ConstraintException(nameof(probability.IsNegative));
-                        else targetEdges[target] = probability.ToString();
-                    }
-                }
-            }
-            return element.SetVerticesAndEdges(vertices, edges);
         }
 
     }

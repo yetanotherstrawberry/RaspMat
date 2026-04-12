@@ -88,6 +88,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        public static string ADD {
+            get {
+                return ResourceManager.GetString("ADD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add zeros..
         /// </summary>
         public static string ADD_ZEROES {
@@ -156,15 +165,6 @@ namespace RaspMat.Properties {
         public static string EQUALITY_SIGN {
             get {
                 return ResourceManager.GetString("EQUALITY_SIGN", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to  .
-        /// </summary>
-        public static string EQUATION_SPACER {
-            get {
-                return ResourceManager.GetString("EQUATION_SPACER", resourceCulture);
             }
         }
         
@@ -412,11 +412,29 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reduce probability chain.
+        /// </summary>
+        public static string REDUCE_CHAIN {
+            get {
+                return ResourceManager.GetString("REDUCE_CHAIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reduced row echelon.
         /// </summary>
         public static string REDUCED {
             get {
                 return ResourceManager.GetString("REDUCED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        public static string REMOVE {
+            get {
+                return ResourceManager.GetString("REMOVE", resourceCulture);
             }
         }
         

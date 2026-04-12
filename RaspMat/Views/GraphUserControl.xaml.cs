@@ -2,8 +2,8 @@
 using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace RaspMat.Views
@@ -20,11 +20,6 @@ namespace RaspMat.Views
         private readonly IViewService _viewService;
 
         /// <summary>
-        /// Used for (de)serialization of the <see cref="GraphControl"/>.
-        /// </summary>
-        private readonly ISerializationService _serializationService;
-
-        /// <summary>
         /// Used for communication with other componenets.
         /// </summary>
         private readonly IEventService _eventService;
@@ -35,7 +30,6 @@ namespace RaspMat.Views
         public GraphUserControl()
         {
             _viewService = App.GetService<IViewService>().ThrowIfNull();
-            _serializationService = App.GetService<ISerializationService>().ThrowIfNull();
             _eventService = App.GetService<IEventService>().ThrowIfNull();
 
             InitializeComponent();
@@ -82,65 +76,32 @@ namespace RaspMat.Views
             HandleEdge((source, target) => GraphControl.AddEdge(source, target, probability.ToString()));
         }
 
+        /// <summary>
+        /// Handles the reduction and UI update of the probability chain.
+        /// </summary>
+        /// <param name="sender">The <see cref="object"/> the requested the operation.</param>
+        /// <param name="eventArgs">Additional arguments.</param>
         private void CalculateNode(object sender, RoutedEventArgs eventArgs)
         {
-            var matrix = GraphControl.ToProbabilityChain();
-            //_eventService.Send(new Events.LoadMatrixEvent(matrix.GaussianElimination().Last().Result));
-            _eventService.Send(new Events.LoadMatrixEvent(matrix));
+            var oldVertices = GraphControl.GetVertices();
+            var probabilityMatrix = GraphControl.ToProbabilityMatrix(out var elimination);
+            var newSourceVertices = probabilityMatrix.Sources.ToDictionary(source => source, source => oldVertices[source]);
+            var newTargetVertices = probabilityMatrix.Targets.ToDictionary(target => target, target => oldVertices[target]);
+            var newVertices = newSourceVertices.Concat(newTargetVertices).ToDictionary();
+            var newEdges = newSourceVertices.Keys.ToDictionary(source => source, source => (IDictionary<string, string>)newTargetVertices.Keys.Select(target => new KeyValuePair<string, Fraction>(target, probabilityMatrix[source, target])).Where(kvp => !kvp.Value.IsZero).ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString()));
+            GraphControl.SetVerticesAndEdges(newVertices, newEdges);
+            _eventService.Send(new Events.LoadMatrixEvent(probabilityMatrix));
+            _eventService.Send(new Events.LoadStepsEvent(elimination));
         }
 
         /// <summary>
-        /// Locks the UI, executes asynchronously the <paramref name="action"/> and unlocks the UI regardless whether the <see cref="Task"/> completed successfully or failed.
+        /// Toggles the step view.
         /// </summary>
-        /// <param name="action">The <see cref="Task"/> to <see langword="await"/> for before unlocking the UI.</param>
-        private async void ExecuteAsync(Func<Task> action)
+        /// <param name="sender">The <see cref="object"/> the requested the operation.</param>
+        /// <param name="eventArgs">Additional arguments.</param>
+        private void ToggleStepView(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                _viewService.Execute(() => IsEnabled = false);
-                await Task.Run(action);
-            }
-            finally
-            {
-                _viewService.Execute(() => IsEnabled = true);
-            }
-        }
-
-        /// <summary>
-        /// Handles the saving of the state.
-        /// </summary>
-        /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
-        /// <param name="eventArgs">The <see cref="EventArgs"/> of the <see langword="event"/>.</param>
-        private void SaveHandler(object sender, RoutedEventArgs eventArgs)
-        {
-            ExecuteAsync(async () =>
-            {
-                await _serializationService.SerializeAsync(GraphControl.ToProbabilityChain());
-            });
-        }
-
-        /// <summary>
-        /// Handles the loading of the state.
-        /// </summary>
-        /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
-        /// <param name="eventArgs">The <see cref="EventArgs"/> of the <see langword="event"/>.</param>
-        private void LoadHandler(object sender, RoutedEventArgs eventArgs)
-        {
-            var random = new Random();
-            ExecuteAsync(async () =>
-            {
-                var probabilityChain = await _serializationService.DeserializeAsync<ProbabilityChain>();
-                if (probabilityChain is null) return;
-                var indexes = probabilityChain.GetIndexes().ToDictionary(index => index.Value, index => index.Key);
-                /*var vertices = indexes.ToDictionary(index => index.Key.ToString(), index => null as object);
-                GraphControl.SetVerticesAndEdges(vertices, probabilityChain.Select((cells, row) => {
-                    return new KeyValuePair<string, IDictionary<string, string>>(indexes[row], (IDictionary<string, string>)cells.Select((cell, column) =>
-                    {
-                        return new KeyValuePair<string, KeyValuePair<string, string>>(indexes[column], new KeyValuePair<string, string>(indexes[column], cell.ToString()));
-                    }).ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
-                }).ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
-                GraphControl.SetProbabilities(probabilityChain);*/
-            });
+            _viewService.ToggleStepsView();
         }
 
     }

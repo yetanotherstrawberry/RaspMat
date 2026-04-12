@@ -55,7 +55,7 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Click="AddVertex"
-                        Content="Add"
+                        Content="{x:Static prop:Resources.ADD}"
                         IsEnabled="{Binding ElementName=VertexName, Path=Text.Length}" />
                     <ComboBox
                         Grid.Column="0"
@@ -71,7 +71,7 @@
                         Grid.Row="1"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
-                        Content="Remove"
+                        Content="{x:Static prop:Resources.REMOVE}"
                         Click="RemoveVertex"
                         IsEnabled="{Binding ElementName=VertexToRemoveName, Path=Text.Length}" />
                 </Grid>
@@ -116,14 +116,14 @@
                     <Button
                         Grid.Column="1"
                         Grid.Row="1"
-                        Content="Add"
+                        Content="{x:Static prop:Resources.ADD}"
                         HorizontalAlignment="Stretch"
                         Click="AddEdge"
                         IsEnabled="{Binding ElementName=EdgeTarget, Path=Text.Length}" />
                     <Button
                         Grid.Row="2"
                         Grid.ColumnSpan="2"
-                        Content="Remove"
+                        Content="{x:Static prop:Resources.REMOVE}"
                         HorizontalAlignment="Center"
                         Click="RemoveEdge"
                         IsEnabled="{Binding ElementName=EdgeTarget, Path=Text.Length}" />
@@ -139,48 +139,27 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <ComboBox
-                        Grid.Column="0"
-                        Grid.Row="0"
-                        Grid.ColumnSpan="2"
-                        Margin="5"
-                        HorizontalAlignment="Stretch"
-                        Name="VertexCalculate"
-                        ItemsSource="{Binding ElementName=GraphControl, Path=Graph.Nodes}"
-                        DisplayMemberPath="Id"
-                        SelectedValuePath="Id" />
                     <Button
                         Grid.Column="0"
                         Grid.Row="1"
                         Grid.ColumnSpan="2"
-                        Content="Calculate probabilities for node"
+                        Content="{x:Static prop:Resources.REDUCE_CHAIN}"
                         Click="CalculateNode"
                         HorizontalAlignment="Stretch" />
                 </Grid>
             </GroupBox>
-            <GroupBox Header="Data">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Button
-                        Grid.Column="0"
-                        Grid.Row="0"
-                        HorizontalAlignment="Stretch"
-                        Content="Load"
-                        Click="LoadHandler" />
-                    <Button
-                        Grid.Column="1"
-                        Grid.Row="0"
-                        HorizontalAlignment="Stretch"
-                        Content="Save"
-                        Click="SaveHandler" />
-                </Grid>
-            </GroupBox>
+        </StackPanel>
+        <StackPanel VerticalAlignment="Bottom">
+            <StackPanel.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="Margin" Value="2,2,2,8" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="Padding" Value="5, 2" />
+                </Style>
+            </StackPanel.Resources>
+            <Button
+                Content="{x:Static prop:Resources.STEPS}"
+                Click="ToggleStepView" />
         </StackPanel>
         <msagl:AutomaticGraphLayoutControl
             Grid.Row="0"

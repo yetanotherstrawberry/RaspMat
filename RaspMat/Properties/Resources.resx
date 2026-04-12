@@ -141,10 +141,6 @@
   <data name="EQUALITY_SIGN" xml:space="preserve">
     <value>=</value>
   </data>
-  <data name="EQUATION_SPACER" xml:space="preserve">
-    <value> </value>
-    <comment>A spacer between parts of the equation. Usually a space.</comment>
-  </data>
   <data name="ERROR" xml:space="preserve">
     <value>Error</value>
   </data>
@@ -282,5 +278,14 @@
   <data name="_FILE_FILTER" xml:space="preserve">
     <value>JSON|*.json|*|*.*</value>
     <comment>Used internally as a filter for file dialogs.</comment>
+  </data>
+  <data name="REDUCE_CHAIN" xml:space="preserve">
+    <value>Reduce probability chain</value>
+  </data>
+  <data name="REMOVE" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ADD" xml:space="preserve">
+    <value>Add</value>
   </data>
 </root>
