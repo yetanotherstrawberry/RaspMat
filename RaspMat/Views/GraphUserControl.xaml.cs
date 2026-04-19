@@ -97,7 +97,7 @@ namespace RaspMat.Views
         /// <summary>
         /// Toggles the step view.
         /// </summary>
-        /// <param name="sender">The <see cref="object"/> the requested the operation.</param>
+        /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
         /// <param name="eventArgs">Additional arguments.</param>
         private void ToggleStepView(object sender, RoutedEventArgs e)
         {

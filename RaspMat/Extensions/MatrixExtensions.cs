@@ -1,6 +1,5 @@
 ﻿using RaspMat.Models;
 using RaspMat.Properties;
-using System;
 using System.Collections.Generic;
 
 namespace RaspMat.Extensions
@@ -26,7 +25,7 @@ namespace RaspMat.Extensions
             {
                 return new AlgorithmStep<Matrix>(string.Format(text, interpolation), stepMatrix);
             }
-            
+
             var steps = new List<AlgorithmStep<Matrix>>()
             {
                 GenerateStep(matrix, string.Empty),
@@ -111,7 +110,7 @@ namespace RaspMat.Extensions
 
             return steps;
         }
-        
+
 
         /*
         private static string[] StrToStrVecs(string vec, char vectorsSplitter = ';')
@@ -187,5 +186,5 @@ namespace RaspMat.Extensions
             return Matrix.Transpose(new Matrix(ret.ToArray()));
         }*/
 
-        }
     }
+}
