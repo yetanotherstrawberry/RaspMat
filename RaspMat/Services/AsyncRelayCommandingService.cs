@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using RaspMat.Extensions;
 using RaspMat.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,9 @@ namespace RaspMat.Services
     {
 
         /// <summary>
-        /// An <see cref="Action"/> to <see cref="Action{T}.Invoke"/> for <see cref="Action"/>s before and after main work of the <see cref="ICommand"/>.
+        /// Used to access the UI.
         /// </summary>
-        private readonly Action<Action> _dispatcherInvoker;
+        private readonly IViewService _viewService;
 
         /// <summary>
         /// An <see cref="ISet{T}"/> that stores <see cref="ICommand"/>s created by this <see cref="ICommandingService"/>.
@@ -32,10 +33,10 @@ namespace RaspMat.Services
         /// <summary>
         /// Creates a <see langword="new"/> instance of <see cref="AsyncRelayCommandingService"/>.
         /// </summary>
-        /// <param name="dispatcherInvoker">An <see cref="Action{T}"/> to <see cref="Action{T}.Invoke(T)"/> for <see cref="Action"/>s before and after main work.</param>
-        public AsyncRelayCommandingService(Action<Action> dispatcherInvoker = null)
+        /// <param name="viewService">Used to access the UI.</param>
+        public AsyncRelayCommandingService(IViewService viewService)
         {
-            _dispatcherInvoker = dispatcherInvoker ?? (action => action?.Invoke());
+            _viewService = viewService.ThrowIfNull();
         }
 
         /// <inheritdoc/>
@@ -47,12 +48,12 @@ namespace RaspMat.Services
             {
                 try
                 {
-                    _dispatcherInvoker(before);
+                    _viewService.Execute(before);
                     await task();
                 }
                 finally
                 {
-                    _dispatcherInvoker(finished);
+                    _viewService.Execute(finished);
                 }
             }
 
@@ -85,13 +86,13 @@ namespace RaspMat.Services
             {
                 try
                 {
-                    _dispatcherInvoker(before);
+                    _viewService.Execute(before);
                     if (action is null) return;
                     await Task.Run(() => action(parameter));
                 }
                 finally
                 {
-                    _dispatcherInvoker(finished);
+                    _viewService.Execute(finished);
                 }
             }
 

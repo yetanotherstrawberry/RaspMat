@@ -20,10 +20,10 @@
             <TabItem Header="{x:Static prop:Resources.GAUSS_ELIM}">
                 <local:GaussianUserControl />
             </TabItem>
-            <TabItem Header="Fractions">
+            <TabItem Header="{x:Static prop:Resources.FRACTIONS}">
                 <local:FractionUserControl />
             </TabItem>
-            <TabItem Header="Probability graph">
+            <TabItem Header="{x:Static prop:Resources.PROBABILITY_GRAPH}">
                 <local:GraphUserControl />
             </TabItem>
         </TabControl>

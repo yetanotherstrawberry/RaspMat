@@ -68,7 +68,7 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>favicon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -101,6 +101,7 @@
     <Compile Include="Extensions\ClassExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Helpers\Algorithms.cs" />
     <Compile Include="Models\Events.cs" />
     <Compile Include="Models\ProbabilityMatrix.cs" />
     <Compile Include="Services\Interfaces\IEventReceiver.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="Services\Win32WPFFileService.cs" />
     <Compile Include="Services\JsonSerializationService.cs" />
     <Compile Include="ViewModels\FractionUserControlViewModel.cs" />
+    <Compile Include="ViewModels\NewVectorsDialogViewModel.cs" />
     <Compile Include="ViewModels\InputMatrixDialogViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\NewMatrixDialogViewModel.cs" />
@@ -135,6 +137,9 @@
     </Compile>
     <Compile Include="Views\InputMatrixDialog.xaml.cs">
       <DependentUpon>InputMatrixDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NewVectorsDialog.xaml.cs">
+      <DependentUpon>NewVectorsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UserControlBase.cs" />
     <Compile Include="Views\WindowBase.cs" />
@@ -150,6 +155,9 @@
     <Compile Include="Views\StepListWindow.xaml.cs">
       <DependentUpon>StepListWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Resources\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\FractionUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -175,6 +183,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\InputMatrixDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\NewVectorsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -217,7 +229,7 @@
       <Version>8.4.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection">
-      <Version>10.0.5</Version>
+      <Version>10.0.9</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
       <Version>1.1.142</Version>
@@ -230,7 +242,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="favicon.ico" />
+    <Resource Include="Resources\favicon.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

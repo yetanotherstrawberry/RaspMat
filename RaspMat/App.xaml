@@ -1,5 +1,5 @@
 ﻿<Application
-    x:Class="RaspMat.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="RaspMat.App"
     ShutdownMode="OnMainWindowClose" />

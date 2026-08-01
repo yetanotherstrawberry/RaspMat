@@ -16,22 +16,32 @@
     d:DataContext="{d:DesignInstance vm:GraphUserControlViewModel, IsDesignTimeCreatable=False}"
     d:Background="White">
     <UserControl.Resources>
-        <Style TargetType="Button">
-            <Setter Property="Margin" Value="5" />
-        </Style>
-        <Style TargetType="ComboBox">
-            <Setter Property="Margin" Value="5" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/RaspMat;component/Resources/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="StackPanel" BasedOn="{StaticResource verticalStackpanel}">
+                <Setter Property="Margin" Value="0" />
+            </Style>
+            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Width" Value="100" />
+                <Setter Property="Margin" Value="5" />
+            </Style>
+            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                <Setter Property="Width" Value="100" />
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Row="0" Grid.Column="0">
+        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0">
             <GroupBox Header="Vertex">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -46,14 +56,10 @@
                         Grid.Column="0"
                         Grid.Row="0"
                         Margin="5"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
                         Name="VertexName" />
                     <Button
                         Grid.Column="1"
                         Grid.Row="0"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
                         Click="AddVertex"
                         Content="{x:Static prop:Resources.ADD}"
                         IsEnabled="{Binding ElementName=VertexName, Path=Text.Length}" />
@@ -61,7 +67,6 @@
                         Grid.Column="0"
                         Grid.Row="1"
                         Margin="5"
-                        HorizontalAlignment="Stretch"
                         Name="VertexToRemoveName"
                         ItemsSource="{Binding ElementName=GraphControl, Path=Graph.Nodes}"
                         DisplayMemberPath="Id"
@@ -69,8 +74,6 @@
                     <Button
                         Grid.Column="1"
                         Grid.Row="1"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
                         Content="{x:Static prop:Resources.REMOVE}"
                         Click="RemoveVertex"
                         IsEnabled="{Binding ElementName=VertexToRemoveName, Path=Text.Length}" />
@@ -139,13 +142,17 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
+                    <Grid.Resources>
+                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Width" Value="200" />
+                        </Style>
+                    </Grid.Resources>
                     <Button
                         Grid.Column="0"
                         Grid.Row="1"
                         Grid.ColumnSpan="2"
                         Content="{x:Static prop:Resources.REDUCE_CHAIN}"
-                        Click="CalculateNode"
-                        HorizontalAlignment="Stretch" />
+                        Click="CalculateNode" />
                 </Grid>
             </GroupBox>
         </StackPanel>

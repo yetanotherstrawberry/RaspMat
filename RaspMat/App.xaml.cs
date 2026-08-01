@@ -22,7 +22,7 @@ namespace RaspMat
         private static App Self => Current as App;
 
         /// <summary>
-        /// <see cref="Dispatcher.Invoke(Action)"/> used to run <see cref="Action"/>s on the UI thread.
+        /// <see cref="Dispatcher.Invoke(Action)"/> used to run <see cref="Action"/>s that access the UI.
         /// </summary>
         private Action<Action> _invoker;
 
@@ -48,10 +48,14 @@ namespace RaspMat
         /// <param name="disUnhExcArgs">An instance which will have its <see cref="DispatcherUnhandledExceptionEventArgs.Handled"/> set by this method.</param>
         private void MsgBoxExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs disUnhExcArgs)
         {
-            _invoker(() =>
+            void ShowMessage()
             {
                 MessageBox.Show(Self?.MainWindow, disUnhExcArgs.Exception.Message, RaspMat.Properties.Resources.ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
-            });
+            }
+
+            if (_invoker is null) ShowMessage();
+            else _invoker(ShowMessage);
+
             disUnhExcArgs.Handled = true; // Do not crash if possible.
         }
 
@@ -84,10 +88,19 @@ namespace RaspMat
         /// <typeparam name="TView">View to register and assign the ViewModel to.</typeparam>
         /// <typeparam name="TViewModel">ViewModel to register and assign to the view.</typeparam>
         /// <param name="collection">Service builder to register transient <typeparamref name="TView"/> and <typeparamref name="TViewModel"/> to.</param>
-        private void RegisterViewModel<TView, TViewModel>(IServiceCollection collection) where TViewModel : class where TView : class
+        /// <param name="singleton">Indicates whether the view should be registered as a singleton.</param>
+        private void RegisterViewModel<TView, TViewModel>(IServiceCollection collection, bool singleton = false) where TViewModel : class where TView : class
         {
-            collection.AddTransient<TView>();
-            collection.AddTransient<TViewModel>();
+            if (singleton)
+            {
+                collection.AddSingleton<TView>();
+                collection.AddSingleton<TViewModel>();
+            }
+            else
+            {
+                collection.AddTransient<TView>();
+                collection.AddTransient<TViewModel>();
+            }
             ViewModelLocator.Add(typeof(TView), typeof(TViewModel));
         }
 
@@ -97,16 +110,16 @@ namespace RaspMat
         /// <param name="builder"><see cref="IServiceCollection"/> to register the services to.</param>
         private void AddServices(IServiceCollection builder)
         {
-            builder.AddTransient<ICommandingService, AsyncRelayCommandingService>(serviceProvider =>
+            builder.AddSingleton<IViewService, WpfViewService>(serviceProvider =>
             {
-                return new AsyncRelayCommandingService(_invoker);
+                return new WpfViewService(serviceProvider, Dispatcher.CurrentDispatcher);
             });
 
+            builder.AddTransient<ICommandingService, AsyncRelayCommandingService>();
             builder.AddSingleton<IFileService, Win32WPFFileService>();
             builder.AddSingleton<ISerializationService, JsonSerializationService>();
             builder.AddSingleton<IEventService, WeakReferenceMessengerEventService>();
             builder.AddSingleton<IMathService, DataTableMathService>();
-            builder.AddSingleton<IViewService, WpfViewService>();
         }
 
         /// <summary>
@@ -115,10 +128,12 @@ namespace RaspMat
         /// <param name="builder"><see cref="IServiceCollection"/> to register the services to.</param>
         private void RegisterViewModels(IServiceCollection builder)
         {
-            RegisterViewModel<MainWindow, MainWindowViewModel>(builder);
+            RegisterViewModel<MainWindow, MainWindowViewModel>(builder, true);
             RegisterViewModel<StepListWindow, StepListWindowViewModel>(builder);
+
             RegisterViewModel<NewMatrixDialog, NewMatrixDialogViewModel>(builder);
             RegisterViewModel<InputMatrixDialog, InputMatrixDialogViewModel>(builder);
+            RegisterViewModel<NewVectorsDialog, NewVectorsDialogViewModel>(builder);
 
             RegisterViewModel<FractionUserControl, FractionUserControlViewModel>(builder);
             RegisterViewModel<GaussianUserControl, GaussianUserControlViewModel>(builder);
@@ -152,13 +167,13 @@ namespace RaspMat
         {
             base.OnExit(exitArgs);
             Dispose();
-            DispatcherUnhandledException -= MsgBoxExceptionHandler;
         }
 
         /// <inheritdoc/>
-        public void Dispose()
+        public virtual void Dispose()
         {
             _serviceProvider.Dispose();
+            DispatcherUnhandledException -= MsgBoxExceptionHandler;
         }
 
     }

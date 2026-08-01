@@ -16,26 +16,18 @@
              d:MinWidth="800">
     <Grid>
         <Grid.Resources>
-            <Style TargetType="Button">
-                <Setter Property="Width" Value="120" />
-                <Setter Property="Height" Value="20" />
-                <Setter Property="Margin" Value="2" />
-            </Style>
-            <Style TargetType="TextBox">
-                <Setter Property="Height" Value="20" />
-                <Setter Property="MinWidth" Value="40" />
-            </Style>
-            <Style TargetType="TextBlock">
-                <Setter Property="Height" Value="20" />
-                <Setter Property="Margin" Value="5,2,5,2" />
-            </Style>
-            <Style TargetType="StackPanel">
-                <Setter Property="HorizontalAlignment" Value="Center" />
-                <Setter Property="Orientation" Value="Horizontal" />
-            </Style>
-            <Style x:Key="verticalStackpanel" TargetType="StackPanel">
-                <Setter Property="Orientation" Value="Vertical" />
-            </Style>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <ResourceDictionary Source="pack://application:,,,/RaspMat;component/Resources/Styles.xaml" />
+                </ResourceDictionary.MergedDictionaries>
+
+                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
+                    <Setter Property="Margin" Value="10,5,10,5" />
+                </Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="Margin" Value="5,2,5,2" />
+                </Style>
+            </ResourceDictionary>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -44,9 +36,9 @@
         <Grid Grid.Column="0">
             <StackPanel Style="{StaticResource verticalStackpanel}">
                 <GroupBox Header="{x:Static prop:Resources.ELEMENTARY_MAT_OP}">
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Style="{StaticResource verticalStackpanel}">
                         <GroupBox Header="{x:Static prop:Resources.SCALE}">
-                            <StackPanel Orientation="Vertical">
+                            <StackPanel Style="{StaticResource verticalStackpanel}">
                                 <StackPanel>
                                     <TextBlock Text="{x:Static prop:Resources.SCALAR}" />
                                     <TextBox Name="Scalar" />
@@ -71,11 +63,10 @@
                     <Button Content="{x:Static prop:Resources.TRANSPOSE}" Command="{Binding MatTransposeComm}" />
                 </GroupBox>
                 <GroupBox Header="{x:Static prop:Resources.MAT_HALF}">
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Style="{StaticResource verticalStackpanel}">
                         <StackPanel>
                             <StackPanel.Resources>
-                                <Style TargetType="RadioButton">
-                                    <Setter Property="Margin" Value="10,5,10,5" />
+                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
                                     <Setter Property="GroupName" Value="Side" />
                                 </Style>
                             </StackPanel.Resources>
@@ -98,12 +89,7 @@
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
-            <StackPanel VerticalAlignment="Bottom">
-                <StackPanel.Resources>
-                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                        <Setter Property="Margin" Value="2,2,2,8" />
-                    </Style>
-                </StackPanel.Resources>
+            <StackPanel VerticalAlignment="Bottom" Margin="8">
                 <Button
                     Content="{x:Static prop:Resources.STEPS}"
                     Command="{Binding StepListWindowComm}" />
@@ -134,16 +120,6 @@
                 Margin="2"
                 x:Name="MainMatrix"
                 ItemsSource="{Binding MatrixDataTable}"
-                ScrollViewer.CanContentScroll="True"
-                EnableRowVirtualization="True"
-                EnableColumnVirtualization="True"
-                SelectionMode="Extended"
-                SelectionUnit="FullRow"
-                HeadersVisibility="None"
-                CanUserAddRows="False"
-                ColumnWidth="SizeToCells"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
                 IsEnabled="{Binding IsFree}">
                 <DataGrid.Resources>
                     <SolidColorBrush

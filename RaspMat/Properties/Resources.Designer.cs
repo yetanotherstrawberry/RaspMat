@@ -61,24 +61,6 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cols.
-        /// </summary>
-        public static string _COLS {
-            get {
-                return ResourceManager.GetString("_COLS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to en-US.
-        /// </summary>
-        public static string _DEF_LOCALE {
-            get {
-                return ResourceManager.GetString("_DEF_LOCALE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to JSON|*.json|*|*.*.
         /// </summary>
         public static string _FILE_FILTER {
@@ -268,11 +250,29 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fractions.
+        /// </summary>
+        public static string FRACTIONS {
+            get {
+                return ResourceManager.GetString("FRACTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Gaussian elimination.
         /// </summary>
         public static string GAUSS_ELIM {
             get {
                 return ResourceManager.GetString("GAUSS_ELIM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to History.
+        /// </summary>
+        public static string HISTORY {
+            get {
+                return ResourceManager.GetString("HISTORY", resourceCulture);
             }
         }
         
@@ -385,6 +385,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New vectors.
+        /// </summary>
+        public static string NEW_VECTORS_TITLE {
+            get {
+                return ResourceManager.GetString("NEW_VECTORS_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
         public static string OK {
@@ -399,6 +408,15 @@ namespace RaspMat.Properties {
         public static string PLUS_SIGN {
             get {
                 return ResourceManager.GetString("PLUS_SIGN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Probability graph.
+        /// </summary>
+        public static string PROBABILITY_GRAPH {
+            get {
+                return ResourceManager.GetString("PROBABILITY_GRAPH", resourceCulture);
             }
         }
         

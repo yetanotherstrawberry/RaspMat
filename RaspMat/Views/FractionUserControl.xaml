@@ -6,6 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:RaspMat.Views"
              xmlns:vm="clr-namespace:RaspMat.ViewModels"
+             xmlns:prop="clr-namespace:RaspMat.Properties"
              mc:Ignorable="d"
              d:Background="White"
              d:DataContext="{d:DesignInstance vm:FractionUserControlViewModel}"
@@ -25,15 +26,29 @@
             <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
         <Grid.Resources>
-            <Style TargetType="StackPanel">
-                <Setter Property="VerticalAlignment" Value="Center" />
-            </Style>
-            <Style TargetType="TextBox">
-                <Setter Property="Margin" Value="80,5,80,5" />
-            </Style>
-            <Style TargetType="Separator">
-                <Setter Property="Margin" Value="60,5,60,5" />
-            </Style>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <ResourceDictionary Source="pack://application:,,,/RaspMat;component/Resources/Styles.xaml" />
+                </ResourceDictionary.MergedDictionaries>
+                
+                <Style TargetType="StackPanel">
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                    <Setter Property="Margin" Value="80,5,80,5" />
+                </Style>
+                <Style TargetType="Separator" BasedOn="{StaticResource {x:Type Separator}}">
+                    <Setter Property="Margin" Value="60,5,60,5" />
+                </Style>
+                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="Width" Value="50" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                </Style>
+                <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="Width" Value="50" />
+                </Style>
+            </ResourceDictionary>
         </Grid.Resources>
         <StackPanel Grid.Column="0">
             <TextBox Text="{Binding LeftFractionUpperInput}" PreviewTextInput="TextBox_PreviewTextInput" />
@@ -50,9 +65,7 @@
         </StackPanel>
         <StackPanel Grid.Column="3">
             <Button
-                Padding="10,0,10,0"
-                Content="="
-                HorizontalAlignment="Center"
+                Content="{x:Static prop:Resources.EQUALITY_SIGN}"
                 Command="{Binding CalculateComm}"
                 CommandParameter="{Binding ElementName=OperationSelector, Path=SelectedValue}" />
         </StackPanel>
@@ -61,7 +74,7 @@
             <Separator />
             <TextBox Text="{Binding Result.Denominator, Mode=OneWay}" IsReadOnly="True" />
         </StackPanel>
-        <GroupBox Header="History" Grid.Row="1" Grid.ColumnSpan="5">
+        <GroupBox Header="{x:Static prop:Resources.HISTORY}" Grid.Row="1" Grid.ColumnSpan="5">
             <ListBox ItemsSource="{Binding History}" d:ItemsSource="{d:SampleData ItemCount=25}" />
         </GroupBox>
     </Grid>
