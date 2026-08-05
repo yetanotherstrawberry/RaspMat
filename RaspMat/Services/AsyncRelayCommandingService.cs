@@ -42,13 +42,12 @@ namespace RaspMat.Services
         /// <inheritdoc/>
         public ICommand CreateFromTask(Action before = null, Func<Task> task = null, Action finished = null, Func<bool> canExecute = null)
         {
-            if (task is null) task = () => Task.CompletedTask;
-
             async Task Execute()
             {
                 try
                 {
                     _viewService.Execute(before);
+                    if (task is null) return;
                     await task();
                 }
                 finally
@@ -105,10 +104,10 @@ namespace RaspMat.Services
         public void NotifyCanExecuteChanged()
         {
             var toRemove = new HashSet<WeakReference<IRelayCommand>>();
-            foreach (var commandRef in Commands)
+            foreach (var commandReference in Commands)
             {
-                if (commandRef.TryGetTarget(out var relayCommand)) relayCommand.NotifyCanExecuteChanged();
-                else Commands.Remove(commandRef);
+                if (commandReference.TryGetTarget(out var relayCommand)) relayCommand.NotifyCanExecuteChanged();
+                else Commands.Remove(commandReference);
             }
             Commands.ExceptWith(toRemove);
         }

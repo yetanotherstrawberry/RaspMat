@@ -14,7 +14,7 @@
              d:Background="White"
              d:MinHeight="350"
              d:MinWidth="800">
-    <Grid>
+    <Grid IsEnabled="{Binding IsFree}">
         <Grid.Resources>
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
@@ -119,8 +119,7 @@
                 Grid.Row="1"
                 Margin="2"
                 x:Name="MainMatrix"
-                ItemsSource="{Binding MatrixDataTable}"
-                IsEnabled="{Binding IsFree}">
+                ItemsSource="{Binding MatrixDataTable}">
                 <DataGrid.Resources>
                     <SolidColorBrush
                         x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"

@@ -1,12 +1,9 @@
 ﻿using RaspMat.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RaspMat.Models
 {
@@ -14,7 +11,7 @@ namespace RaspMat.Models
     /// A representation of <see cref="Fraction"/>s.
     /// </summary>
     [Serializable]
-    internal class Matrix : ISerializable, ICloneable
+    internal class Matrix : ISerializable
     {
 
         #region ConstantsAndStaticFields
@@ -70,7 +67,6 @@ namespace RaspMat.Models
         private Fraction[] this[int row]
         {
             get => FractionMatrix[row];
-            set => FractionMatrix[row] = value;
         }
 
         /// <summary>
@@ -88,27 +84,13 @@ namespace RaspMat.Models
         #endregion Properties
         #region Constructors
 
+        private Matrix(Fraction[][] fractionMatrix) => FractionMatrix = fractionMatrix.ThrowIfNull();
+
         public Matrix(int rows, int columns, Func<int, int, Fraction> values)
-        {
-            if (rows == 0 || columns == 0) throw new ArgumentOutOfRangeException(nameof(columns));
+            : this(ParallelEnumerable.Range(0, rows).AsOrdered().Select(row => ParallelEnumerable.Range(0, columns).AsOrdered().Select(column => values(row, column)).ToArray()).ToArray()) { }
 
-            FractionMatrix = new Fraction[rows][];
-
-            Parallel.For(0, Rows, row =>
-            {
-                this[row] = new Fraction[columns];
-                Parallel.For(0, this[row].Length, column => this[row][column] = values(row, column));
-            });
-        }
-
-        private Matrix(Fraction[][] fractionMatrix)
-        {
-            FractionMatrix = fractionMatrix.ThrowIfNull();
-        }
-
-        protected internal Matrix(SerializationInfo info, StreamingContext context) : this((Fraction[][])info.GetValue(nameof(FractionMatrix), typeof(Fraction[][]))) { }
-
-        public Matrix(int rows, int columns) : this(Enumerable.Range(0, rows).Select(row => new Fraction[columns]).ToArray()) { }
+        protected internal Matrix(SerializationInfo info, StreamingContext context)
+            : this((Fraction[][])info.GetValue(nameof(FractionMatrix), typeof(Fraction[][]))) { }
 
         #endregion Constructors
         #region StaticMethods
@@ -150,7 +132,7 @@ namespace RaspMat.Models
 
             return new Matrix(left.Rows, right.Columns, (row, column) =>
             {
-                return Enumerable.Range(0, left.Columns).Select(cell => left[row, cell] * right[cell, column]).Aggregate((x, y) => x + y);
+                return ParallelEnumerable.Range(0, left.Columns).Select(cell => left[row, cell] * right[cell, column]).Aggregate((x, y) => x + y);
             });
         }
 
@@ -287,7 +269,7 @@ namespace RaspMat.Models
             {
                 for (var column = 0; column < Columns; column++)
                 {
-                    stringBuilder.Append(this[row, column]);
+                    stringBuilder.Append(this[row, column].ToString());
                     if (column < Columns - 1) stringBuilder.Append(COLUMN_SEPARATOR);
                 }
 
@@ -300,24 +282,12 @@ namespace RaspMat.Models
         /// <inheritdoc/>
         public override bool Equals(object compared)
         {
-            if (!(compared is Matrix matrix) || Columns != matrix.Columns || Rows != matrix.Rows) return false;
-
-            var differences = 0;
-
-            Parallel.For(0, Rows, (row, rowLoop) =>
-            {
-                if (differences != 0) rowLoop.Stop();
-                Parallel.For(0, Columns, (column, columnLoop) =>
-                {
-                    if (differences != 0) columnLoop.Stop();
-                    else if (this[row, column] != matrix[row, column])
-                    {
-                        Interlocked.Increment(ref differences);
-                    }
-                });
-            });
-
-            return differences == 0;
+            return
+                compared is Matrix matrix &&
+                Columns == matrix.Columns &&
+                Rows == matrix.Rows &&
+                !FractionMatrix.AsParallel().Where((cells, row) => cells.AsParallel().Where((cell, column) => cell != matrix[row, column]).Any()).Any()
+                ;
         }
 
         /// <inheritdoc/>
@@ -343,18 +313,6 @@ namespace RaspMat.Models
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue(nameof(FractionMatrix), FractionMatrix, FractionMatrix.GetType());
-        }
-
-        /// <inheritdoc/>
-        public virtual object Clone() => new Matrix(Rows, Columns, (row, column) => this[row, column]);
-
-        /// <summary>
-        /// Will <see langword="return"/> the <see cref="FractionMatrix"/> of <see langword="this"/> <see cref="Matrix"/> <see langword="as"/> <see cref="IEnumerable{T}"/>.
-        /// </summary>
-        /// <returns>An <see cref="IEnumerable{T}"/>.</returns>
-        public virtual IEnumerable<IEnumerable<Fraction>> AsEnumerable()
-        {
-            return FractionMatrix.Select(row => row.AsEnumerable());
         }
 
         #endregion Methods

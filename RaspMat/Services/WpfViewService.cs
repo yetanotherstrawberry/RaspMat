@@ -71,7 +71,11 @@ namespace RaspMat.Services
         public void ToggleMatrixInputDialog() => ToggleView<InputMatrixDialog>();
 
         /// <inheritdoc/>
-        public void Execute(Action action) => _dispatcher.Invoke(action);
+        public void Execute(Action action)
+        {
+            if (action is null) return;
+            _dispatcher.Invoke(action);
+        }
 
         /// <inheritdoc/>
         public Task<TResult> ExecuteAsync<TResult>(Func<TResult> callback) => _dispatcher.InvokeAsync(callback).Task;

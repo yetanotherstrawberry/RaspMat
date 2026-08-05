@@ -89,14 +89,14 @@ namespace RaspMat.Tests.Models
         [Test]
         public void ZeroDivisionException()
         {
-            Assert.Throws<DivideByZeroException>(() =>
+            Assert.Throws<DivideByZeroException>(new Action(() =>
             {
                 new Fraction(1, 0).GetHashCode();
-            });
-            Assert.Throws<DivideByZeroException>(() =>
+            }));
+            Assert.Throws<DivideByZeroException>(new Action(() =>
             {
                 (Fraction.Parse("1") / 0).GetHashCode();
-            });
+            }));
         }
 
         [Test]

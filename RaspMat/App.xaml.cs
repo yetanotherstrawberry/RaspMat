@@ -48,9 +48,12 @@ namespace RaspMat
         /// <param name="disUnhExcArgs">An instance which will have its <see cref="DispatcherUnhandledExceptionEventArgs.Handled"/> set by this method.</param>
         private void MsgBoxExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs disUnhExcArgs)
         {
+            var exception = disUnhExcArgs.Exception;
+            while (exception.InnerException != null) exception = exception.InnerException;
+
             void ShowMessage()
             {
-                MessageBox.Show(Self?.MainWindow, disUnhExcArgs.Exception.Message, RaspMat.Properties.Resources.ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Self?.MainWindow, exception.Message, RaspMat.Properties.Resources.ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             if (_invoker is null) ShowMessage();
@@ -143,12 +146,6 @@ namespace RaspMat
         /// <inheritdoc/>
         protected override void OnStartup(StartupEventArgs startupEventArgs)
         {
-            _invoker = action =>
-            {
-                if (action is null) return;
-                Dispatcher.Invoke(action);
-            };
-
             DispatcherUnhandledException += MsgBoxExceptionHandler;
 
             base.OnStartup(startupEventArgs);
@@ -159,6 +156,7 @@ namespace RaspMat
 
             _serviceProvider = builder.BuildServiceProvider();
 
+            _invoker = Services.GetRequiredService<IViewService>().Execute;
             Services.GetRequiredService<IViewService>().ToggleMainWindow();
         }
 

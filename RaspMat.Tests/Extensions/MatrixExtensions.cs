@@ -2,6 +2,7 @@
 using RaspMat.Extensions;
 using RaspMat.Helpers;
 using RaspMat.Models;
+using System;
 using System.Linq;
 
 namespace RaspMat.Tests.Extensions
@@ -29,22 +30,23 @@ namespace RaspMat.Tests.Extensions
         [Test]
         public void BasisChangeMatrix()
         {
-            var from = new Fraction[][]
-            {
-                new Fraction[] { 1, 0 },
-                new Fraction[] { 0, 1 }
-            };
-            var to = new Fraction[][]
-            {
-                new Fraction[] { 3, 1 },
-                new Fraction[] { -2, 1 }
-            };
-            /*var expected = new Matrix(new Fraction[][]
-            {
-                new Fraction[] { 1, 1 },
-                new Fraction[] { 1, -1 }
-            });*/
-            var basisChangeMatrix = Algorithms.BasisChangeMatrix(from, to);
+            var from = Matrix.Parse(
+                "0 -1"
+                + Environment.NewLine +
+                "1 1"
+            );
+            var to = Matrix.Parse(
+                "1 2"
+                + Environment.NewLine +
+                "1 0"
+            );
+            var expected = Matrix.Parse(
+                "2 2"
+                + Environment.NewLine +
+                "-1 -2"
+            );
+            var basisChangeMatrix = Algorithms.BasisChangeMatrix(to, from);
+            Assert.That(basisChangeMatrix, Is.EqualTo(expected));
         }
 
     }
