@@ -28,7 +28,7 @@ namespace RaspMat.Tests.Extensions
         }
 
         [Test]
-        public void BasisChangeMatrix()
+        public void BasisChangeMatrix2D()
         {
             var from = Matrix.Parse(
                 "0 -1"
@@ -46,6 +46,27 @@ namespace RaspMat.Tests.Extensions
                 "-1 -2"
             );
             var basisChangeMatrix = Algorithms.BasisChangeMatrix(to, from);
+            Assert.That(basisChangeMatrix, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void BasisChangeMatrix3D()
+        {
+            var from = Matrix.Parse(
+                "1 0 2"
+                + Environment.NewLine +
+                "-1 1 3"
+                + Environment.NewLine +
+                "2 1 0"
+            );
+            var to = Matrix.Identity(3);
+            var expected = Matrix.Parse(
+                "2 2"
+                + Environment.NewLine +
+                "-1 -2"
+            );
+            var basisChangeMatrix = Algorithms.BasisChangeMatrix(to, from);
+            var test = basisChangeMatrix.ToString();
             Assert.That(basisChangeMatrix, Is.EqualTo(expected));
         }
 
