@@ -27,7 +27,7 @@ namespace RaspMat.Services
         /// <summary>
         /// Adds a <see cref="WeakReference{T}"/> to <see cref="Commands"/>.
         /// </summary>
-        /// <param name="command"></param>
+        /// <param name="command">The command to add.</param>
         private void AddCommand(IRelayCommand command) => Commands.Add(new WeakReference<IRelayCommand>(command));
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace RaspMat.Services
             foreach (var commandReference in Commands)
             {
                 if (commandReference.TryGetTarget(out var relayCommand)) relayCommand.NotifyCanExecuteChanged();
-                else Commands.Remove(commandReference);
+                else toRemove.Add(commandReference);
             }
             Commands.ExceptWith(toRemove);
         }

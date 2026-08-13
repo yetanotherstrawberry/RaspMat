@@ -14,25 +14,30 @@ namespace RaspMat.Models
     internal class Matrix : ISerializable
     {
 
-        #region ConstantsAndStaticFields
+        #region StaticFields
 
         /// <summary>
         /// Column separator.
         /// </summary>
-        private const string COLUMN_SEPARATOR = "\t";
+        private readonly static string _columnSeparator = "\t";
+
+        /// <summary>
+        /// The preferred separator between rows.
+        /// </summary>
+        private readonly static string _rowSeparator = Environment.NewLine;
 
         /// <summary>
         /// Allowed separators between rows when parsing a <see langword="string"/>.
         /// </summary>
         private readonly static string[] _rowSeparators = new[] {
-            Environment.NewLine,
+            _rowSeparator,
         };
 
         /// <summary>
         /// Allowed separators between columns when parsing a <see langword="string"/>.
         /// </summary>
         private readonly static string[] _columnSeparators = new[] {
-            COLUMN_SEPARATOR,
+            _columnSeparator,
             " ",
         };
 
@@ -270,10 +275,10 @@ namespace RaspMat.Models
                 for (var column = 0; column < Columns; column++)
                 {
                     stringBuilder.Append(this[row, column].ToString());
-                    if (column < Columns - 1) stringBuilder.Append(COLUMN_SEPARATOR);
+                    if (column < Columns - 1) stringBuilder.Append(_columnSeparator);
                 }
 
-                if (row < Rows - 1) stringBuilder.AppendLine();
+                if (row < Rows - 1) stringBuilder.Append(_rowSeparator);
             }
 
             return stringBuilder.ToString();
@@ -293,20 +298,11 @@ namespace RaspMat.Models
         /// <inheritdoc/>
         public override int GetHashCode()
         {
-            var iterateColumns = Columns > Rows;
-            var stop = iterateColumns ? Columns : Rows;
-            var total = 0;
-
-            for (var index = 0; index < stop; index++)
-            {
-                var hash = (iterateColumns ? this[0, index] : this[index, 0]).GetHashCode();
-                unchecked
-                {
-                    total += hash;
-                }
-            }
-
-            return total;
+            return
+                Enumerable.Range(0, Math.Max(Columns, Rows))
+                .Select(index => this[Math.Min(index, Rows - 1), Math.Min(index, Columns - 1)].GetHashCode())
+                .Aggregate((left, right) => unchecked(left + right))
+                ;
         }
 
         /// <inheritdoc/>
