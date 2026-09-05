@@ -30,7 +30,8 @@ namespace RaspMat.Models
         /// Allowed separators between rows when parsing a <see langword="string"/>.
         /// </summary>
         private readonly static string[] _rowSeparators = new[] {
-            _rowSeparator,
+            "\r\n",
+            "\n",
         };
 
         /// <summary>
@@ -57,7 +58,7 @@ namespace RaspMat.Models
         /// <summary>
         /// The total number of columns.
         /// </summary>
-        public int Columns => FractionMatrix.FirstOrDefault()?.Length ?? 0;
+        public int Columns => FractionMatrix.Select(row => row.Length).FirstOrDefault();
 
         /// <summary>
         /// Returns <see langword="true"/> if <see langword="this"/> <see cref="Matrix"/> is square.
@@ -131,14 +132,16 @@ namespace RaspMat.Models
 
         public static Matrix operator *(Matrix matrix, Fraction scalar) => scalar * matrix;
 
-        public static Matrix operator *(Matrix left, Matrix right)
+        public static Matrix operator *(Matrix multiplicand, Matrix multiplier)
         {
-            if (left.Columns != right.Rows) throw new InvalidOperationException(nameof(left.Columns));
-
-            return new Matrix(left.Rows, right.Columns, (row, column) =>
+            return multiplicand.Columns == multiplier.Rows ? new Matrix(multiplicand.Rows, multiplier.Columns, (row, column) =>
             {
-                return ParallelEnumerable.Range(0, left.Columns).Select(cell => left[row, cell] * right[cell, column]).Aggregate((x, y) => x + y);
-            });
+                return
+                    Enumerable.Range(0, multiplicand.Columns)
+                    .Select(cell => multiplicand[row, cell] * multiplier[cell, column])
+                    .Aggregate((left, right) => left + right)
+                    ;
+            }) : throw new InvalidOperationException(nameof(multiplicand.Columns));
         }
 
         /// <summary>
@@ -236,9 +239,7 @@ namespace RaspMat.Models
         /// <exception cref="ArgumentException"><see cref="IsSquare"/> is <see langword="false"/>.</exception>
         public Matrix WithIdentity(bool onLeft)
         {
-            if (!IsSquare) throw new ArgumentException(nameof(IsSquare));
-
-            return new Matrix(Rows, Columns * 2, (row, column) =>
+            return IsSquare ? new Matrix(Rows, Columns * 2, (row, column) =>
             {
                 if (onLeft)
                 {
@@ -250,11 +251,11 @@ namespace RaspMat.Models
                     if (column < Columns) return this[row, column];
                     else return row == column - Columns ? 1 : 0;
                 }
-            });
+            }) : throw new InvalidOperationException(nameof(IsSquare));
         }
 
         /// <summary>
-        /// Creates a <see cref="DataTable"/> with its cells (<see langword="as"/> <see cref="string"/>) populated based on <see langword="this"/> <see cref="Matrix"/>.
+        /// Creates a <see cref="DataTable"/> with its cells (<see langword="as"/> <see cref="string"/>s) populated based on <see langword="this"/> <see cref="Matrix"/>.
         /// </summary>
         /// <returns>A <see langword="new"/> <see cref="DataTable"/>.</returns>
         public DataTable ToDataTable()
@@ -268,7 +269,7 @@ namespace RaspMat.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            var stringBuilder = new StringBuilder(Rows * 2 + Columns * 2 - 2);
+            var stringBuilder = new StringBuilder(Rows * 2 * (Columns * 2 - 2) - 2);
 
             for (var row = 0; row < Rows; row++)
             {
@@ -299,7 +300,7 @@ namespace RaspMat.Models
         public override int GetHashCode()
         {
             return
-                Enumerable.Range(0, Math.Max(Columns, Rows))
+                ParallelEnumerable.Range(0, Math.Max(Columns, Rows))
                 .Select(index => this[Math.Min(index, Rows - 1), Math.Min(index, Columns - 1)].GetHashCode())
                 .Aggregate((left, right) => unchecked(left + right))
                 ;

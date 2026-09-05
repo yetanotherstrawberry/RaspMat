@@ -28,45 +28,40 @@ namespace RaspMat.Tests.Extensions
         }
 
         [Test]
-        public void BasisChangeMatrix2D()
+        public void BasisChangeMatrix3D()
         {
-            var from = Matrix.Parse(
-                "0 -1"
-                + Environment.NewLine +
-                "1 1"
-            );
+            var from = Matrix.Identity(3);
             var to = Matrix.Parse(
-                "1 2"
+                "1 0 0"
                 + Environment.NewLine +
-                "1 0"
-            );
-            var expected = Matrix.Parse(
-                "2 2"
+                "0 1 0"
                 + Environment.NewLine +
-                "-1 -2"
+                "0 0 1"
             );
-            var basisChangeMatrix = Algorithms.BasisChangeMatrix(to, from);
+            var expected = Matrix.Identity(3);
+            var basisChangeMatrix = Algorithms.BasisChangeMatrix(from, to);
             Assert.That(basisChangeMatrix, Is.EqualTo(expected));
         }
 
         [Test]
-        public void BasisChangeMatrix3D()
+        public void BasisChangeMatrix2D()
         {
             var from = Matrix.Parse(
-                "1 0 2"
+                "1 1"
                 + Environment.NewLine +
-                "-1 1 3"
-                + Environment.NewLine +
-                "2 1 0"
+                "0 -1"
             );
-            var to = Matrix.Identity(3);
+            var to = Matrix.Parse(
+                "0 1"
+                + Environment.NewLine +
+                "1 1"
+            );
             var expected = Matrix.Parse(
-                "2 2"
-                + Environment.NewLine +
                 "-1 -2"
+                + Environment.NewLine +
+                "1 1"
             );
-            var basisChangeMatrix = Algorithms.BasisChangeMatrix(to, from);
-            var test = basisChangeMatrix.ToString();
+            var basisChangeMatrix = Algorithms.BasisChangeMatrix(from, to);
             Assert.That(basisChangeMatrix, Is.EqualTo(expected));
         }
 
