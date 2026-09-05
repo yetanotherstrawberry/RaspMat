@@ -138,6 +138,9 @@
     <Compile Include="Views\InputMatrixDialog.xaml.cs">
       <DependentUpon>InputMatrixDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\MatrixDataGrid.xaml.cs">
+      <DependentUpon>MatrixDataGrid.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\NewVectorsDialog.xaml.cs">
       <DependentUpon>NewVectorsDialog.xaml</DependentUpon>
     </Compile>
@@ -183,6 +186,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\InputMatrixDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\MatrixDataGrid.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

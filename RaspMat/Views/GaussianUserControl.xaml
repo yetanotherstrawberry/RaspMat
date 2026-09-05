@@ -1,19 +1,20 @@
-﻿<local:UserControlBase x:Class="RaspMat.Views.GaussianUserControl"
-             x:ClassModifier="internal"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:prop="clr-namespace:RaspMat.Properties"
-             xmlns:local="clr-namespace:RaspMat.Views"
-             xmlns:vm="clr-namespace:RaspMat.ViewModels"
-             xmlns:s="clr-namespace:System;assembly=mscorlib"
-             mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance vm:GaussianUserControlViewModel, IsDesignTimeCreatable=False}"
-             d:Background="White"
-             d:MinHeight="350"
-             d:MinWidth="800">
+﻿<local:UserControlBase
+    x:Class="RaspMat.Views.GaussianUserControl"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:prop="clr-namespace:RaspMat.Properties"
+    xmlns:local="clr-namespace:RaspMat.Views"
+    xmlns:vm="clr-namespace:RaspMat.ViewModels"
+    xmlns:s="clr-namespace:System;assembly=mscorlib"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance vm:GaussianUserControlViewModel, IsDesignTimeCreatable=False}"
+    d:Background="White"
+    d:MinHeight="350"
+    d:MinWidth="800">
     <Grid IsEnabled="{Binding IsFree}">
         <Grid.Resources>
             <ResourceDictionary>
@@ -115,22 +116,9 @@
                     </Button>
                 </StackPanel>
             </GroupBox>
-            <DataGrid
-                Grid.Row="1"
+            <local:MatrixDataGrid
                 Margin="2"
-                x:Name="MainMatrix"
-                ItemsSource="{Binding MatrixDataTable}">
-                <DataGrid.Resources>
-                    <SolidColorBrush
-                        x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
-                        Color="{x:Static SystemColors.ActiveCaptionColor}"/>
-                </DataGrid.Resources>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding GridSelectedRowComm}" CommandParameter="{Binding ElementName=MainMatrix, Path=SelectedItems}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </DataGrid>
+                Grid.Row="1" />
             <GroupBox Header="{x:Static prop:Resources.MATRIX}" Grid.Row="2">
                 <StackPanel>
                     <Button Content="{x:Static prop:Resources.ENTER_MATRIX}" Command="{Binding UserInputComm}" />
