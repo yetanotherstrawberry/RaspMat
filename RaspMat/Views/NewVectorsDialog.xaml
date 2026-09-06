@@ -22,7 +22,7 @@
                     <ResourceDictionary Source="pack://application:,,,/RaspMat;component/Resources/Styles.xaml" />
                 </ResourceDictionary.MergedDictionaries>
 
-                <Style TargetType="TextBlock" />
+                <Style TargetType="TextBlock" /><!-- Override style. -->
             </ResourceDictionary>
         </Grid.Resources>
         

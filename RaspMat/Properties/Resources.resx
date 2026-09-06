@@ -292,4 +292,7 @@
   <data name="HISTORY" xml:space="preserve">
     <value>History</value>
   </data>
+  <data name="BASIS_CHANGE" xml:space="preserve">
+    <value>Basis change</value>
+  </data>
 </root>

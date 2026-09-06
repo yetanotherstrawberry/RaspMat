@@ -122,6 +122,7 @@
     <Compile Include="Services\WeakReferenceMessengerEventService.cs" />
     <Compile Include="Services\Win32WPFFileService.cs" />
     <Compile Include="Services\JsonSerializationService.cs" />
+    <Compile Include="ViewModels\BasisChangeWindowsViewModel.cs" />
     <Compile Include="ViewModels\FractionUserControlViewModel.cs" />
     <Compile Include="ViewModels\NewVectorsDialogViewModel.cs" />
     <Compile Include="ViewModels\InputMatrixDialogViewModel.cs" />
@@ -143,6 +144,9 @@
     </Compile>
     <Compile Include="Views\NewVectorsDialog.xaml.cs">
       <DependentUpon>NewVectorsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BasisChangeWindow.xaml.cs">
+      <DependentUpon>BasisChangeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UserControlBase.cs" />
     <Compile Include="Views\WindowBase.cs" />
@@ -200,6 +204,10 @@
     <Page Include="Views\NewMatrixDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BasisChangeWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\StepListWindow.xaml">
       <SubType>Designer</SubType>

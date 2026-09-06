@@ -97,6 +97,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Basis change.
+        /// </summary>
+        public static string BASIS_CHANGE {
+            get {
+                return ResourceManager.GetString("BASIS_CHANGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot inverse this matrix, because its determinant is zero..
         /// </summary>
         public static string DET_ZERO {

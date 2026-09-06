@@ -3,6 +3,7 @@ using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 
@@ -29,9 +30,11 @@ namespace RaspMat.Views
         /// </summary>
         public GraphUserControl()
         {
-            _viewService = App.GetService<IViewService>().ThrowIfNull();
-            _eventService = App.GetService<IEventService>().ThrowIfNull();
-
+            if (!DesignerProperties.GetIsInDesignMode(this))
+            {
+                _viewService = App.GetService<IViewService>().ThrowIfNull();
+                _eventService = App.GetService<IEventService>().ThrowIfNull();
+            }
             InitializeComponent();
         }
 

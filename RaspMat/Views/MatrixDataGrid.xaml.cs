@@ -2,6 +2,9 @@
 
 namespace RaspMat.Views
 {
+    /// <summary>
+    /// Interaction logic for <see cref="MatrixDataGrid"/>.
+    /// </summary>
     internal partial class MatrixDataGrid : DataGrid
     {
 
