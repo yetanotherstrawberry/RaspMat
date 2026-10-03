@@ -295,4 +295,16 @@
   <data name="BASIS_CHANGE" xml:space="preserve">
     <value>Basis change</value>
   </data>
+  <data name="NEXT" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="BACK" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="SOURCE_DIM" xml:space="preserve">
+    <value>Source basis dimensions:</value>
+  </data>
+  <data name="DEST_DIM" xml:space="preserve">
+    <value>Destination basis dimensions:</value>
+  </data>
 </root>

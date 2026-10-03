@@ -71,6 +71,9 @@ namespace RaspMat.Services
         public void ToggleMatrixInputDialog() => ToggleView<InputMatrixDialog>();
 
         /// <inheritdoc/>
+        public void ToggleBasisChangeDialog() => ToggleView<BasisChangeDialog>();
+
+        /// <inheritdoc/>
         public void Execute(Action action)
         {
             if (action is null) return;

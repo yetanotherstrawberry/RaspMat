@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using RaspMat.Extensions;
 using RaspMat.Services;
 using RaspMat.Services.Interfaces;
 using RaspMat.ViewModels;
@@ -48,8 +49,7 @@ namespace RaspMat
         /// <param name="disUnhExcArgs">An instance which will have its <see cref="DispatcherUnhandledExceptionEventArgs.Handled"/> set by this method.</param>
         private void MsgBoxExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs disUnhExcArgs)
         {
-            var exception = disUnhExcArgs.Exception;
-            while (exception.InnerException != null) exception = exception.InnerException;
+            var exception = disUnhExcArgs.Exception.Unwrap();
 
             void ShowMessage()
             {
@@ -133,6 +133,7 @@ namespace RaspMat
         {
             RegisterViewModel<MainWindow, MainWindowViewModel>(builder, true);
             RegisterViewModel<StepListWindow, StepListWindowViewModel>(builder);
+            RegisterViewModel<BasisChangeDialog, BasisChangeWindowsViewModel>(builder);
 
             RegisterViewModel<NewMatrixDialog, NewMatrixDialogViewModel>(builder);
             RegisterViewModel<InputMatrixDialog, InputMatrixDialogViewModel>(builder);

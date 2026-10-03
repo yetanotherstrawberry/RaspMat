@@ -41,7 +41,7 @@
                         <GroupBox Header="{x:Static prop:Resources.SCALE}">
                             <StackPanel Style="{StaticResource verticalStackpanel}">
                                 <StackPanel>
-                                    <TextBlock Text="{x:Static prop:Resources.SCALAR}" />
+                                    <Label Target="{Binding ElementName=Scalar}" Content="{x:Static prop:Resources.SCALAR}" />
                                     <TextBox Name="Scalar" />
                                 </StackPanel>
                                 <StackPanel>
@@ -114,6 +114,7 @@
                             <s:Boolean>False</s:Boolean>
                         </Button.CommandParameter>
                     </Button>
+                    <Button Content="{x:Static prop:Resources.BASIS_CHANGE}" Command="{Binding BasisChangeComm}" />
                 </StackPanel>
             </GroupBox>
             <local:MatrixDataGrid

@@ -97,11 +97,29 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Back.
+        /// </summary>
+        public static string BACK {
+            get {
+                return ResourceManager.GetString("BACK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Basis change.
         /// </summary>
         public static string BASIS_CHANGE {
             get {
                 return ResourceManager.GetString("BASIS_CHANGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination basis dimensions:.
+        /// </summary>
+        public static string DEST_DIM {
+            get {
+                return ResourceManager.GetString("DEST_DIM", resourceCulture);
             }
         }
         
@@ -403,6 +421,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        public static string NEXT {
+            get {
+                return ResourceManager.GetString("NEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
         public static string OK {
@@ -516,6 +543,15 @@ namespace RaspMat.Properties {
         public static string SCALE {
             get {
                 return ResourceManager.GetString("SCALE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source basis dimensions:.
+        /// </summary>
+        public static string SOURCE_DIM {
+            get {
+                return ResourceManager.GetString("SOURCE_DIM", resourceCulture);
             }
         }
         

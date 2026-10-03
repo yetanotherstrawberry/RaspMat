@@ -31,6 +31,11 @@ namespace RaspMat.Services.Interfaces
         void ToggleMatrixInputDialog();
 
         /// <summary>
+        /// Shows or closes a view that create a basis change <see cref="Matrix"/>.
+        /// </summary>
+        void ToggleBasisChangeDialog();
+
+        /// <summary>
         /// Executes the <paramref name="action"/>, so that it can access the view.
         /// </summary>
         /// <param name="action">Work to do.</param>

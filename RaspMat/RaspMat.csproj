@@ -100,6 +100,8 @@
     <Compile Include="Extensions\AutomaticGraphLayoutControlExtensions.cs" />
     <Compile Include="Extensions\ClassExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Extensions\ExceptionExtensions.cs" />
+    <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Helpers\Algorithms.cs" />
     <Compile Include="Models\Events.cs" />
@@ -145,8 +147,8 @@
     <Compile Include="Views\NewVectorsDialog.xaml.cs">
       <DependentUpon>NewVectorsDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\BasisChangeWindow.xaml.cs">
-      <DependentUpon>BasisChangeWindow.xaml</DependentUpon>
+    <Compile Include="Views\BasisChangeDialog.xaml.cs">
+      <DependentUpon>BasisChangeDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UserControlBase.cs" />
     <Compile Include="Views\WindowBase.cs" />
@@ -205,7 +207,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\BasisChangeWindow.xaml">
+    <Page Include="Views\BasisChangeDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

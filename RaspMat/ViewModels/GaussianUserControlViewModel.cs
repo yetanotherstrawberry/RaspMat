@@ -1,4 +1,5 @@
-﻿using RaspMat.Extensions;
+﻿using CommunityToolkit.Mvvm.Input;
+using RaspMat.Extensions;
 using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System;
@@ -325,6 +326,29 @@ namespace RaspMat.ViewModels
                     });
                 }
                 return _rawInputComm;
+            }
+        }
+
+        /// <summary>
+        /// Field for <see cref="BasisChangeComm"/>.
+        /// </summary>
+        private ICommand _basisChangeComm;
+
+        /// <summary>
+        /// Opens a view for changing of the basis.
+        /// </summary>
+        public ICommand BasisChangeComm
+        {
+            get
+            {
+                if (_basisChangeComm is null)
+                {
+                    _basisChangeComm = GenerateCommand(() =>
+                    {
+                        _viewService.ToggleBasisChangeDialog();
+                    });
+                }
+                return _basisChangeComm;
             }
         }
 

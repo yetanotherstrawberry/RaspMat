@@ -3,7 +3,6 @@ using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 
@@ -30,7 +29,7 @@ namespace RaspMat.Views
         /// </summary>
         public GraphUserControl()
         {
-            if (!DesignerProperties.GetIsInDesignMode(this))
+            if (this.IsNotInDesign())
             {
                 _viewService = App.GetService<IViewService>().ThrowIfNull();
                 _eventService = App.GetService<IEventService>().ThrowIfNull();
@@ -41,14 +40,14 @@ namespace RaspMat.Views
         /// <summary>
         /// Handles the removal of a vertex.
         /// </summary>
-        /// <param name="sender">The <see cref="object"/> the requested the operation.</param>
+        /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
         /// <param name="eventArgs">Additional arguments.</param>
         private void RemoveVertex(object sender, RoutedEventArgs eventArgs) => GraphControl.RemoveVertex(VertexToRemoveName.Text);
 
         /// <summary>
         /// Handles the creation of a vertex.
         /// </summary>
-        /// <param name="sender">The <see cref="object"/> the requested the operation.</param>
+        /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
         /// <param name="eventArgs">Additional arguments.</param>
         private void AddVertex(object sender, RoutedEventArgs eventArgs) => GraphControl.AddVertex(VertexName.Text);
 
@@ -61,14 +60,14 @@ namespace RaspMat.Views
         /// <summary>
         /// Handles the removal of an edge.
         /// </summary>
-        /// <param name="sender">The <see cref="object"/> the requested the operation.</param>
+        /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
         /// <param name="eventArgs">Additional arguments.</param>
         private void RemoveEdge(object sender, RoutedEventArgs eventArgs) => HandleEdge((source, target) => GraphControl.RemoveEdge(source, target));
 
         /// <summary>
         /// Handles the creation of an edge.
         /// </summary>
-        /// <param name="sender">The <see cref="object"/> the requested the operation.</param>
+        /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
         /// <param name="eventArgs">Additional arguments.</param>
         private void AddEdge(object sender, RoutedEventArgs eventArgs)
         {
@@ -82,7 +81,7 @@ namespace RaspMat.Views
         /// <summary>
         /// Handles the reduction and UI update of the probability chain.
         /// </summary>
-        /// <param name="sender">The <see cref="object"/> the requested the operation.</param>
+        /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
         /// <param name="eventArgs">Additional arguments.</param>
         private void CalculateNode(object sender, RoutedEventArgs eventArgs)
         {
@@ -91,7 +90,14 @@ namespace RaspMat.Views
             var newSourceVertices = probabilityMatrix.Sources.ToDictionary(source => source, source => oldVertices[source]);
             var newTargetVertices = probabilityMatrix.Targets.ToDictionary(target => target, target => oldVertices[target]);
             var newVertices = newSourceVertices.Concat(newTargetVertices).ToDictionary();
-            var newEdges = newSourceVertices.Keys.ToDictionary(source => source, source => (IDictionary<string, string>)newTargetVertices.Keys.Select(target => new KeyValuePair<string, Fraction>(target, probabilityMatrix[source, target])).Where(kvp => !kvp.Value.IsZero).ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString()));
+            var newEdges = newSourceVertices.Keys
+                .ToDictionary(source => source, source =>
+                {
+                    return (IDictionary<string, string>)newTargetVertices.Keys
+                        .Select(target => new KeyValuePair<string, Fraction>(target, probabilityMatrix[source, target]))
+                        .Where(kvp => !kvp.Value.IsZero)
+                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString());
+                });
             GraphControl.SetVerticesAndEdges(newVertices, newEdges);
             _eventService.Send(new Events.LoadMatrixEvent(probabilityMatrix));
             _eventService.Send(new Events.LoadStepsEvent(elimination));

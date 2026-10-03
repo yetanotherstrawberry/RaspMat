@@ -1,4 +1,6 @@
-﻿namespace RaspMat.Services.Interfaces
+﻿using System;
+
+namespace RaspMat.Services.Interfaces
 {
     /// <summary>
     /// A service for computing equations.
@@ -12,7 +14,7 @@
         /// <typeparam name="TResult">Cast of the result.</typeparam>
         /// <param name="equation">A <see cref="string"/> representation of the equation, like "1+1".</param>
         /// <returns>Result of the <paramref name="equation"/> casted to <typeparamref name="TResult"/>.</returns>
-        TResult Compute<TResult>(string equation);
+        TResult Compute<TResult>(string equation) where TResult : unmanaged, IComparable<TResult>, IConvertible;
 
     }
 }

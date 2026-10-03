@@ -1,0 +1,87 @@
+﻿<local:WindowBase
+        x:Class="RaspMat.Views.BasisChangeDialog"
+        x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:RaspMat.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:prop="clr-namespace:RaspMat.Properties"
+        xmlns:local="clr-namespace:RaspMat.Views"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type vm:BasisChangeWindowsViewModel}, IsDesignTimeCreatable=False}" 
+        Title="{x:Static prop:Resources.BASIS_CHANGE}"
+        Height="400"
+        Width="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <ResourceDictionary Source="pack://application:,,,/RaspMat;component/Resources/Styles.xaml" />
+                </ResourceDictionary.MergedDictionaries>
+            </ResourceDictionary>
+        </Grid.Resources>
+        <ProgressBar
+            Margin="3"
+            Grid.Row="0"
+            Height="20"
+            Minimum="0"
+            Maximum="3"
+            Name="ProgressIndicator" />
+        <StackPanel
+            Grid.Row="1"
+            VerticalAlignment="Center">
+            <StackPanel
+                Margin="3"
+                Name="DimensionsContainer">
+                <StackPanel.Resources>
+                    <Style TargetType="StackPanel" BasedOn="{StaticResource {x:Type StackPanel}}">
+                        <Style.Triggers>
+                            <Trigger Property="{Binding StepIndex}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </Style.Triggers>
+                        <Setter Property="Margin" Value="10" />
+                    </Style>
+                </StackPanel.Resources>
+                <StackPanel Orientation="Vertical">
+                    <Label
+                    Content="{x:Static prop:Resources.SOURCE_DIM}"
+                    Target="{Binding ElementName=SourceBasisDimensionsTextBox}" />
+                    <TextBox x:Name="SourceBasisDimensionsTextBox" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <Label
+                    Content="{x:Static prop:Resources.DEST_DIM}"
+                    Target="{Binding ElementName=DestinationBasisDimensionsTextBox}" />
+                    <TextBox x:Name="DestinationBasisDimensionsTextBox" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel
+                Margin="3"
+                Name="SourceMatrixContainer">
+                <local:MatrixDataGrid />
+            </StackPanel>
+        </StackPanel>
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Center"
+            Margin="3">
+            <Button
+                Content="{x:Static prop:Resources.BACK}"
+                Name="BackButton"
+                Click="PrevButton_Click">
+            </Button>
+            <Button
+                Content="{x:Static prop:Resources.NEXT}"
+                Name="NextButton"
+                Click="NextButton_Click" />
+        </StackPanel>
+    </Grid>
+</local:WindowBase>

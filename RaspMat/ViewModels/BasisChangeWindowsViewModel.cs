@@ -1,5 +1,6 @@
 ﻿using RaspMat.Extensions;
 using RaspMat.Services.Interfaces;
+using System;
 using System.Windows.Input;
 
 namespace RaspMat.ViewModels
@@ -18,20 +19,6 @@ namespace RaspMat.ViewModels
             _eventService = eventService.ThrowIfNull();
             _viewService = viewService.ThrowIfNull();
             _commandingService = commandingService.ThrowIfNull();
-        }
-
-        /// <summary>
-        /// Field for <see cref="StepIndex"/>.
-        /// </summary>
-        private int _stepIndex;
-
-        /// <summary>
-        /// The current step.
-        /// </summary>
-        public int StepIndex
-        {
-            get => _stepIndex;
-            private set => SetProperty(ref _stepIndex, value);
         }
 
         /// <summary>
@@ -62,21 +49,20 @@ namespace RaspMat.ViewModels
             private set => SetProperty(ref _columns, value);
         }
 
-        private ICommand _nextStepCommand;
 
-        public ICommand NextStepCommand
+        private ICommand _generateMatrix;
+
+        public ICommand GenerateMatrix
         {
             get
             {
-                if (_nextStepCommand is null)
+                if (_generateMatrix is null)
                 {
-                    _nextStepCommand = _commandingService.CreateFromAction(action: () =>
-                    {
-
-                    });
+                    _generateMatrix = _commandingService.CreateFromAction();
                 }
-                return _nextStepCommand;
+                return _generateMatrix;
             }
+
         }
 
     }
