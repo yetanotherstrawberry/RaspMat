@@ -114,10 +114,13 @@
                             <s:Boolean>False</s:Boolean>
                         </Button.CommandParameter>
                     </Button>
-                    <Button Content="{x:Static prop:Resources.BASIS_CHANGE}" Command="{Binding BasisChangeComm}" />
+                    <Button
+                        Content="{x:Static prop:Resources.BASIS_CHANGE}"
+                        Command="{Binding BasisChangeComm}" />
                 </StackPanel>
             </GroupBox>
             <local:MatrixDataGrid
+                ItemsSource="{Binding MatrixDataTable}"
                 Margin="2"
                 Grid.Row="1" />
             <GroupBox Header="{x:Static prop:Resources.MATRIX}" Grid.Row="2">

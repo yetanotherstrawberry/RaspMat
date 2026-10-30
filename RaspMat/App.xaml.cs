@@ -81,7 +81,7 @@ namespace RaspMat
         /// <returns>An instance of <typeparamref name="TService"/> or <see langword="null"/>.</returns>
         internal static TService GetService<TService>() where TService : class
         {
-            return Self?.Services.GetService<TService>();
+            return Self?.Services.GetRequiredService<TService>();
         }
 
         /// <summary>

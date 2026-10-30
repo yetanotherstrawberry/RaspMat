@@ -1,6 +1,7 @@
 ﻿using RaspMat.Extensions;
 using RaspMat.Services.Interfaces;
 using System;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RaspMat.ViewModels
@@ -22,33 +23,32 @@ namespace RaspMat.ViewModels
         }
 
         /// <summary>
-        /// Field for <see cref="Rows"/>.
+        /// Field for <see cref="SourceRows"/>.
         /// </summary>
-        private int _rows = 3;
+        private int _sourceRows = 3;
 
         /// <summary>
         /// Indicates the number of rows in the matrix.
         /// </summary>
-        public int Rows
+        public int SourceRows
         {
-            get => _rows;
-            private set => SetProperty(ref _rows, value);
+            get => _sourceRows;
+            private set => SetProperty(ref _sourceRows, value);
         }
 
         /// <summary>
-        /// Field for <see cref="Columns"/>.
+        /// Field for <see cref="SourceColumns"/>.
         /// </summary>
-        private int _columns = 3;
+        private int _sourceColumns = 3;
 
         /// <summary>
         /// Indicates the number of columns in the matrix.
         /// </summary>
-        public int Columns
+        public int SourceColumns
         {
-            get => _columns;
-            private set => SetProperty(ref _columns, value);
+            get => _sourceColumns;
+            private set => SetProperty(ref _sourceColumns, value);
         }
-
 
         private ICommand _generateMatrix;
 
@@ -59,6 +59,8 @@ namespace RaspMat.ViewModels
                 if (_generateMatrix is null)
                 {
                     _generateMatrix = _commandingService.CreateFromAction();
+                    var a= new DataGrid();
+                    
                 }
                 return _generateMatrix;
             }

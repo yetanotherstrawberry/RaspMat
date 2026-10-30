@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:RaspMat.ViewModels"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:prop="clr-namespace:RaspMat.Properties"
              xmlns:local="clr-namespace:RaspMat.Views"
              mc:Ignorable="d"
@@ -35,10 +36,9 @@
             HeadersVisibility="None"
             CanUserAddRows="True"
             AutoGenerateColumns="False"
-            d:ItemsSource="{d:SampleData ItemCount=5}">
-            <DataGrid.Columns>
-                <DataGridTextColumn />
-            </DataGrid.Columns>
+            d:ItemsSource="{d:SampleData ItemCount=5}"
+            >
+            
         </DataGrid>
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Center">

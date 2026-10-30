@@ -12,17 +12,17 @@ namespace RaspMat.Views
         /// <summary>
         /// Indicates whether the dialog has been shown.
         /// </summary>
-        private bool Shown { get; set; } = false;
+        //private bool Shown { get; set; } = false;
 
         /// <summary>
         /// Field for <see cref="CurrentPage"/>.
         /// </summary>
-        private int _currentPage = -1;
+        private ushort _currentPage = ushort.MaxValue;
 
         /// <summary>
         /// Indicates the current page of the dialog.
         /// </summary>
-        private int CurrentPage
+        private ushort CurrentPage
         {
             get => _currentPage;
             set
@@ -38,25 +38,37 @@ namespace RaspMat.Views
         /// <exception cref="ArgumentOutOfRangeException">The <see cref="CurrentPage"/> is out of range.</exception>
         private void UpdateContent()
         {
-            const int TOTAL_PAGES = 3;
-            DimensionsContainer.Visibility = Visibility.Hidden;
-            BackButton.Visibility = NextButton.Visibility = Visibility.Visible;
-            switch (CurrentPage)
+            using (Dispatcher.DisableProcessing())
             {
-                case 0:
-                    DimensionsContainer.Visibility = Visibility.Visible;
-                    BackButton.Visibility = Visibility.Hidden;
-                    break;
-                case 1:
-                    
-                    break;
-                case 2:
-
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(CurrentPage));
+                const ushort TOTAL_PAGES = 3;
+                DestinationMatrixContainer.Visibility = SourceMatrixContainer.Visibility = DimensionsContainer.Visibility = Visibility.Collapsed;
+                BackButton.IsEnabled = NextButton.IsEnabled = false;
+                switch (CurrentPage)
+                {
+                    case 0:
+                        DimensionsContainer.Visibility = Visibility.Visible;
+                        NextButton.IsEnabled = true;
+                        break;
+                    case 1:
+                        SourceMatrixContainer.Visibility = Visibility.Visible;
+                        BackButton.IsEnabled = true;
+                        NextButton.IsEnabled = true;
+                        break;
+                    case 2:
+                        DestinationMatrixContainer.Visibility = Visibility.Visible;
+                        BackButton.IsEnabled = true;
+                        NextButton.IsEnabled = true;
+                        break;
+                    case 3:
+                        ProgressIndicator.Value = 1;
+                        // TODO: Implement the logic.
+                        Close();
+                        return;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(CurrentPage));
+                }
+                ProgressIndicator.Value = CurrentPage / (double)TOTAL_PAGES;
             }
-            ProgressIndicator.Value = CurrentPage / 3.0;
         }
 
         /// <summary>
@@ -65,6 +77,7 @@ namespace RaspMat.Views
         public BasisChangeDialog()
         {
             InitializeComponent();
+            CurrentPage = 0;
         }
 
         /// <summary>
@@ -74,7 +87,7 @@ namespace RaspMat.Views
         /// <param name="eventArgs">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void PrevButton_Click(object sender, RoutedEventArgs eventArgs)
         {
-
+            CurrentPage--;
         }
 
         /// <summary>
@@ -84,9 +97,10 @@ namespace RaspMat.Views
         /// <param name="eventArgs">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void NextButton_Click(object sender, RoutedEventArgs eventArgs)
         {
-
+            CurrentPage++;
         }
 
+        /*
         /// <inheritdoc/>
         protected override void OnContentRendered(EventArgs eventArgs)
         {
@@ -94,9 +108,10 @@ namespace RaspMat.Views
             if (!Shown)
             {
                 Shown = true;
-                CurrentPage = 0;
+                
             }
         }
+        */
 
     }
 }

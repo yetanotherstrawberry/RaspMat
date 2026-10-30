@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using RaspMat.Extensions;
+﻿using RaspMat.Extensions;
 using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System;
@@ -383,7 +382,11 @@ namespace RaspMat.ViewModels
             private set
             {
                 SelectedRows.Clear();
-                SetProperty(ref _matrixDataTable, value);
+                var oldValue = MatrixDataTable;
+                if (SetProperty(ref _matrixDataTable, value))
+                {
+                    oldValue?.Dispose();
+                }
             }
         }
 
@@ -403,12 +406,7 @@ namespace RaspMat.ViewModels
         private Matrix CurrentMatrix
         {
             get => Matrix.Parse(MatrixDataTable);
-            set
-            {
-                var matrix = MatrixDataTable;
-                MatrixDataTable = value.ToDataTable();
-                matrix.Dispose();
-            }
+            set => MatrixDataTable = value.ToDataTable();
         }
 
         /// <summary>
@@ -437,7 +435,7 @@ namespace RaspMat.ViewModels
         /// <inheritdoc/>
         public void Dispose()
         {
-            MatrixDataTable.Dispose();
+            MatrixDataTable = null;
         }
 
         /// <summary>

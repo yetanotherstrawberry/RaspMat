@@ -11,7 +11,7 @@
     xmlns:local="clr-namespace:RaspMat.Views"
     xmlns:vm="clr-namespace:RaspMat.ViewModels"
     xmlns:s="clr-namespace:System;assembly=mscorlib"
-    ItemsSource="{Binding MatrixDataTable}"
+
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=vm:GaussianUserControlViewModel, IsDesignTimeCreatable=False}"
     d:Width="200"

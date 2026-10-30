@@ -31,21 +31,22 @@
             Grid.Row="0"
             Height="20"
             Minimum="0"
-            Maximum="3"
+            Maximum="1"
             Name="ProgressIndicator" />
         <StackPanel
             Grid.Row="1"
-            VerticalAlignment="Center">
+            VerticalAlignment="Center"
+            Orientation="Vertical">
             <StackPanel
                 Margin="3"
                 Name="DimensionsContainer">
                 <StackPanel.Resources>
                     <Style TargetType="StackPanel" BasedOn="{StaticResource {x:Type StackPanel}}">
-                        <Style.Triggers>
+                        <!--<Style.Triggers>
                             <Trigger Property="{Binding StepIndex}" Value="0">
                                 <Setter Property="Visibility" Value="Visible" />
                             </Trigger>
-                        </Style.Triggers>
+                        </Style.Triggers>-->
                         <Setter Property="Margin" Value="10" />
                     </Style>
                 </StackPanel.Resources>
@@ -57,14 +58,27 @@
                 </StackPanel>
                 <StackPanel Orientation="Vertical">
                     <Label
-                    Content="{x:Static prop:Resources.DEST_DIM}"
-                    Target="{Binding ElementName=DestinationBasisDimensionsTextBox}" />
-                    <TextBox x:Name="DestinationBasisDimensionsTextBox" />
+                        Content="{x:Static prop:Resources.DEST_DIM}"
+                        Target="{Binding ElementName=DestinationBasisDimensionsTextBox}" />
+                    <TextBox
+                        x:Name="DestinationBasisDimensionsTextBox"
+                        />
                 </StackPanel>
             </StackPanel>
             <StackPanel
-                Margin="3"
-                Name="SourceMatrixContainer">
+                Name="SourceMatrixContainer"
+                Orientation="Vertical">
+                <TextBlock
+                    Margin="3"
+                    Text="Source matrix" />
+                <local:MatrixDataGrid />
+            </StackPanel>
+            <StackPanel
+                Name="DestinationMatrixContainer"
+                Orientation="Vertical">
+                <TextBlock
+                    Margin="3"
+                    Text="Destination matrix" />
                 <local:MatrixDataGrid />
             </StackPanel>
         </StackPanel>
@@ -82,6 +96,14 @@
                 Content="{x:Static prop:Resources.NEXT}"
                 Name="NextButton"
                 Click="NextButton_Click" />
+            <Button
+                Content="{x:Static prop:Resources.NEXT}"
+                Name="FinishButton"
+                Command="{Binding FinishCommand}">
+                <Button.CommandParameter>
+                    <x:Null /><!-- TODO -->
+                </Button.CommandParameter>
+            </Button>
         </StackPanel>
     </Grid>
 </local:WindowBase>
