@@ -49,5 +49,11 @@ namespace RaspMat.Services.Interfaces
         /// <returns>A <see langword="new"/> <see cref="Task"/> that can be used to access the <paramref name="callback"/>.</returns>
         Task<TResult> ExecuteAsync<TResult>(Func<TResult> callback);
 
+        /// <summary>
+        /// Pauses rendering of the view.
+        /// </summary>
+        /// <returns>An <see cref="IDisposable"/> that can be used to resume rendering.</returns>
+        IDisposable PauseRender();
+
     }
 }

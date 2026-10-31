@@ -307,4 +307,7 @@
   <data name="DEST_DIM" xml:space="preserve">
     <value>Destination basis dimensions:</value>
   </data>
+  <data name="FINISH" xml:space="preserve">
+    <value>Finish</value>
+  </data>
 </root>

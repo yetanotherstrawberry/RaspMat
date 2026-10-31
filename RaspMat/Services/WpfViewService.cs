@@ -51,9 +51,14 @@ namespace RaspMat.Services
                     if (tempWindow is DialogWindowBase tempDialogWindow)
                     {
                         tempWindow.Owner = _serviceProvider.GetRequiredService<MainWindow>();
+                        tempWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                         tempWindow.ShowDialog();
                     }
-                    else tempWindow.Show();
+                    else
+                    {
+                        tempWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                        tempWindow.Show();
+                    }
                 }
             });
         }
@@ -82,6 +87,9 @@ namespace RaspMat.Services
 
         /// <inheritdoc/>
         public Task<TResult> ExecuteAsync<TResult>(Func<TResult> callback) => _dispatcher.InvokeAsync(callback).Task;
+
+        /// <inheritdoc/>
+        public IDisposable PauseRender() => _dispatcher.DisableProcessing();
 
         /// <summary>
         /// Creates a new instance of <see cref="IViewService"/> that uses the provided <see cref="IServiceProvider"/> to create <see cref="Window"/>s.

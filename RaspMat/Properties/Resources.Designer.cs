@@ -277,6 +277,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Finish.
+        /// </summary>
+        public static string FINISH {
+            get {
+                return ResourceManager.GetString("FINISH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fractions.
         /// </summary>
         public static string FRACTIONS {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RaspMat.Services.Interfaces;
+using System;
 using System.Windows;
 
 namespace RaspMat.Views
@@ -6,13 +7,13 @@ namespace RaspMat.Views
     /// <summary>
     /// Interaction logic for <see cref="BasisChangeDialog"/>.
     /// </summary>
-    internal partial class BasisChangeDialog : WindowBase
+    internal partial class BasisChangeDialog : DialogWindowBase
     {
 
         /// <summary>
-        /// Indicates whether the dialog has been shown.
+        /// Used to access the view.
         /// </summary>
-        //private bool Shown { get; set; } = false;
+        private readonly IViewService _viewService = App.GetService<IViewService>();
 
         /// <summary>
         /// Field for <see cref="CurrentPage"/>.
@@ -38,11 +39,13 @@ namespace RaspMat.Views
         /// <exception cref="ArgumentOutOfRangeException">The <see cref="CurrentPage"/> is out of range.</exception>
         private void UpdateContent()
         {
-            using (Dispatcher.DisableProcessing())
+            using (_viewService.PauseRender())
             {
                 const ushort TOTAL_PAGES = 3;
-                DestinationMatrixContainer.Visibility = SourceMatrixContainer.Visibility = DimensionsContainer.Visibility = Visibility.Collapsed;
                 BackButton.IsEnabled = NextButton.IsEnabled = false;
+                NextButton.Visibility = Visibility.Visible;
+                FinishButton.Visibility = DestinationMatrixContainer.Visibility = SourceMatrixContainer.Visibility = DimensionsContainer.Visibility =
+                    Visibility.Collapsed;
                 switch (CurrentPage)
                 {
                     case 0:
@@ -57,11 +60,11 @@ namespace RaspMat.Views
                     case 2:
                         DestinationMatrixContainer.Visibility = Visibility.Visible;
                         BackButton.IsEnabled = true;
-                        NextButton.IsEnabled = true;
+                        NextButton.Visibility = Visibility.Collapsed;
+                        FinishButton.Visibility = Visibility.Visible;
                         break;
                     case 3:
                         ProgressIndicator.Value = 1;
-                        // TODO: Implement the logic.
                         Close();
                         return;
                     default:
@@ -99,19 +102,6 @@ namespace RaspMat.Views
         {
             CurrentPage++;
         }
-
-        /*
-        /// <inheritdoc/>
-        protected override void OnContentRendered(EventArgs eventArgs)
-        {
-            base.OnContentRendered(eventArgs);
-            if (!Shown)
-            {
-                Shown = true;
-                
-            }
-        }
-        */
 
     }
 }

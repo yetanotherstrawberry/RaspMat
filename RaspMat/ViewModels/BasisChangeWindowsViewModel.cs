@@ -1,7 +1,7 @@
 ﻿using RaspMat.Extensions;
+using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RaspMat.ViewModels
@@ -9,10 +9,19 @@ namespace RaspMat.ViewModels
     internal class BasisChangeWindowsViewModel : ViewModelBase
     {
 
+        /// <summary>
+        /// Used for communication between components.
+        /// </summary>
         private readonly IEventService _eventService;
 
+        /// <summary>
+        /// Used to access the view.
+        /// </summary>
         private readonly IViewService _viewService;
 
+        /// <summary>
+        /// Used for commanding.
+        /// </summary>
         private readonly ICommandingService _commandingService;
 
         public BasisChangeWindowsViewModel(IEventService eventService, IViewService viewService, ICommandingService commandingService)
@@ -23,48 +32,49 @@ namespace RaspMat.ViewModels
         }
 
         /// <summary>
-        /// Field for <see cref="SourceRows"/>.
+        /// Field for <see cref="RefreshStateCommand"/>.
         /// </summary>
-        private int _sourceRows = 3;
+        private ICommand _refreshStateCommand;
 
         /// <summary>
-        /// Indicates the number of rows in the matrix.
+        /// Refreshes the state.
         /// </summary>
-        public int SourceRows
-        {
-            get => _sourceRows;
-            private set => SetProperty(ref _sourceRows, value);
-        }
-
-        /// <summary>
-        /// Field for <see cref="SourceColumns"/>.
-        /// </summary>
-        private int _sourceColumns = 3;
-
-        /// <summary>
-        /// Indicates the number of columns in the matrix.
-        /// </summary>
-        public int SourceColumns
-        {
-            get => _sourceColumns;
-            private set => SetProperty(ref _sourceColumns, value);
-        }
-
-        private ICommand _generateMatrix;
-
-        public ICommand GenerateMatrix
+        public ICommand RefreshStateCommand
         {
             get
             {
-                if (_generateMatrix is null)
+                if (_refreshStateCommand is null)
                 {
-                    _generateMatrix = _commandingService.CreateFromAction();
-                    var a= new DataGrid();
-                    
-                }
-                return _generateMatrix;
-            }
+                    _refreshStateCommand = _commandingService.CreateFromAction(action: () =>
+                    {
 
+                    });
+                }
+                return _refreshStateCommand;
+            }
+        }
+
+        /// <summary>
+        /// Field for <see cref="RefreshStateCommand"/>.
+        /// </summary>
+        private ICommand _finishCommand;
+
+        /// <summary>
+        /// Finishes the operation by creating a <see cref="Matrix"/>.
+        /// </summary>
+        public ICommand FinishCommand
+        {
+            get
+            {
+                if (_finishCommand is null)
+                {
+                    _finishCommand = _commandingService.CreateFromAction(action: () =>
+                    {
+
+                    });
+                }
+                return _finishCommand;
+            }
         }
 
     }

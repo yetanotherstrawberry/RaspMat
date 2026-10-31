@@ -1,4 +1,4 @@
-﻿<local:WindowBase
+﻿<local:DialogWindowBase
         x:Class="RaspMat.Views.BasisChangeDialog"
         x:ClassModifier="internal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -40,16 +40,6 @@
             <StackPanel
                 Margin="3"
                 Name="DimensionsContainer">
-                <StackPanel.Resources>
-                    <Style TargetType="StackPanel" BasedOn="{StaticResource {x:Type StackPanel}}">
-                        <!--<Style.Triggers>
-                            <Trigger Property="{Binding StepIndex}" Value="0">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </Trigger>
-                        </Style.Triggers>-->
-                        <Setter Property="Margin" Value="10" />
-                    </Style>
-                </StackPanel.Resources>
                 <StackPanel Orientation="Vertical">
                     <Label
                     Content="{x:Static prop:Resources.SOURCE_DIM}"
@@ -95,15 +85,13 @@
             <Button
                 Content="{x:Static prop:Resources.NEXT}"
                 Name="NextButton"
-                Click="NextButton_Click" />
+                Click="NextButton_Click"
+                Command="{Binding RefreshStateCommand}" />
             <Button
-                Content="{x:Static prop:Resources.NEXT}"
+                Content="{x:Static prop:Resources.FINISH}"
                 Name="FinishButton"
-                Command="{Binding FinishCommand}">
-                <Button.CommandParameter>
-                    <x:Null /><!-- TODO -->
-                </Button.CommandParameter>
-            </Button>
+                Click="NextButton_Click"
+                Command="{Binding FinishCommand}" />
         </StackPanel>
     </Grid>
-</local:WindowBase>
+</local:DialogWindowBase>
