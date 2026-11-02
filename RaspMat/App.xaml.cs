@@ -137,7 +137,6 @@ namespace RaspMat
 
             RegisterViewModel<NewMatrixDialog, NewMatrixDialogViewModel>(builder);
             RegisterViewModel<InputMatrixDialog, InputMatrixDialogViewModel>(builder);
-            RegisterViewModel<NewVectorsDialog, NewVectorsDialogViewModel>(builder);
 
             RegisterViewModel<FractionUserControl, FractionUserControlViewModel>(builder);
             RegisterViewModel<GaussianUserControl, GaussianUserControlViewModel>(builder);

@@ -1,4 +1,5 @@
 ﻿using RaspMat.Extensions;
+using RaspMat.Helpers;
 using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System;
@@ -30,7 +31,6 @@ namespace RaspMat.ViewModels
             _eventService = eventService.ThrowIfNull();
             _viewService = viewService.ThrowIfNull();
             _commandingService = commandingService.ThrowIfNull();
-            GridSelectedRowComm = _commandingService.CreateFromAction();
             SourceDim = 3;
             TargetDim = 3;
         }
@@ -102,29 +102,6 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Field for <see cref="RefreshStateCommand"/>.
         /// </summary>
-        private ICommand _refreshStateCommand;
-
-        /// <summary>
-        /// Refreshes the state.
-        /// </summary>
-        public ICommand RefreshStateCommand
-        {
-            get
-            {
-                if (_refreshStateCommand is null)
-                {
-                    _refreshStateCommand = _commandingService.CreateFromAction(action: () =>
-                    {
-
-                    });
-                }
-                return _refreshStateCommand;
-            }
-        }
-
-        /// <summary>
-        /// Field for <see cref="RefreshStateCommand"/>.
-        /// </summary>
         private ICommand _finishCommand;
 
         /// <summary>
@@ -136,10 +113,13 @@ namespace RaspMat.ViewModels
             {
                 if (_finishCommand is null)
                 {
-                    _finishCommand = _commandingService.CreateFromAction(action: () =>
+                    _finishCommand = _commandingService.CreateFromAction(() => IsFree = false, () =>
                     {
-
-                    });
+                        var sourceMatrix = Matrix.Parse(SourceGrid);
+                        var targetMatrix = Matrix.Parse(TargetGrid);
+                        var matrix = Algorithms.BasisChangeMatrix(sourceMatrix, targetMatrix);
+                        _eventService.Send(new Events.LoadMatrixEvent(matrix));
+                    }, () => IsFree = true);
                 }
                 return _finishCommand;
             }
@@ -148,7 +128,7 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Used upon selecting a row.
         /// </summary>
-        public ICommand GridSelectedRowComm { get; set; }
+        public ICommand GridSelectedRowComm { get; set; } = null;
 
     }
 }

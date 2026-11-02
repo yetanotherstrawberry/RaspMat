@@ -39,7 +39,7 @@ namespace RaspMat.ViewModels
                     _closeDialogCommand = _commandingService.CreateFromAction(() => IsFree = false, () =>
                     {
                         var fill = Fraction.Parse(Fill);
-                        _eventService.Send(new LoadMatrixEvent(new Matrix(int.Parse(Rows), int.Parse(Columns), (row, column) => fill)));
+                        _eventService.Send(new LoadMatrixEvent(new Matrix(Rows, Columns, (row, column) => fill)));
                         _viewService.ToggleNewMatrixDialog();
                     }, () => IsFree = true);
                 }
@@ -55,7 +55,7 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Number of rows.
         /// </summary>
-        public string Rows
+        public ushort Rows
         {
             get => _rows;
             set => SetProperty(ref _rows, value);
@@ -64,12 +64,12 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Field for <see cref="Rows"/>.
         /// </summary>
-        private string _rows = string.Empty;
+        private ushort _rows;
 
         /// <summary>
         /// Number of columns.
         /// </summary>
-        public string Columns
+        public ushort Columns
         {
             get => _columns;
             set => SetProperty(ref _columns, value);
@@ -78,7 +78,7 @@ namespace RaspMat.ViewModels
         /// <summary>
         /// Field for <see cref="Columns"/>.
         /// </summary>
-        private string _columns = string.Empty;
+        private ushort _columns;
 
         /// <summary>
         /// Indicated whether the result should be filled with zeros.

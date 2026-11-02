@@ -13,7 +13,8 @@
         d:DataContext="{d:DesignInstance {x:Type vm:BasisChangeWindowsViewModel}, IsDesignTimeCreatable=False}" 
         Title="{x:Static prop:Resources.BASIS_CHANGE}"
         Height="400"
-        Width="600">
+        Width="600"
+        IsEnabled="{Binding IsFree}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -91,8 +92,7 @@
             <Button
                 Content="{x:Static prop:Resources.NEXT}"
                 Name="NextButton"
-                Click="NextButton_Click"
-                Command="{Binding RefreshStateCommand}" />
+                Click="NextButton_Click" />
             <Button
                 Content="{x:Static prop:Resources.FINISH}"
                 Name="FinishButton"
