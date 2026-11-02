@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using RaspMat.Extensions;
+using System.Windows;
 using System.Windows.Input;
 
 namespace RaspMat.Views
@@ -24,7 +25,7 @@ namespace RaspMat.Views
         /// <param name="textCompositionArgs">An instance of <see cref="TextCompositionEventArgs"/> to check <see cref="TextCompositionEventArgs.Text"/> and set <see cref="RoutedEventArgs.Handled"/>.</param>
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs textCompositionArgs)
         {
-            if (!int.TryParse(textCompositionArgs.Text, out var number) || number <= 0) textCompositionArgs.Handled = true;
+            if (!textCompositionArgs.Text.IsPositiveInteger()) textCompositionArgs.Handled = true;
         }
 
     }

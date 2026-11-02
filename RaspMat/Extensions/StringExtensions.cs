@@ -23,5 +23,26 @@ namespace RaspMat.Extensions
             return input is null ? null : _whiteSpaceRegex.Replace(input, string.Empty);
         }
 
+        /// <summary>
+        /// Tries to parse a <see cref="string"/> as a positive number.
+        /// </summary>
+        /// <param name="input">The <see cref="string"/> to parse.</param>
+        /// <param name="parsed">The parsed number.</param>
+        /// <returns>Indicates whether the string is a positive integer.</returns>
+        public static bool IsPositiveInteger(this string input, out ushort parsed)
+        {
+            return ushort.TryParse(input, out parsed);
+        }
+
+        /// <summary>
+        /// Tries to parse a <see cref="string"/> as a positive number.
+        /// </summary>
+        /// <param name="input">The <see cref="string"/> to parse.</param>
+        /// <returns>Indicates whether the string is a positive integer.</returns>
+        public static bool IsPositiveInteger(this string input)
+        {
+            return input.IsPositiveInteger(out var _);
+        }
+
     }
 }

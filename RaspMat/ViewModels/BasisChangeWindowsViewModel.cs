@@ -31,6 +31,7 @@ namespace RaspMat.ViewModels
             _commandingService = commandingService.ThrowIfNull();
         }
 
+
         /// <summary>
         /// Field for <see cref="RefreshStateCommand"/>.
         /// </summary>
