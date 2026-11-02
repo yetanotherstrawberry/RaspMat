@@ -97,8 +97,11 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\StringToFractionConverter.cs" />
+    <Compile Include="Converters\StringToUshortConverter.cs" />
     <Compile Include="Extensions\AutomaticGraphLayoutControlExtensions.cs" />
     <Compile Include="Extensions\ClassExtensions.cs" />
+    <Compile Include="Extensions\DataTableExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />

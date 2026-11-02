@@ -2,6 +2,7 @@
 using RaspMat.Models;
 using RaspMat.Services.Interfaces;
 using System;
+using System.Data;
 using System.Windows.Input;
 
 namespace RaspMat.ViewModels
@@ -29,8 +30,74 @@ namespace RaspMat.ViewModels
             _eventService = eventService.ThrowIfNull();
             _viewService = viewService.ThrowIfNull();
             _commandingService = commandingService.ThrowIfNull();
+            GridSelectedRowComm = _commandingService.CreateFromAction();
+            SourceDim = 3;
+            TargetDim = 3;
         }
 
+        /// <summary>
+        /// Field for <see cref="SourceDim"/>.
+        /// </summary>
+        private ushort _sourceDim;
+
+        /// <summary>
+        /// Source dimension size.
+        /// </summary>
+        public ushort SourceDim
+        {
+            get => _sourceDim;
+            set
+            {
+                SetProperty(ref _sourceDim, value);
+                SourceGrid.SetColumns(value).SetRows(value);
+            }
+        }
+
+        /// <summary>
+        /// Field for <see cref="TargetDim"/>.
+        /// </summary>
+        private ushort _targetDim;
+
+        /// <summary>
+        /// Target dimension size.
+        /// </summary>
+        public ushort TargetDim
+        {
+            get => _targetDim;
+            set
+            {
+                SetProperty(ref _targetDim, value);
+                TargetGrid.SetColumns(value).SetRows(value);
+            }
+        }
+
+        /// <summary>
+        /// Field for <see cref="SourceGrid"/>.
+        /// </summary>
+        private DataTable _sourceGrid = new DataTable();
+
+        /// <summary>
+        /// The grid representing the source dimension.
+        /// </summary>
+        public DataTable SourceGrid
+        {
+            get => _sourceGrid;
+            set => SetProperty(ref _sourceGrid, value);
+        }
+
+        /// <summary>
+        /// Field for <see cref="TargetGrid"/>.
+        /// </summary>
+        private DataTable _targetGrid = new DataTable();
+
+        /// <summary>
+        /// The grid representing the target dimension.
+        /// </summary>
+        public DataTable TargetGrid
+        {
+            get => _targetGrid;
+            set => SetProperty(ref _targetGrid, value);
+        }
 
         /// <summary>
         /// Field for <see cref="RefreshStateCommand"/>.
@@ -77,6 +144,11 @@ namespace RaspMat.ViewModels
                 return _finishCommand;
             }
         }
+
+        /// <summary>
+        /// Used upon selecting a row.
+        /// </summary>
+        public ICommand GridSelectedRowComm { get; set; }
 
     }
 }

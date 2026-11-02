@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:RaspMat.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:c="clr-namespace:RaspMat.Converters"
         xmlns:prop="clr-namespace:RaspMat.Properties"
         xmlns:local="clr-namespace:RaspMat.Views"
         mc:Ignorable="d"
@@ -24,6 +25,7 @@
                 <ResourceDictionary.MergedDictionaries>
                     <ResourceDictionary Source="pack://application:,,,/RaspMat;component/Resources/Styles.xaml" />
                 </ResourceDictionary.MergedDictionaries>
+                <c:StringToUshortConverter x:Key="StringToUshortConverter" />
             </ResourceDictionary>
         </Grid.Resources>
         <ProgressBar
@@ -42,9 +44,11 @@
                 Name="DimensionsContainer">
                 <StackPanel Orientation="Vertical">
                     <Label
-                    Content="{x:Static prop:Resources.SOURCE_DIM}"
-                    Target="{Binding ElementName=SourceBasisDimensionsTextBox}" />
-                    <TextBox x:Name="SourceBasisDimensionsTextBox" />
+                        Content="{x:Static prop:Resources.SOURCE_DIM}"
+                        Target="{Binding ElementName=SourceBasisDimensionsTextBox}" />
+                    <TextBox
+                        x:Name="SourceBasisDimensionsTextBox"
+                        Text="{Binding SourceDim, Converter={StaticResource StringToUshortConverter}}" />
                 </StackPanel>
                 <StackPanel Orientation="Vertical">
                     <Label
@@ -52,7 +56,7 @@
                         Target="{Binding ElementName=DestinationBasisDimensionsTextBox}" />
                     <TextBox
                         x:Name="DestinationBasisDimensionsTextBox"
-                        />
+                        Text="{Binding TargetDim, Converter={StaticResource StringToUshortConverter}}" />
                 </StackPanel>
             </StackPanel>
             <StackPanel
@@ -61,7 +65,8 @@
                 <TextBlock
                     Margin="3"
                     Text="Source matrix" />
-                <local:MatrixDataGrid />
+                <local:MatrixDataGrid
+                    ItemsSource="{Binding SourceGrid}" />
             </StackPanel>
             <StackPanel
                 Name="DestinationMatrixContainer"
@@ -69,7 +74,8 @@
                 <TextBlock
                     Margin="3"
                     Text="Destination matrix" />
-                <local:MatrixDataGrid />
+                <local:MatrixDataGrid
+                    ItemsSource="{Binding TargetGrid}" />
             </StackPanel>
         </StackPanel>
         <StackPanel
