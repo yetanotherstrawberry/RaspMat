@@ -23,11 +23,4 @@
             <Style TargetType="{x:Type local:MatrixDataGrid}" BasedOn="{StaticResource {x:Type DataGrid}}" />
         </ResourceDictionary>
     </DataGrid.Resources>
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="SelectionChanged">
-            <i:InvokeCommandAction
-                Command="{Binding GridSelectedRowComm}"
-                CommandParameter="{Binding ElementName=MainMatrix, Path=SelectedItems}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
 </DataGrid>

@@ -46,18 +46,10 @@
                 <StackPanel Orientation="Vertical">
                     <Label
                         Content="{x:Static prop:Resources.SOURCE_DIM}"
-                        Target="{Binding ElementName=SourceBasisDimensionsTextBox}" />
+                        Target="{Binding ElementName=BasisDimensionsTextBox}" />
                     <TextBox
-                        x:Name="SourceBasisDimensionsTextBox"
-                        Text="{Binding SourceDim, Converter={StaticResource StringToUshortConverter}}" />
-                </StackPanel>
-                <StackPanel Orientation="Vertical">
-                    <Label
-                        Content="{x:Static prop:Resources.DEST_DIM}"
-                        Target="{Binding ElementName=DestinationBasisDimensionsTextBox}" />
-                    <TextBox
-                        x:Name="DestinationBasisDimensionsTextBox"
-                        Text="{Binding TargetDim, Converter={StaticResource StringToUshortConverter}}" />
+                        x:Name="BasisDimensionsTextBox"
+                        Text="{Binding Dimensions, Converter={StaticResource StringToUshortConverter}}" />
                 </StackPanel>
             </StackPanel>
             <StackPanel
@@ -65,8 +57,14 @@
                 Orientation="Vertical">
                 <TextBlock
                     Margin="3"
-                    Text="Source matrix" />
+                    Text="Source matrix"
+                    HorizontalAlignment="Center" />
                 <local:MatrixDataGrid
+                    ScrollViewer.CanContentScroll="True"
+                    HorizontalScrollBarVisibility="Visible"
+                    VerticalScrollBarVisibility="Visible"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
                     ItemsSource="{Binding SourceGrid}" />
             </StackPanel>
             <StackPanel
@@ -87,8 +85,7 @@
             <Button
                 Content="{x:Static prop:Resources.BACK}"
                 Name="BackButton"
-                Click="PrevButton_Click">
-            </Button>
+                Click="PrevButton_Click" />
             <Button
                 Content="{x:Static prop:Resources.NEXT}"
                 Name="NextButton"

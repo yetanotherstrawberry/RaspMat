@@ -14,7 +14,8 @@
     d:MinHeight="350"
     d:MinWidth="800"
     d:DataContext="{d:DesignInstance vm:GraphUserControlViewModel, IsDesignTimeCreatable=False}"
-    d:Background="White">
+    d:Background="White"
+    IsEnabled="{Binding IsFree}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

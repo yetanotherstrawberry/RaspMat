@@ -14,8 +14,9 @@
     d:DataContext="{d:DesignInstance vm:GaussianUserControlViewModel, IsDesignTimeCreatable=False}"
     d:Background="White"
     d:MinHeight="350"
-    d:MinWidth="800">
-    <Grid IsEnabled="{Binding IsFree}">
+    d:MinWidth="800"
+    IsEnabled="{Binding IsFree}">
+    <Grid>
         <Grid.Resources>
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
@@ -122,7 +123,15 @@
             <local:MatrixDataGrid
                 ItemsSource="{Binding MatrixDataTable}"
                 Margin="2"
-                Grid.Row="1" />
+                Grid.Row="1">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding GridSelectedRowComm}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=local:MatrixDataGrid}, Path=SelectedItems}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+            </local:MatrixDataGrid>
             <GroupBox Header="{x:Static prop:Resources.MATRIX}" Grid.Row="2">
                 <StackPanel>
                     <Button Content="{x:Static prop:Resources.ENTER_MATRIX}" Command="{Binding UserInputComm}" />

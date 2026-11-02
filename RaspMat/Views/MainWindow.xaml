@@ -14,7 +14,8 @@
     MinHeight="520"
     MinWidth="850"
     Height="540"
-    Width="900">
+    Width="900"
+    IsEnabled="{Binding IsFree}">
     <Grid>
         <TabControl>
             <TabItem Header="{x:Static prop:Resources.GAUSS_ELIM}">

@@ -17,56 +17,32 @@ namespace RaspMat.ViewModels
         private readonly IEventService _eventService;
 
         /// <summary>
-        /// Used to access the view.
-        /// </summary>
-        private readonly IViewService _viewService;
-
-        /// <summary>
         /// Used for commanding.
         /// </summary>
         private readonly ICommandingService _commandingService;
 
-        public BasisChangeWindowsViewModel(IEventService eventService, IViewService viewService, ICommandingService commandingService)
+        public BasisChangeWindowsViewModel(IEventService eventService, ICommandingService commandingService)
         {
             _eventService = eventService.ThrowIfNull();
-            _viewService = viewService.ThrowIfNull();
             _commandingService = commandingService.ThrowIfNull();
-            SourceDim = 3;
-            TargetDim = 3;
+            Dimensions = 3;
         }
 
         /// <summary>
         /// Field for <see cref="SourceDim"/>.
         /// </summary>
-        private ushort _sourceDim;
+        private ushort _dimensions;
 
         /// <summary>
         /// Source dimension size.
         /// </summary>
-        public ushort SourceDim
+        public ushort Dimensions
         {
-            get => _sourceDim;
+            get => _dimensions;
             set
             {
-                SetProperty(ref _sourceDim, value);
+                SetProperty(ref _dimensions, value);
                 SourceGrid.SetColumns(value).SetRows(value);
-            }
-        }
-
-        /// <summary>
-        /// Field for <see cref="TargetDim"/>.
-        /// </summary>
-        private ushort _targetDim;
-
-        /// <summary>
-        /// Target dimension size.
-        /// </summary>
-        public ushort TargetDim
-        {
-            get => _targetDim;
-            set
-            {
-                SetProperty(ref _targetDim, value);
                 TargetGrid.SetColumns(value).SetRows(value);
             }
         }
@@ -124,11 +100,6 @@ namespace RaspMat.ViewModels
                 return _finishCommand;
             }
         }
-
-        /// <summary>
-        /// Used upon selecting a row.
-        /// </summary>
-        public ICommand GridSelectedRowComm { get; set; } = null;
 
     }
 }
