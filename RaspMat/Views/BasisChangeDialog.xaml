@@ -40,6 +40,8 @@
             Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
+                <d:RowDefinition Height="*" />
+                <d:RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <StackPanel
                 Grid.Row="0"
@@ -56,6 +58,7 @@
             </StackPanel>
             <DockPanel
                 Grid.Row="0"
+                d:Grid.Row="1"
                 Name="SourceMatrixContainer"
                 LastChildFill="True">
                 <TextBlock
@@ -68,6 +71,7 @@
             </DockPanel>
             <DockPanel
                 Grid.Row="0"
+                d:Grid.Row="2"
                 Name="DestinationMatrixContainer"
                 LastChildFill="True">
                 <TextBlock
