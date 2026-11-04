@@ -301,13 +301,16 @@
   <data name="BACK" xml:space="preserve">
     <value>Back</value>
   </data>
-  <data name="SOURCE_DIM" xml:space="preserve">
-    <value>Source basis dimensions:</value>
-  </data>
-  <data name="DEST_DIM" xml:space="preserve">
-    <value>Destination basis dimensions:</value>
+  <data name="BASIS_DIMENSIONS" xml:space="preserve">
+    <value>Basis dimensions:</value>
   </data>
   <data name="FINISH" xml:space="preserve">
     <value>Finish</value>
+  </data>
+  <data name="SOURCE_BASIS_MAT" xml:space="preserve">
+    <value>Source basis matrix</value>
+  </data>
+  <data name="DEST_BASIS_MAT" xml:space="preserve">
+    <value>Target basis matrix</value>
   </data>
 </root>

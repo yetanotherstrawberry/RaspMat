@@ -36,47 +36,49 @@
             Minimum="0"
             Maximum="1"
             Name="ProgressIndicator" />
-        <StackPanel
-            Grid.Row="1"
-            VerticalAlignment="Center"
-            Orientation="Vertical">
+        <Grid
+            Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <StackPanel
+                Grid.Row="0"
                 Margin="3"
                 Name="DimensionsContainer">
                 <StackPanel Orientation="Vertical">
                     <Label
-                        Content="{x:Static prop:Resources.SOURCE_DIM}"
+                        Content="{x:Static prop:Resources.BASIS_DIMENSIONS}"
                         Target="{Binding ElementName=BasisDimensionsTextBox}" />
                     <TextBox
                         x:Name="BasisDimensionsTextBox"
                         Text="{Binding Dimensions, Converter={StaticResource StringToUshortConverter}}" />
                 </StackPanel>
             </StackPanel>
-            <StackPanel
+            <DockPanel
+                Grid.Row="0"
                 Name="SourceMatrixContainer"
-                Orientation="Vertical">
+                LastChildFill="True">
                 <TextBlock
+                    DockPanel.Dock="Top"
                     Margin="3"
-                    Text="Source matrix"
+                    Text="{x:Static prop:Resources.SOURCE_BASIS_MAT}"
                     HorizontalAlignment="Center" />
                 <local:MatrixDataGrid
-                    ScrollViewer.CanContentScroll="True"
-                    HorizontalScrollBarVisibility="Visible"
-                    VerticalScrollBarVisibility="Visible"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
                     ItemsSource="{Binding SourceGrid}" />
-            </StackPanel>
-            <StackPanel
+            </DockPanel>
+            <DockPanel
+                Grid.Row="0"
                 Name="DestinationMatrixContainer"
-                Orientation="Vertical">
+                LastChildFill="True">
                 <TextBlock
+                    DockPanel.Dock="Top"
                     Margin="3"
-                    Text="Destination matrix" />
+                    Text="{x:Static prop:Resources.DEST_BASIS_MAT}"
+                    HorizontalAlignment="Center" />
                 <local:MatrixDataGrid
                     ItemsSource="{Binding TargetGrid}" />
-            </StackPanel>
-        </StackPanel>
+            </DockPanel>
+        </Grid>
         <StackPanel
             Grid.Row="2"
             Orientation="Horizontal"

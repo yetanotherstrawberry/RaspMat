@@ -115,11 +115,20 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Destination basis dimensions:.
+        ///   Looks up a localized string similar to Basis dimensions:.
         /// </summary>
-        public static string DEST_DIM {
+        public static string BASIS_DIMENSIONS {
             get {
-                return ResourceManager.GetString("DEST_DIM", resourceCulture);
+                return ResourceManager.GetString("BASIS_DIMENSIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target basis matrix.
+        /// </summary>
+        public static string DEST_BASIS_MAT {
+            get {
+                return ResourceManager.GetString("DEST_BASIS_MAT", resourceCulture);
             }
         }
         
@@ -556,11 +565,11 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Source basis dimensions:.
+        ///   Looks up a localized string similar to Source basis matrix.
         /// </summary>
-        public static string SOURCE_DIM {
+        public static string SOURCE_BASIS_MAT {
             get {
-                return ResourceManager.GetString("SOURCE_DIM", resourceCulture);
+                return ResourceManager.GetString("SOURCE_BASIS_MAT", resourceCulture);
             }
         }
         
