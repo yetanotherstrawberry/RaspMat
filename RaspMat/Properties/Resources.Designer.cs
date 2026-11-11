@@ -124,6 +124,15 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Provide matrices of you basis vectors. Make sure that vectors are added vertically..
+        /// </summary>
+        public static string BASIS_MAT_INFO {
+            get {
+                return ResourceManager.GetString("BASIS_MAT_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Target basis matrix.
         /// </summary>
         public static string DEST_BASIS_MAT {

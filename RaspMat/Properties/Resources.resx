@@ -313,4 +313,7 @@
   <data name="DEST_BASIS_MAT" xml:space="preserve">
     <value>Target basis matrix</value>
   </data>
+  <data name="BASIS_MAT_INFO" xml:space="preserve">
+    <value>Provide matrices of you basis vectors. Make sure that vectors are added vertically.</value>
+  </data>
 </root>
