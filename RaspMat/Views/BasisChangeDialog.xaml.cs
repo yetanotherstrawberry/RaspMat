@@ -91,6 +91,7 @@ namespace RaspMat.Views
         private void PrevButton_Click(object sender, RoutedEventArgs eventArgs)
         {
             CurrentPage--;
+            eventArgs.Handled = true;
         }
 
         /// <summary>
@@ -101,6 +102,7 @@ namespace RaspMat.Views
         private void NextButton_Click(object sender, RoutedEventArgs eventArgs)
         {
             CurrentPage++;
+            eventArgs.Handled = true;
         }
 
     }
