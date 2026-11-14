@@ -27,6 +27,58 @@
                     <ResourceDictionary Source="pack://application:,,,/RaspMat;component/Resources/Styles.xaml" />
                 </ResourceDictionary.MergedDictionaries>
                 <c:StringToUshortConverter x:Key="StringToUshortConverter" />
+                <DataTemplate x:Key="Dimensions">
+                    <StackPanel
+                        Grid.Row="0"
+                        Margin="3"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                        <StackPanel Orientation="Vertical">
+                            <Label
+                                Content="{x:Static prop:Resources.BASIS_DIMENSIONS}"
+                                Target="{Binding ElementName=BasisDimensionsTextBox}" />
+                            <TextBox
+                                x:Name="BasisDimensionsTextBox"
+                                TextAlignment="Center"
+                                Text="{Binding Dimensions, Converter={StaticResource StringToUshortConverter}}" />
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+                <DataTemplate x:Key="SourceMatrix">
+                    <DockPanel
+                        Grid.Row="0"
+                        d:Grid.Row="1"
+                        LastChildFill="True">
+                        <TextBlock
+                            DockPanel.Dock="Top"
+                            Margin="3"
+                            Text="{x:Static prop:Resources.SOURCE_BASIS_MAT}"
+                            TextAlignment="Center" />
+                        <TextBlock
+                            DockPanel.Dock="Top"
+                            TextWrapping="Wrap"
+                            TextAlignment="Center"
+                            Text="{x:Static prop:Resources.BASIS_MAT_INFO}"
+                            Margin="5"
+                            Height="Auto" />
+                        <local:MatrixDataGrid
+                            ItemsSource="{Binding SourceGrid}" />
+                    </DockPanel>
+                </DataTemplate>
+                <DataTemplate x:Key="DestinationMatrix">
+                    <DockPanel
+                        Grid.Row="0"
+                        d:Grid.Row="2"
+                        LastChildFill="True">
+                        <TextBlock
+                            DockPanel.Dock="Top"
+                            Margin="3"
+                            Text="{x:Static prop:Resources.DEST_BASIS_MAT}"
+                            TextAlignment="Center" />
+                        <local:MatrixDataGrid
+                            ItemsSource="{Binding TargetGrid}" />
+                    </DockPanel>
+                </DataTemplate>
             </ResourceDictionary>
         </Grid.Resources>
         <ProgressBar
@@ -34,67 +86,30 @@
             Grid.Row="0"
             Height="20"
             Minimum="0"
-            Maximum="1"
+            Maximum="3"
+            Value="0"
             Name="ProgressIndicator" />
-        <Grid
-            Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <d:RowDefinition Height="*" />
-                <d:RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <StackPanel
-                Grid.Row="0"
-                Margin="3"
-                Name="DimensionsContainer"
-                HorizontalAlignment="Center">
-                <StackPanel Orientation="Vertical">
-                    <Label
-                        Content="{x:Static prop:Resources.BASIS_DIMENSIONS}"
-                        Target="{Binding ElementName=BasisDimensionsTextBox}" />
-                    <TextBox
-                        x:Name="BasisDimensionsTextBox"
-                        TextAlignment="Center"
-                        Text="{Binding Dimensions, Converter={StaticResource StringToUshortConverter}}" />
-                </StackPanel>
-            </StackPanel>
-            <DockPanel
-                Grid.Row="0"
-                d:Grid.Row="1"
-                Name="SourceMatrixContainer"
-                LastChildFill="True">
-                <TextBlock
-                    DockPanel.Dock="Top"
-                    Margin="3"
-                    Text="{x:Static prop:Resources.SOURCE_BASIS_MAT}"
-                    TextAlignment="Center" />
-                <TextBlock
-                    DockPanel.Dock="Top"
-                    TextWrapping="Wrap"
-                    TextAlignment="Center"
-                    Text="{x:Static prop:Resources.BASIS_MAT_INFO}"
-                    Margin="5"
-                    Height="Auto" />
-                <local:MatrixDataGrid
-                    ItemsSource="{Binding SourceGrid}" />
-            </DockPanel>
-            <DockPanel
-                Grid.Row="0"
-                d:Grid.Row="2"
-                Name="DestinationMatrixContainer"
-                LastChildFill="True">
-                <TextBlock
-                    DockPanel.Dock="Top"
-                    Margin="3"
-                    Text="{x:Static prop:Resources.DEST_BASIS_MAT}"
-                    TextAlignment="Center" />
-                <local:MatrixDataGrid
-                    ItemsSource="{Binding TargetGrid}" />
-            </DockPanel>
-        </Grid>
+        <ContentControl
+            Grid.Row="1"
+            Focusable="False"
+            Content="{Binding .}">
+            <ContentControl.Style>
+                <Style TargetType="{x:Type ContentControl}" BasedOn="{StaticResource {x:Type ContentControl}}">
+                    <Setter Property="ContentTemplate" Value="{x:Null}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Value, ElementName=ProgressIndicator}" Value="0">
+                            <Setter Property="ContentTemplate" Value="{StaticResource Dimensions}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Value, ElementName=ProgressIndicator}" Value="1">
+                            <Setter Property="ContentTemplate" Value="{StaticResource SourceMatrix}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Value, ElementName=ProgressIndicator}" Value="2">
+                            <Setter Property="ContentTemplate" Value="{StaticResource DestinationMatrix}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
         <StackPanel
             Grid.Row="2"
             Orientation="Horizontal"
@@ -102,17 +117,49 @@
             Margin="3">
             <Button
                 Content="{x:Static prop:Resources.BACK}"
-                Name="BackButton"
-                Click="PrevButton_Click" />
+                Click="PrevButton_Click">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                        <Setter Property="IsEnabled" Value="True" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Value, ElementName=ProgressIndicator}" Value="0">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
             <Button
                 Content="{x:Static prop:Resources.NEXT}"
                 Name="NextButton"
-                Click="NextButton_Click" />
+                Click="NextButton_Click">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Visibility, ElementName=FinishButton}" Value="Visible">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
             <Button
                 Content="{x:Static prop:Resources.FINISH}"
                 Name="FinishButton"
                 Click="NextButton_Click"
-                Command="{Binding FinishCommand}" />
+                Command="{Binding FinishCommand}">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Value, ElementName=ProgressIndicator}" Value="2">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
         </StackPanel>
     </Grid>
 </local:DialogWindowBase>

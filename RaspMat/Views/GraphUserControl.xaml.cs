@@ -42,14 +42,28 @@ namespace RaspMat.Views
         /// </summary>
         /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
         /// <param name="eventArgs">Additional arguments.</param>
-        private void RemoveVertex(object sender, RoutedEventArgs eventArgs) => GraphControl.RemoveVertex(VertexToRemoveName.Text);
+        private void RemoveVertex(object sender, RoutedEventArgs eventArgs)
+        {
+            if (!eventArgs.Handled)
+            {
+                GraphControl.RemoveVertex(VertexToRemoveName.Text);
+                eventArgs.Handled = true;
+            }
+        }
 
         /// <summary>
         /// Handles the creation of a vertex.
         /// </summary>
         /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
         /// <param name="eventArgs">Additional arguments.</param>
-        private void AddVertex(object sender, RoutedEventArgs eventArgs) => GraphControl.AddVertex(VertexName.Text);
+        private void AddVertex(object sender, RoutedEventArgs eventArgs)
+        {
+            if (!eventArgs.Handled)
+            {
+                GraphControl.AddVertex(VertexName.Text);
+                eventArgs.Handled = true;
+            }
+        }
 
         /// <summary>
         /// Executes the <paramref name="handler"/> with 2 vertices.
@@ -62,7 +76,14 @@ namespace RaspMat.Views
         /// </summary>
         /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
         /// <param name="eventArgs">Additional arguments.</param>
-        private void RemoveEdge(object sender, RoutedEventArgs eventArgs) => HandleEdge((source, target) => GraphControl.RemoveEdge(source, target));
+        private void RemoveEdge(object sender, RoutedEventArgs eventArgs)
+        {
+            if (!eventArgs.Handled)
+            {
+                HandleEdge((source, target) => GraphControl.RemoveEdge(source, target));
+                eventArgs.Handled = true;
+            }
+        }
 
         /// <summary>
         /// Handles the creation of an edge.
@@ -71,11 +92,15 @@ namespace RaspMat.Views
         /// <param name="eventArgs">Additional arguments.</param>
         private void AddEdge(object sender, RoutedEventArgs eventArgs)
         {
-            var probabilityText = EdgeProbability.Text;
-            if (string.IsNullOrWhiteSpace(probabilityText)) throw new ArgumentNullException(nameof(EdgeProbability));
-            var probability = Fraction.Parse(probabilityText);
-            if (probability.Numerator.Sign < 0) throw new ArgumentOutOfRangeException(nameof(EdgeProbability));
-            HandleEdge((source, target) => GraphControl.AddEdge(source, target, probability.ToString()));
+            if (!eventArgs.Handled)
+            {
+                var probabilityText = EdgeProbability.Text;
+                if (string.IsNullOrWhiteSpace(probabilityText)) throw new ArgumentNullException(nameof(EdgeProbability));
+                var probability = Fraction.Parse(probabilityText);
+                if (probability.Numerator.Sign < 0) throw new ArgumentOutOfRangeException(nameof(EdgeProbability));
+                HandleEdge((source, target) => GraphControl.AddEdge(source, target, probability.ToString()));
+                eventArgs.Handled = true;
+            }
         }
 
         /// <summary>
@@ -85,22 +110,26 @@ namespace RaspMat.Views
         /// <param name="eventArgs">Additional arguments.</param>
         private void CalculateNode(object sender, RoutedEventArgs eventArgs)
         {
-            var oldVertices = GraphControl.GetVertices();
-            var probabilityMatrix = GraphControl.ToProbabilityMatrix(out var elimination);
-            var newSourceVertices = probabilityMatrix.Sources.ToDictionary(source => source, source => oldVertices[source]);
-            var newTargetVertices = probabilityMatrix.Targets.ToDictionary(target => target, target => oldVertices[target]);
-            var newVertices = newSourceVertices.Concat(newTargetVertices).ToDictionary();
-            var newEdges = newSourceVertices.Keys
-                .ToDictionary(source => source, source =>
-                {
-                    return (IDictionary<string, string>)newTargetVertices.Keys
-                        .Select(target => new KeyValuePair<string, Fraction>(target, probabilityMatrix[source, target]))
-                        .Where(kvp => !kvp.Value.IsZero)
-                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString());
-                });
-            GraphControl.SetVerticesAndEdges(newVertices, newEdges);
-            _eventService.Send(new Events.LoadMatrixEvent(probabilityMatrix));
-            _eventService.Send(new Events.LoadStepsEvent(elimination));
+            if (!eventArgs.Handled)
+            {
+                var oldVertices = GraphControl.GetVertices();
+                var probabilityMatrix = GraphControl.ToProbabilityMatrix(out var elimination);
+                var newSourceVertices = probabilityMatrix.Sources.ToDictionary(source => source, source => oldVertices[source]);
+                var newTargetVertices = probabilityMatrix.Targets.ToDictionary(target => target, target => oldVertices[target]);
+                var newVertices = newSourceVertices.Concat(newTargetVertices).ToDictionary();
+                var newEdges = newSourceVertices.Keys
+                    .ToDictionary(source => source, source =>
+                    {
+                        return (IDictionary<string, string>)newTargetVertices.Keys
+                            .Select(target => new KeyValuePair<string, Fraction>(target, probabilityMatrix[source, target]))
+                            .Where(kvp => !kvp.Value.IsZero)
+                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString());
+                    });
+                GraphControl.SetVerticesAndEdges(newVertices, newEdges);
+                _eventService.Send(new Events.LoadMatrixEvent(probabilityMatrix));
+                _eventService.Send(new Events.LoadStepsEvent(elimination));
+                eventArgs.Handled = true;
+            }
         }
 
         /// <summary>
@@ -108,9 +137,13 @@ namespace RaspMat.Views
         /// </summary>
         /// <param name="sender">The <see cref="object"/> that requested the operation.</param>
         /// <param name="eventArgs">Additional arguments.</param>
-        private void ToggleStepView(object sender, RoutedEventArgs e)
+        private void ToggleStepView(object sender, RoutedEventArgs eventArgs)
         {
-            _viewService.ToggleStepsView();
+            if (!eventArgs.Handled)
+            {
+                _viewService.ToggleStepsView();
+                eventArgs.Handled = true;
+            }
         }
 
     }
