@@ -8,6 +8,9 @@ using System.Windows.Input;
 
 namespace RaspMat.ViewModels
 {
+    /// <summary>
+    /// ViewModel for the change of basis algorithm.
+    /// </summary>
     internal class BasisChangeWindowsViewModel : ViewModelBase
     {
 
