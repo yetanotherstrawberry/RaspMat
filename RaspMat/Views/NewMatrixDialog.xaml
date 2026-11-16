@@ -20,7 +20,8 @@
     <Grid Margin="5">
         <Grid.Resources>
             <ResourceDictionary>
-                <c:StringToUshortConverter x:Key="StringToUShortConverter" />
+                <c:UshortToStringConverter x:Key="UshortToStringConverter" />
+                <c:FractionToStringConverter x:Key="FractionToStringConverter" />
             </ResourceDictionary>
         </Grid.Resources>
         <Grid.RowDefinitions>
@@ -38,7 +39,7 @@
                     Target="{Binding ElementName=RowsTextBox}" />
                 <TextBox
                     Height="25"
-                    Text="{Binding Rows, Converter={StaticResource StringToUShortConverter}}"
+                    Text="{Binding Rows, Converter={StaticResource UshortToStringConverter}}"
                     Margin="1"
                     Name="RowsTextBox"
                     PreviewTextInput="TextBox_PreviewTextInput" />
@@ -49,7 +50,7 @@
                     Target="{Binding ElementName=ColumnsTextBox}" />
                 <TextBox
                     Height="25"
-                    Text="{Binding Columns, Converter={StaticResource StringToUShortConverter}}"
+                    Text="{Binding Columns, Converter={StaticResource UshortToStringConverter}}"
                     Margin="1"
                     Name="ColumnsTextBox"
                     PreviewTextInput="TextBox_PreviewTextInput" />
@@ -62,7 +63,7 @@
                     Target="{Binding ElementName=FillTextBox}" />
                 <TextBox
                     Height="25"
-                    Text="{Binding Fill}"
+                    Text="{Binding Fill, Converter={StaticResource FractionToStringConverter}}"
                     Name="FillTextBox"
                     Margin="1"
                     PreviewTextInput="TextBox_PreviewTextInput"

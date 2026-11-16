@@ -1,27 +1,25 @@
-﻿using RaspMat.Models;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows.Data;
 
 namespace RaspMat.Converters
 {
     /// <summary>
-    /// Convertion between <see cref="string"/> and <see cref="Fraction"/> implementing <see cref="IValueConverter"/>.
+    /// Convertion between <see cref="string"/> and <see cref="ushort"/> implementing <see cref="IValueConverter"/>.
     /// </summary>
-    internal class StringToFractionConverter : IValueConverter
+    internal class UshortToStringConverter : IValueConverter
     {
 
         /// <inheritdoc/>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var stringValue = value?.ToString();
-            return string.IsNullOrWhiteSpace(stringValue) ? default : Fraction.Parse(stringValue);
+            return (value as ushort?)?.ToString(culture) ?? string.Empty;
         }
 
         /// <inheritdoc/>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value?.ToString() ?? string.Empty;
+            return ushort.TryParse(value?.ToString(), NumberStyles.Integer & ~NumberStyles.AllowLeadingSign, culture, out var parsed) ? parsed : 0;
         }
 
     }
