@@ -16,11 +16,12 @@ namespace RaspMat.Services
         private readonly DataTable _dataTab = new DataTable();
 
         /// <inheritdoc/>
-        public TResult Compute<TResult>(string equation)
+        public TResult Compute<TResult>(string equation) where TResult : unmanaged, IComparable<TResult>, IConvertible
         {
             if (string.IsNullOrWhiteSpace(equation)) throw new ArgumentNullException(nameof(equation));
             var ret = _dataTab.Compute(equation, null);
-            return DBNull.Value.Equals(ret) ? throw new ArithmeticException(nameof(equation)) : (TResult)ret;
+            if (DBNull.Value.Equals(ret)) throw new ArithmeticException();
+            return (TResult)Convert.ChangeType(((IConvertible)ret).ToDecimal(null), typeof(TResult), null);
         }
 
         /// <inheritdoc/>

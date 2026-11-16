@@ -31,6 +31,11 @@ namespace RaspMat.Services.Interfaces
         void ToggleMatrixInputDialog();
 
         /// <summary>
+        /// Shows or closes a view that create a basis change <see cref="Matrix"/>.
+        /// </summary>
+        void ToggleBasisChangeDialog();
+
+        /// <summary>
         /// Executes the <paramref name="action"/>, so that it can access the view.
         /// </summary>
         /// <param name="action">Work to do.</param>
@@ -43,6 +48,12 @@ namespace RaspMat.Services.Interfaces
         /// <param name="callback">Work to do.</param>
         /// <returns>A <see langword="new"/> <see cref="Task"/> that can be used to access the <paramref name="callback"/>.</returns>
         Task<TResult> ExecuteAsync<TResult>(Func<TResult> callback);
+
+        /// <summary>
+        /// Pauses rendering of the view.
+        /// </summary>
+        /// <returns>An <see cref="IDisposable"/> that can be used to resume rendering.</returns>
+        IDisposable PauseRender();
 
     }
 }

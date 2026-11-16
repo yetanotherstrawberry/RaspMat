@@ -267,14 +267,6 @@
   <data name="RAW_MATRIX_INPUT" xml:space="preserve">
     <value>Raw input</value>
   </data>
-  <data name="_COLS" xml:space="preserve">
-    <value>Cols</value>
-    <comment>Do not translate. Used internally as a name for a parameter.</comment>
-  </data>
-  <data name="_DEF_LOCALE" xml:space="preserve">
-    <value>en-US</value>
-    <comment>Default locale (language) of this application.</comment>
-  </data>
   <data name="_FILE_FILTER" xml:space="preserve">
     <value>JSON|*.json|*|*.*</value>
     <comment>Used internally as a filter for file dialogs.</comment>
@@ -287,5 +279,41 @@
   </data>
   <data name="ADD" xml:space="preserve">
     <value>Add</value>
+  </data>
+  <data name="NEW_VECTORS_TITLE" xml:space="preserve">
+    <value>New vectors</value>
+  </data>
+  <data name="FRACTIONS" xml:space="preserve">
+    <value>Fractions</value>
+  </data>
+  <data name="PROBABILITY_GRAPH" xml:space="preserve">
+    <value>Probability graph</value>
+  </data>
+  <data name="HISTORY" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="BASIS_CHANGE" xml:space="preserve">
+    <value>Basis change</value>
+  </data>
+  <data name="NEXT" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="BACK" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="BASIS_DIMENSIONS" xml:space="preserve">
+    <value>Basis dimensions:</value>
+  </data>
+  <data name="FINISH" xml:space="preserve">
+    <value>Finish</value>
+  </data>
+  <data name="SOURCE_BASIS_MAT" xml:space="preserve">
+    <value>Source basis matrix</value>
+  </data>
+  <data name="DEST_BASIS_MAT" xml:space="preserve">
+    <value>Target basis matrix</value>
+  </data>
+  <data name="BASIS_MAT_INFO" xml:space="preserve">
+    <value>Provide matrices of you basis vectors. Make sure that vectors are added vertically.</value>
   </data>
 </root>

@@ -1,6 +1,9 @@
 ﻿using RaspMat.Models;
 using RaspMat.Properties;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace RaspMat.Extensions
 {
@@ -11,7 +14,7 @@ namespace RaspMat.Extensions
     {
 
         /// <summary>
-        /// Performs Gaussian elimination on a <see cref="Matrix"/>. Returns all steps that were made with matrices. Does not modify the original matrix.
+        /// Performs Gaussian elimination on a <see cref="Matrix"/>. Returns all steps that were made with matrices. Does not modify the provided <paramref name="matrix"/>.
         /// The implementation is based on
         /// <see href="https://en.wikipedia.org/wiki/Gaussian_elimination#Pseudocode">en.wikipedia.org</see> and 
         /// <see href="https://apollo.astro.amu.edu.pl/PAD/pmwiki.php?n=Dybol.DydaktykaEliminacjaGaussa">apollo.astro.amu.edu.pl</see> algorithms.
@@ -110,81 +113,6 @@ namespace RaspMat.Extensions
 
             return steps;
         }
-
-
-        /*
-        private static string[] StrToStrVecs(string vec, char vectorsSplitter = ';')
-            => Array.ConvertAll(vec.Split(vectorsSplitter), str => str.TrimStart('(').TrimEnd(')'));
-
-        private static IList<Matrix> BasisStrToMatrix(string[] from, string[] to, char vectorSplitter = ',')
-        {
-            if (from.Length != to.Length)
-                throw new ArgumentOutOfRangeException(nameof(from));
-
-            var ret = new List<Fraction[][]>();
-
-            foreach (var vecFrom in from)
-            {
-                var temp = new Fraction[to.Length + 1][];
-
-                for (long i = 0; i < to.Length; i++)
-                {
-                    temp[i] = Array.ConvertAll(to[i].Split(vectorSplitter), str => Fraction.Parse(str));
-                }
-
-                temp[to.Length] = Array.ConvertAll(vecFrom.Split(vectorSplitter), str => Fraction.Parse(str));
-
-                ret.Add(temp);
-            }
-            //                    if (Interaction.MsgBox("Należy przedstawić wektor (" + wektor_z + ") jako kombinację wektorów bazy {" + tekst_do + "} za pomocą macierzy, której kolumnami są poszczególne wektory.\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Eliminacja Gaussa") == MsgBoxResult.No)
-            return ret.ConvertAll(matFrac2D => Matrix.Transpose(new Matrix(matFrac2D)));
-        }
-
-        public static Matrix BasisChangeMatrix(string from, string to)
-        {
-            var macierze_do_rozwiazania = BasisStrToMatrix(StrToStrVecs(from), StrToStrVecs(to));
-            //if (czyPokaz)
-            //   if (Interaction.MsgBox("Należy rozwiązać " + macierze_do_rozwiazania.Count() + " macierz/e(-y) za pomocą całkowitej eliminacji.\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Eliminacja Gaussa") == MsgBoxResult.No)
-            //      if (obiekt != null)
-            //         return;
-            //    else
-            //       throw new ConstraintException(bladPodalgorytmu);
-
-            List<Matrix> rozwiazane_macierze = new List<Matrix>();
-
-            foreach (Matrix macierz_do_rozwiazania in macierze_do_rozwiazania)
-            {
-
-                //if (czyPokaz)
-                //   if (Interaction.MsgBox("Należy rozwiązać następującą macierz:\n" + macierz_do_rozwiazania.ToString() + "\nskładającą się z wektorów bazy docelowej i jednego z wektorów z bazy pierwotnej w ostatniej kolumnie.\nCzy chcesz kontynuować algorytm?", MsgBoxStyle.YesNo, "Eliminacja Gaussa") == MsgBoxResult.No)
-                //      if (obiekt != null)
-                //         return;
-                //    else
-                //       throw new ConstraintException(bladPodalgorytmu);
-
-                TotalGaussianElimination(macierz_do_rozwiazania);
-
-                rozwiazane_macierze.Add(macierz_do_rozwiazania);
-
-            }
-
-            var ret = new List<string[]>();
-
-            foreach (Matrix rozwiazana_macierz in rozwiazane_macierze)
-            {
-
-                string[] wiersze = new string[rozwiazana_macierz.Rows];
-
-                for (long i = 0; i < rozwiazana_macierz.Rows; i++)
-                    wiersze[i] = rozwiazana_macierz[i, rozwiazana_macierz.Columns - 1].ToString();
-
-                ret.Add(wiersze);
-            }
-
-            //if (czyPokaz)
-            //Interaction.MsgBox("Wszystkie macierze zostały rozwiązane.\nUzyskane wyniki należy wstawić do kolumn nowej macierzy, która będzie macierzą przejścia z bazy B1 do B2.", MsgBoxStyle.OkOnly, "Macierz utworzona - koniec pracy");
-            return Matrix.Transpose(new Matrix(ret.ToArray()));
-        }*/
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace RaspMat.Views
@@ -18,13 +19,13 @@ namespace RaspMat.Views
         }
 
         /// <summary>
-        /// Forces positive integer input.
+        /// Filters the input.
         /// </summary>
         /// <param name="sender">The <see cref="object"/> that triggered the handler.</param>
         /// <param name="textCompositionArgs">An instance of <see cref="TextCompositionEventArgs"/> to check <see cref="TextCompositionEventArgs.Text"/> and set <see cref="RoutedEventArgs.Handled"/>.</param>
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs textCompositionArgs)
         {
-            if (!int.TryParse(textCompositionArgs.Text, out var number) || number <= 0) textCompositionArgs.Handled = true;
+            if (!textCompositionArgs.Text.All(stringChar => char.IsDigit(stringChar) || stringChar == '-' || stringChar == '/')) textCompositionArgs.Handled = true;
         }
 
     }

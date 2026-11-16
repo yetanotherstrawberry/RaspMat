@@ -16,7 +16,7 @@ namespace RaspMat.Tests.Models
             {
                 for (var columns = 1; columns <= 3; columns++)
                 {
-                    var zeroDefault = new Matrix(rows, columns);
+                    var zeroDefault = new Matrix(rows, columns, (row, column) => default);
                     var zeroManual = new Matrix(rows, columns, (row, column) => 0);
                     Assert.That(zeroDefault, Is.EqualTo(zeroManual));
                     var sabotage = new Matrix(rows, columns, (row, column) => row + column + 1);
@@ -46,7 +46,7 @@ namespace RaspMat.Tests.Models
                 var doubleIdentity = new Matrix(identity.Rows, identity.Columns, (row, column) => identity[row, column] * 2);
                 var result = matrix * identity;
                 Assert.That(result, Is.EqualTo(matrix));
-                Assert.That(result, Is.Not.EqualTo(new Matrix(size, size)));
+                Assert.That(result, Is.Not.EqualTo(new Matrix(size, size, (row, column) => 0)));
                 Assert.That(matrix * doubleIdentity, Is.EqualTo(matrixDouble));
             }
         }

@@ -12,7 +12,8 @@
         d:DataContext="{d:DesignInstance {x:Type vm:StepListWindowViewModel}, IsDesignTimeCreatable=False}" 
         Title="{x:Static prop:Resources.STEPS}"
         Height="450"
-        Width="800">
+        Width="800"
+        IsEnabled="{Binding IsFree}">
     <ListBox HorizontalAlignment="Stretch" ItemsSource="{Binding Steps}" d:ItemsSource="{d:SampleData ItemCount=20}" ScrollViewer.VerticalScrollBarVisibility="Visible">
         <ListBox.ItemContainerStyle>
             <Style TargetType="{x:Type ListBoxItem}">

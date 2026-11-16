@@ -329,6 +329,29 @@ namespace RaspMat.ViewModels
         }
 
         /// <summary>
+        /// Field for <see cref="BasisChangeComm"/>.
+        /// </summary>
+        private ICommand _basisChangeComm;
+
+        /// <summary>
+        /// Opens a view for changing of the basis.
+        /// </summary>
+        public ICommand BasisChangeComm
+        {
+            get
+            {
+                if (_basisChangeComm is null)
+                {
+                    _basisChangeComm = GenerateCommand(() =>
+                    {
+                        _viewService.ToggleBasisChangeDialog();
+                    });
+                }
+                return _basisChangeComm;
+            }
+        }
+
+        /// <summary>
         /// Field for <see cref="DeserializeComm"/>.
         /// </summary>
         private ICommand _deserializeComm;
@@ -359,7 +382,11 @@ namespace RaspMat.ViewModels
             private set
             {
                 SelectedRows.Clear();
-                SetProperty(ref _matrixDataTable, value);
+                var oldValue = MatrixDataTable;
+                if (SetProperty(ref _matrixDataTable, value))
+                {
+                    oldValue?.Dispose();
+                }
             }
         }
 
@@ -379,12 +406,7 @@ namespace RaspMat.ViewModels
         private Matrix CurrentMatrix
         {
             get => Matrix.Parse(MatrixDataTable);
-            set
-            {
-                var matrix = MatrixDataTable;
-                MatrixDataTable = value.ToDataTable();
-                matrix.Dispose();
-            }
+            set => MatrixDataTable = value.ToDataTable();
         }
 
         /// <summary>
@@ -413,7 +435,7 @@ namespace RaspMat.ViewModels
         /// <inheritdoc/>
         public void Dispose()
         {
-            MatrixDataTable.Dispose();
+            MatrixDataTable = null;
         }
 
         /// <summary>

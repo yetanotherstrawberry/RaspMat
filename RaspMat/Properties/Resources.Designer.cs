@@ -61,24 +61,6 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cols.
-        /// </summary>
-        public static string _COLS {
-            get {
-                return ResourceManager.GetString("_COLS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to en-US.
-        /// </summary>
-        public static string _DEF_LOCALE {
-            get {
-                return ResourceManager.GetString("_DEF_LOCALE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to JSON|*.json|*|*.*.
         /// </summary>
         public static string _FILE_FILTER {
@@ -111,6 +93,51 @@ namespace RaspMat.Properties {
         public static string ALGORITHMS {
             get {
                 return ResourceManager.GetString("ALGORITHMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back.
+        /// </summary>
+        public static string BACK {
+            get {
+                return ResourceManager.GetString("BACK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Basis change.
+        /// </summary>
+        public static string BASIS_CHANGE {
+            get {
+                return ResourceManager.GetString("BASIS_CHANGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Basis dimensions:.
+        /// </summary>
+        public static string BASIS_DIMENSIONS {
+            get {
+                return ResourceManager.GetString("BASIS_DIMENSIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provide matrices of you basis vectors. Make sure that vectors are added vertically..
+        /// </summary>
+        public static string BASIS_MAT_INFO {
+            get {
+                return ResourceManager.GetString("BASIS_MAT_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target basis matrix.
+        /// </summary>
+        public static string DEST_BASIS_MAT {
+            get {
+                return ResourceManager.GetString("DEST_BASIS_MAT", resourceCulture);
             }
         }
         
@@ -268,11 +295,38 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Finish.
+        /// </summary>
+        public static string FINISH {
+            get {
+                return ResourceManager.GetString("FINISH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fractions.
+        /// </summary>
+        public static string FRACTIONS {
+            get {
+                return ResourceManager.GetString("FRACTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Gaussian elimination.
         /// </summary>
         public static string GAUSS_ELIM {
             get {
                 return ResourceManager.GetString("GAUSS_ELIM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to History.
+        /// </summary>
+        public static string HISTORY {
+            get {
+                return ResourceManager.GetString("HISTORY", resourceCulture);
             }
         }
         
@@ -385,6 +439,24 @@ namespace RaspMat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New vectors.
+        /// </summary>
+        public static string NEW_VECTORS_TITLE {
+            get {
+                return ResourceManager.GetString("NEW_VECTORS_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        public static string NEXT {
+            get {
+                return ResourceManager.GetString("NEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
         public static string OK {
@@ -399,6 +471,15 @@ namespace RaspMat.Properties {
         public static string PLUS_SIGN {
             get {
                 return ResourceManager.GetString("PLUS_SIGN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Probability graph.
+        /// </summary>
+        public static string PROBABILITY_GRAPH {
+            get {
+                return ResourceManager.GetString("PROBABILITY_GRAPH", resourceCulture);
             }
         }
         
@@ -489,6 +570,15 @@ namespace RaspMat.Properties {
         public static string SCALE {
             get {
                 return ResourceManager.GetString("SCALE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source basis matrix.
+        /// </summary>
+        public static string SOURCE_BASIS_MAT {
+            get {
+                return ResourceManager.GetString("SOURCE_BASIS_MAT", resourceCulture);
             }
         }
         

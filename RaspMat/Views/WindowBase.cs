@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using RaspMat.Extensions;
 using System.Windows;
 using System.Windows.Input;
 
@@ -15,7 +15,7 @@ namespace RaspMat.Views
         /// </summary>
         public WindowBase()
         {
-            if (!DesignerProperties.GetIsInDesignMode(this))
+            if (this.IsNotInDesign())
             {
                 var viewModel = App.GetViewModel(GetType());
                 if (viewModel != null) DataContext = viewModel;

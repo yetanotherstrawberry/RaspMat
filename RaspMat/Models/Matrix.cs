@@ -1,12 +1,9 @@
 ﻿using RaspMat.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RaspMat.Models
 {
@@ -14,28 +11,34 @@ namespace RaspMat.Models
     /// A representation of <see cref="Fraction"/>s.
     /// </summary>
     [Serializable]
-    internal class Matrix : ISerializable, ICloneable
+    internal class Matrix : ISerializable
     {
 
-        #region ConstantsAndStaticFields
+        #region StaticFields
 
         /// <summary>
         /// Column separator.
         /// </summary>
-        private const string COLUMN_SEPARATOR = "\t";
+        private readonly static string _columnSeparator = "\t";
+
+        /// <summary>
+        /// The preferred separator between rows.
+        /// </summary>
+        private readonly static string _rowSeparator = Environment.NewLine;
 
         /// <summary>
         /// Allowed separators between rows when parsing a <see langword="string"/>.
         /// </summary>
         private readonly static string[] _rowSeparators = new[] {
-            Environment.NewLine,
+            "\r\n",
+            "\n",
         };
 
         /// <summary>
         /// Allowed separators between columns when parsing a <see langword="string"/>.
         /// </summary>
         private readonly static string[] _columnSeparators = new[] {
-            COLUMN_SEPARATOR,
+            _columnSeparator,
             " ",
         };
 
@@ -55,7 +58,7 @@ namespace RaspMat.Models
         /// <summary>
         /// The total number of columns.
         /// </summary>
-        public int Columns => FractionMatrix.FirstOrDefault()?.Length ?? 0;
+        public int Columns => FractionMatrix.Select(row => row.Length).FirstOrDefault();
 
         /// <summary>
         /// Returns <see langword="true"/> if <see langword="this"/> <see cref="Matrix"/> is square.
@@ -70,7 +73,6 @@ namespace RaspMat.Models
         private Fraction[] this[int row]
         {
             get => FractionMatrix[row];
-            set => FractionMatrix[row] = value;
         }
 
         /// <summary>
@@ -88,27 +90,13 @@ namespace RaspMat.Models
         #endregion Properties
         #region Constructors
 
+        private Matrix(Fraction[][] fractionMatrix) => FractionMatrix = fractionMatrix.ThrowIfNull();
+
         public Matrix(int rows, int columns, Func<int, int, Fraction> values)
-        {
-            if (rows == 0 || columns == 0) throw new ArgumentOutOfRangeException(nameof(columns));
+            : this(ParallelEnumerable.Range(0, rows).AsOrdered().Select(row => ParallelEnumerable.Range(0, columns).AsOrdered().Select(column => values(row, column)).ToArray()).ToArray()) { }
 
-            FractionMatrix = new Fraction[rows][];
-
-            Parallel.For(0, Rows, row =>
-            {
-                this[row] = new Fraction[columns];
-                Parallel.For(0, this[row].Length, column => this[row][column] = values(row, column));
-            });
-        }
-
-        private Matrix(Fraction[][] fractionMatrix)
-        {
-            FractionMatrix = fractionMatrix.ThrowIfNull();
-        }
-
-        protected internal Matrix(SerializationInfo info, StreamingContext context) : this((Fraction[][])info.GetValue(nameof(FractionMatrix), typeof(Fraction[][]))) { }
-
-        public Matrix(int rows, int columns) : this(Enumerable.Range(0, rows).Select(row => new Fraction[columns]).ToArray()) { }
+        protected internal Matrix(SerializationInfo info, StreamingContext context)
+            : this((Fraction[][])info.GetValue(nameof(FractionMatrix), typeof(Fraction[][]))) { }
 
         #endregion Constructors
         #region StaticMethods
@@ -144,14 +132,16 @@ namespace RaspMat.Models
 
         public static Matrix operator *(Matrix matrix, Fraction scalar) => scalar * matrix;
 
-        public static Matrix operator *(Matrix left, Matrix right)
+        public static Matrix operator *(Matrix multiplicand, Matrix multiplier)
         {
-            if (left.Columns != right.Rows) throw new InvalidOperationException(nameof(left.Columns));
-
-            return new Matrix(left.Rows, right.Columns, (row, column) =>
+            return multiplicand.Columns == multiplier.Rows ? new Matrix(multiplicand.Rows, multiplier.Columns, (row, column) =>
             {
-                return Enumerable.Range(0, left.Columns).Select(cell => left[row, cell] * right[cell, column]).Aggregate((x, y) => x + y);
-            });
+                return
+                    Enumerable.Range(0, multiplicand.Columns)
+                    .Select(cell => multiplicand[row, cell] * multiplier[cell, column])
+                    .Aggregate((left, right) => left + right)
+                    ;
+            }) : throw new InvalidOperationException(nameof(multiplicand.Columns));
         }
 
         /// <summary>
@@ -249,9 +239,7 @@ namespace RaspMat.Models
         /// <exception cref="ArgumentException"><see cref="IsSquare"/> is <see langword="false"/>.</exception>
         public Matrix WithIdentity(bool onLeft)
         {
-            if (!IsSquare) throw new ArgumentException(nameof(IsSquare));
-
-            return new Matrix(Rows, Columns * 2, (row, column) =>
+            return IsSquare ? new Matrix(Rows, Columns * 2, (row, column) =>
             {
                 if (onLeft)
                 {
@@ -263,11 +251,11 @@ namespace RaspMat.Models
                     if (column < Columns) return this[row, column];
                     else return row == column - Columns ? 1 : 0;
                 }
-            });
+            }) : throw new InvalidOperationException(nameof(IsSquare));
         }
 
         /// <summary>
-        /// Creates a <see cref="DataTable"/> with its cells (<see langword="as"/> <see cref="string"/>) populated based on <see langword="this"/> <see cref="Matrix"/>.
+        /// Creates a <see cref="DataTable"/> with its cells (<see langword="as"/> <see cref="string"/>s) populated based on <see langword="this"/> <see cref="Matrix"/>.
         /// </summary>
         /// <returns>A <see langword="new"/> <see cref="DataTable"/>.</returns>
         public DataTable ToDataTable()
@@ -281,17 +269,17 @@ namespace RaspMat.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            var stringBuilder = new StringBuilder(Rows * 2 + Columns * 2 - 2);
+            var stringBuilder = new StringBuilder(Rows * 2 * (Columns * 2 - 2) - 2);
 
             for (var row = 0; row < Rows; row++)
             {
                 for (var column = 0; column < Columns; column++)
                 {
-                    stringBuilder.Append(this[row, column]);
-                    if (column < Columns - 1) stringBuilder.Append(COLUMN_SEPARATOR);
+                    stringBuilder.Append(this[row, column].ToString());
+                    if (column < Columns - 1) stringBuilder.Append(_columnSeparator);
                 }
 
-                if (row < Rows - 1) stringBuilder.AppendLine();
+                if (row < Rows - 1) stringBuilder.Append(_rowSeparator);
             }
 
             return stringBuilder.ToString();
@@ -300,61 +288,28 @@ namespace RaspMat.Models
         /// <inheritdoc/>
         public override bool Equals(object compared)
         {
-            if (!(compared is Matrix matrix) || Columns != matrix.Columns || Rows != matrix.Rows) return false;
-
-            var differences = 0;
-
-            Parallel.For(0, Rows, (row, rowLoop) =>
-            {
-                if (differences != 0) rowLoop.Stop();
-                Parallel.For(0, Columns, (column, columnLoop) =>
-                {
-                    if (differences != 0) columnLoop.Stop();
-                    else if (this[row, column] != matrix[row, column])
-                    {
-                        Interlocked.Increment(ref differences);
-                    }
-                });
-            });
-
-            return differences == 0;
+            return
+                compared is Matrix matrix &&
+                Columns == matrix.Columns &&
+                Rows == matrix.Rows &&
+                !FractionMatrix.AsParallel().Where((cells, row) => cells.AsParallel().Where((cell, column) => cell != matrix[row, column]).Any()).Any()
+                ;
         }
 
         /// <inheritdoc/>
         public override int GetHashCode()
         {
-            var iterateColumns = Columns > Rows;
-            var stop = iterateColumns ? Columns : Rows;
-            var total = 0;
-
-            for (var index = 0; index < stop; index++)
-            {
-                var hash = (iterateColumns ? this[0, index] : this[index, 0]).GetHashCode();
-                unchecked
-                {
-                    total += hash;
-                }
-            }
-
-            return total;
+            return
+                ParallelEnumerable.Range(0, Math.Max(Columns, Rows))
+                .Select(index => this[Math.Min(index, Rows - 1), Math.Min(index, Columns - 1)].GetHashCode())
+                .Aggregate((left, right) => unchecked(left + right))
+                ;
         }
 
         /// <inheritdoc/>
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue(nameof(FractionMatrix), FractionMatrix, FractionMatrix.GetType());
-        }
-
-        /// <inheritdoc/>
-        public virtual object Clone() => new Matrix(Rows, Columns, (row, column) => this[row, column]);
-
-        /// <summary>
-        /// Will <see langword="return"/> the <see cref="FractionMatrix"/> of <see langword="this"/> <see cref="Matrix"/> <see langword="as"/> <see cref="IEnumerable{T}"/>.
-        /// </summary>
-        /// <returns>An <see cref="IEnumerable{T}"/>.</returns>
-        public virtual IEnumerable<IEnumerable<Fraction>> AsEnumerable()
-        {
-            return FractionMatrix.Select(row => row.AsEnumerable());
         }
 
         #endregion Methods

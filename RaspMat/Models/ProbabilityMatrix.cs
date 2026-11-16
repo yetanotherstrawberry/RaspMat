@@ -63,11 +63,5 @@ namespace RaspMat.Models
             base.GetObjectData(info, context);
         }
 
-        /// <inheritdoc/>
-        public override object Clone()
-        {
-            return new ProbabilityMatrix(this, TransientIndexes.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key), ExitIndexes.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key));
-        }
-
     }
 }

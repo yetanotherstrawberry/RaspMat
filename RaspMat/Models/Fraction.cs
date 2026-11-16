@@ -62,7 +62,7 @@ namespace RaspMat.Models
         /// <exception cref="DivideByZeroException">Zero <paramref name="denominator"/>.</exception>
         public Fraction(BigInteger numerator, BigInteger denominator)
         {
-            if (denominator.IsZero) throw new DivideByZeroException(nameof(denominator));
+            if (denominator.IsZero) throw new DivideByZeroException();
 
             if (denominator.Sign < 0)
             {

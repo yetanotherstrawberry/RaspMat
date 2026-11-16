@@ -18,20 +18,27 @@
              IsEnabled="{Binding IsFree}">
     <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        <Grid.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <ResourceDictionary Source="pack://application:,,,/RaspMat;component/Resources/Styles.xaml" />
+                </ResourceDictionary.MergedDictionaries>
+
+                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                    <Setter Property="Height" Value="90" />
+                </Style>
+            </ResourceDictionary>
+        </Grid.Resources>
         <TextBox
             AcceptsReturn="True"
             Text="{Binding Input}"
             Grid.Row="0" />
         <StackPanel
-            Margin="3,4,3,0"
-            Grid.Row="1"
-            Orientation="Horizontal"
-            HorizontalAlignment="Center">
+            Grid.Row="1">
             <Button
-                Padding="3"
                 Content="{x:Static prop:Resources.OK}"
                 Command="{Binding SaveCommand}" />
         </StackPanel>
