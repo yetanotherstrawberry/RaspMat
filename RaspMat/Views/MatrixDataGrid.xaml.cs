@@ -3,15 +3,15 @@
 namespace RaspMat.Views
 {
     /// <summary>
-    /// Interaction logic for NewMatDialog.xaml
+    /// Interaction logic for <see cref="MatrixDataGrid"/>.
     /// </summary>
-    public partial class NewMatDialog : UserControl
+    internal partial class MatrixDataGrid : DataGrid
     {
 
         /// <summary>
         /// Initializes XAML.
         /// </summary>
-        public NewMatDialog()
+        public MatrixDataGrid()
         {
             InitializeComponent();
         }

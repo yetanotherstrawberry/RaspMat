@@ -1,24 +1,27 @@
-﻿using Prism.Events;
-using Prism.Mvvm;
-using RaspMat.Helpers;
+﻿using RaspMat.Extensions;
 using RaspMat.Models;
+using RaspMat.Services.Interfaces;
 using System.Collections.Generic;
 using System.Windows.Input;
+using static RaspMat.Models.Events;
 
 namespace RaspMat.ViewModels
 {
     /// <summary>
     /// ViewModel for the list of <see cref="AlgorithmStep{T}"/> where <c>T</c> is <see cref="Matrix"/>.
     /// </summary>
-    internal class StepListWindowViewModel : BindableBase
+    internal class StepListWindowViewModel : ViewModelBase, IEventReceiver<LoadStepsEvent>
     {
 
-        private readonly IEventAggregator _eventAggregator;
+        /// <summary>
+        /// Used for communication with other ViewModels.
+        /// </summary>
+        private readonly IEventService _eventService;
 
-        private void Update(ICollection<AlgorithmStep<Matrix>> steps)
-        {
-            Steps = steps;
-        }
+        /// <summary>
+        /// Used for the creation of <see cref="ICommand"/>s.
+        /// </summary>
+        private readonly ICommandingService _commandingService;
 
         /// <summary>
         /// Steps of the algorithm shown to the user.
@@ -28,6 +31,10 @@ namespace RaspMat.ViewModels
             get => _steps;
             private set => SetProperty(ref _steps, value);
         }
+
+        /// <summary>
+        /// Field for <see cref="Steps"/>.
+        /// </summary>
         private ICollection<AlgorithmStep<Matrix>> _steps;
 
         /// <summary>
@@ -37,23 +44,25 @@ namespace RaspMat.ViewModels
         {
             get
             {
-                if (_loadMatrix is null)
-                {
-                    _loadMatrix = new AsyncDelegateCommand<Matrix>(_eventAggregator.GetEvent<Events.LoadMatrixEvent>().Publish);
-                }
+                if (_loadMatrix is null) _loadMatrix = _commandingService.CreateFromAction<Matrix>(action: matrix => _eventService.Send(new LoadMatrixEvent(matrix)));
                 return _loadMatrix;
             }
         }
-        private ICommand _loadMatrix;
 
         /// <summary>
-        /// Creates a new instance of <see cref="StepListWindowViewModel"/> with <paramref name="steps"/> for a <see cref="Matrix"/>.
+        /// Field for <see cref="LoadMatrix"/>.
         /// </summary>
-        /// <param name="eventAggregator">Event aggregator that will use <see cref="Events.LoadStepsEvent"/> to update <see cref="Steps"/>.</param>
-        public StepListWindowViewModel(IEventAggregator eventAggregator)
+        private ICommand _loadMatrix;
+
+        /// <inheritdoc/>
+        public void Receive(LoadStepsEvent value) => Steps = value.Data;
+
+        public StepListWindowViewModel(IEventService eventService, ICommandingService commandingService)
         {
-            _eventAggregator = eventAggregator;
-            _eventAggregator.GetEvent<Events.LoadStepsEvent>().Subscribe(Update);
+            _eventService = eventService.ThrowIfNull();
+            _commandingService = commandingService.ThrowIfNull();
+
+            _eventService.Subscribe<StepListWindowViewModel, LoadStepsEvent>(this);
         }
 
     }

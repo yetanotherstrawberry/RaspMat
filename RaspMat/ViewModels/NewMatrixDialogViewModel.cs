@@ -1,0 +1,104 @@
+﻿using RaspMat.Extensions;
+using RaspMat.Models;
+using RaspMat.Services.Interfaces;
+using System.Windows.Input;
+using static RaspMat.Models.Events;
+
+namespace RaspMat.ViewModels
+{
+    /// <summary>
+    /// ViewModel for creating a <see cref="Matrix"/>.
+    /// </summary>
+    internal class NewMatrixDialogViewModel : ViewModelBase
+    {
+
+        /// <summary>
+        /// Used for communication with the UI.
+        /// </summary>
+        private readonly IViewService _viewService;
+
+        /// <summary>
+        /// Used for communication between ViewModels.
+        /// </summary>
+        private readonly IEventService _eventService;
+
+        /// <summary>
+        /// Used for creating the <see cref="ICommand"/>s.
+        /// </summary>
+        private readonly ICommandingService _commandingService;
+
+        /// <summary>
+        /// Creates a new <see cref="Matrix"/> and calls <see cref="LoadMatrixEvent"/>.
+        /// </summary>
+        public ICommand CloseDialogCommand
+        {
+            get
+            {
+                if (_closeDialogCommand is null)
+                {
+                    _closeDialogCommand = _commandingService.CreateFromAction(() => IsFree = false, () =>
+                    {
+                        _eventService.Send(new LoadMatrixEvent(new Matrix(Rows, Columns, (row, column) => Fill)));
+                        _viewService.ToggleNewMatrixDialog();
+                    }, () => IsFree = true);
+                }
+                return _closeDialogCommand;
+            }
+        }
+
+        /// <summary>
+        /// Field for <see cref="CloseDialogCommand"/>.
+        /// </summary>
+        private ICommand _closeDialogCommand;
+
+        /// <summary>
+        /// Number of rows.
+        /// </summary>
+        public ushort Rows
+        {
+            get => _rows;
+            set => SetProperty(ref _rows, value);
+        }
+
+        /// <summary>
+        /// Field for <see cref="Rows"/>.
+        /// </summary>
+        private ushort _rows = 3;
+
+        /// <summary>
+        /// Number of columns.
+        /// </summary>
+        public ushort Columns
+        {
+            get => _columns;
+            set => SetProperty(ref _columns, value);
+        }
+
+        /// <summary>
+        /// Field for <see cref="Columns"/>.
+        /// </summary>
+        private ushort _columns = 3;
+
+        /// <summary>
+        /// Indicated whether the result should be filled with zeros.
+        /// </summary>
+        public Fraction Fill
+        {
+            get => _fill;
+            set => SetProperty(ref _fill, value);
+        }
+
+        /// <summary>
+        /// Field for <see cref="Fill"/>.
+        /// </summary>
+        private Fraction _fill = new Fraction(3, 4);
+
+        public NewMatrixDialogViewModel(ICommandingService commandingService, IEventService eventService, IViewService viewService)
+        {
+            _eventService = eventService.ThrowIfNull();
+            _commandingService = commandingService.ThrowIfNull();
+            _viewService = viewService.ThrowIfNull();
+        }
+
+    }
+}

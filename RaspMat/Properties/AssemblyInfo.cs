@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 using System.Windows;
 
 [assembly: AssemblyTitle("RaspMat")]
-[assembly: AssemblyDescription("User interface for performing algebra operations.")]
+[assembly: AssemblyDescription("User interface for algebra.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("RaspMat")]
-[assembly: AssemblyCopyright("Copyright © yetanotherstrawberry 2020-2024")]
+[assembly: AssemblyCopyright("Copyright © yetanotherstrawberry 2020-2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -1,9 +1,12 @@
-﻿namespace RaspMat.Views
+﻿using System;
+using System.Windows;
+
+namespace RaspMat.Views
 {
     /// <summary>
     /// Interaction logic for <see cref="MainWindow"/>.
     /// </summary>
-    public partial class MainWindow : CommonWindow
+    internal partial class MainWindow : WindowBase
     {
 
         /// <summary>

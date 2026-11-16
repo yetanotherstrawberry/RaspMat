@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RaspMat.Services.Interfaces;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -11,31 +12,40 @@ namespace RaspMat.Services
     internal class JsonSerializationService : ISerializationService
     {
 
+        /// <summary>
+        /// Used to access the files.
+        /// </summary>
         private readonly IFileService _fileService;
-        private readonly JsonSerializer serializer = new JsonSerializer();
 
-        public async Task<TDeserialized> Deserialize<TDeserialized>() where TDeserialized : class // Constraint forces value to be nullable.
+        /// <summary>
+        /// Used for (de)serialization.
+        /// </summary>
+        private readonly JsonSerializer _serializer = JsonSerializer.CreateDefault();
+
+        /// <inheritdoc/>
+        public async Task<TDeserialized> DeserializeAsync<TDeserialized>() where TDeserialized : class
         {
-            var stream = await _fileService.OpenFileAsync();
+            var stream = await _fileService.OpenFileAsync().ConfigureAwait(false);
             if (stream is null) return null; // No file selected by the user.
 
             using (stream)
             using (var reader = new StreamReader(stream))
             using (var jsonReader = new JsonTextReader(reader))
             {
-                return serializer.Deserialize<TDeserialized>(jsonReader);
+                return await Task.Run(() => _serializer.Deserialize<TDeserialized>(jsonReader)).ConfigureAwait(false);
             }
         }
 
-        public async Task Serialize<TDeserialized>(TDeserialized serialized) where TDeserialized : class
+        /// <inheritdoc/>
+        public async Task SerializeAsync<TDeserialized>(TDeserialized serialized) where TDeserialized : class
         {
-            var stream = await _fileService.NewFileAsync();
+            var stream = await _fileService.NewFileAsync().ConfigureAwait(false);
             if (stream is null) return; // No file selected - cancel silently.
 
             using (stream)
             using (var writer = new StreamWriter(stream))
             {
-                serializer.Serialize(writer, serialized);
+                await Task.Run(() => _serializer.Serialize(writer, serialized)).ConfigureAwait(false);
             }
         }
 
@@ -45,7 +55,7 @@ namespace RaspMat.Services
         /// <param name="fileService">A service used for streaming the (de)serialized data.</param>
         public JsonSerializationService(IFileService fileService)
         {
-            _fileService = fileService;
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         }
 
     }
